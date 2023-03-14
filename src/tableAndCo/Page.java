@@ -27,10 +27,14 @@ public class Page implements Serializable{
         return this.pageTuples.size();
     }
     public void insertIntoPage(Hashtable<String,String> tuple) {
+        for (Integer i = 0; i < pageTuples.size(); i++)
+        {
+            //adjust the sorting to insert the tuple in its correct table
+        }
         //pageTuples.add(tuple);
     }
     public void deleteFromPage(Hashtable<String,String> tuple) {
-
+        pageTuples.remove(tuple);
     }
 
     public int getMaxSizePerPage() {
