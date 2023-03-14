@@ -1,10 +1,10 @@
 import exceptions.DBAppException;
 import SQLTerm.SQLTerm;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class DBApp {
-
+public class DBApp implements Serializable {
 
     public void init(){
 
