@@ -1,4 +1,6 @@
 package pagesAndRelated;
 
-public class Tuple {
+import java.io.*;
+
+public class Tuple implements Serializable {
 }
