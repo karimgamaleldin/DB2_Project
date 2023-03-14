@@ -23,8 +23,14 @@ public class Page implements Serializable{
     public boolean isPageEmpty(){
         return this.pageTuples.isEmpty();
     }
-    public int sizeOfPage(){
+    public int sizeOfPage() {
         return this.pageTuples.size();
+    }
+    public void insertIntoPage(Hashtable<String,String> tuple) {
+        //pageTuples.add(tuple);
+    }
+    public void deleteFromPage(Hashtable<String,String> tuple) {
+
     }
 
 }
