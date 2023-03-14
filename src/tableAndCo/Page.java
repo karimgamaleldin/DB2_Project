@@ -29,7 +29,7 @@ public class Page implements Serializable{
     public void insertIntoPage(Hashtable<String,String> tuple) {
         for (Integer i = 0; i < pageTuples.size(); i++)
         {
-            //adjust the sorting to insert the tuple in its correct table
+            //adjust the sorting to insert the tuple in its correct position
         }
         //pageTuples.add(tuple);
     }
