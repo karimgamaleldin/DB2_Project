@@ -33,4 +33,27 @@ public class Page implements Serializable{
 
     }
 
+    public int getMaxSizePerPage() {
+        return maxSizePerPage;
+    }
+
+    public String getFile_path() {
+        return file_path;
+    }
+
+    public Vector<Tuple> getPageTuples() {
+        return pageTuples;
+    }
+
+    public void setMaxSizePerPage(int maxSizePerPage) {
+        this.maxSizePerPage = maxSizePerPage;
+    }
+
+    public void setFile_path(String file_path) {
+        this.file_path = file_path;
+    }
+
+    public void setPageTuples(Vector<Tuple> pageTuples) {
+        this.pageTuples = pageTuples;
+    }
 }

@@ -15,4 +15,36 @@ public class Table implements Serializable {
         this.tuplesSize = tuplesSize;
         this.maxPageSize = maxPageSize;
     }
+
+    public void setTablePages(Vector<String> tablePages) {
+        this.tablePages = tablePages;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public void setTuplesSize(int tuplesSize) {
+        this.tuplesSize = tuplesSize;
+    }
+
+    public void setMaxPageSize(int maxPageSize) {
+        this.maxPageSize = maxPageSize;
+    }
+
+    public Vector<String> getTablePages() {
+        return tablePages;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public int getTuplesSize() {
+        return tuplesSize;
+    }
+
+    public int getMaxPageSize() {
+        return maxPageSize;
+    }
 }
