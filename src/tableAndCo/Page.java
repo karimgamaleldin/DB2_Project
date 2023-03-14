@@ -4,7 +4,7 @@ import java.util.*;
 
 
 public class Page implements Serializable{
-    // if a field is not serializable it is marked as transistent
+    // if a field is not serializable it is marked as transient
     private int maxSizePerPage;
     private String file_path;
     private Vector<Tuple> pageTuples;

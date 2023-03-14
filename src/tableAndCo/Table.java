@@ -1,8 +1,9 @@
 package tableAndCo;
 
+import java.io.Serializable;
 import java.util.Vector;
 
-public class Table {
+public class Table implements Serializable {
     private Vector<String> tablePages; // Contain the file names of the pages
     private String tableName;
     private int tuplesSize;
