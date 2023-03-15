@@ -11,14 +11,19 @@ public class DBApp implements Serializable {
     private Vector<String> tableNames;
     private Metadata metaData;
 
-
     public DBApp(){
-        tableNames = new Vector<String>();
+        this.tableNames = new Vector<String>();
         init();
     }
     public void init(){
+        try {
+            metaData = new Metadata("data/metadata.csv");
 
-    };
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
+
+    }
 
 
 
