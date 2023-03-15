@@ -1,6 +1,4 @@
 import exceptions.DBAppException;
-import SQLTerm.SQLTerm;
-import tableAndCo.Table;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,11 +7,19 @@ import java.io.Serializable;
 import java.util.*;
 
 public class DBApp implements Serializable {
-    private Table table;
 
+    private Vector<String> tableNames;
+
+
+    public DBApp(){
+        tableNames = new Vector<String>();
+
+    }
     public void init(){
 
     };
+
+
 
     public void createTable(String strTableName,
                             String strClusteringKeyColumn,
@@ -21,7 +27,20 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameMin,
                             Hashtable<String,String> htblColNameMax ) throws DBAppException {
 
-        MetaDataOperations.writeMetaData(
+        for(int i = 0;i<tableNames.size();i++){
+            if (tableNames.get(i).equals(strTableName)){
+                throw new DBAppException("This table already exists");
+            }
+        }
+
+        Set<Map.Entry<String, String>> entrySet = htblColNameType.entrySet();
+        for (Map.Entry<String, String> entry : entrySet) {
+            if (!isSupported(entry.getValue())){
+                throw new DBAppException("This data type is not supported");
+            }
+        }
+
+        Metadata.writeMetaData(
                 "metadata.csv",
                 strTableName,
                 strClusteringKeyColumn,
@@ -29,6 +48,9 @@ public class DBApp implements Serializable {
                 htblColNameMin,
                 htblColNameMax
         );
+        int maxPageSize = readFromConfig("MaximumRowsCountinTablePage");
+        //new Table();
+        tableNames.add(strTableName);
     }
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
 //
@@ -42,9 +64,35 @@ public class DBApp implements Serializable {
     public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
 
     }
-//    public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 //
-//    }
+//  }
+    public boolean isSupported(String dt){
+        HashSet<String> supportedDataTypes = new HashSet<String>();
+        supportedDataTypes.add("java.lang.Integer");
+        supportedDataTypes.add("java.lang.String");
+        supportedDataTypes.add("java.lang.Double");
+        supportedDataTypes.add("java.util.Date");
+        return supportedDataTypes.contains(dt);
+    }
+
+    public int readFromConfig(String cfgPath){
+        Properties prop = new Properties();
+        String fileName = "src/resources/DBApp.config";
+        try{
+            FileInputStream fis = new FileInputStream(fileName);
+            prop.load(fis);
+
+        }
+        catch(FileNotFoundException ex){
+            System.out.println(ex);
+        }
+        catch(IOException io){
+            System.out.println(io);
+        }
+        return Integer.parseInt(prop.getProperty(cfgPath));
+    }
+
     public static void main(String[] args) throws DBAppException, IOException {
         String strTableName = "CityShop";
         DBApp dbApp = new DBApp( );
@@ -76,15 +124,8 @@ public class DBApp implements Serializable {
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
 
 
-        Properties prop = new Properties();
-        String fileName = "./resources/DBApp.config";
-        try(FileInputStream fis = new FileInputStream(fileName)){
-            prop.load(fis);
-        }
-        catch(FileNotFoundException ex){
 
-        }
-        System.out.println(prop.getProperty("./resources/DBApp.MaximumRowsCountinTablePage"));
+
 
     }
 }

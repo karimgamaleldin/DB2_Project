@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class MetaDataOperations {
+public class Metadata {
     public static void writeMetaData(String filePath,
                                            String strTableName,
                                            String strClusteringKeyColumn,
