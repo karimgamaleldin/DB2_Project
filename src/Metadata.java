@@ -48,6 +48,9 @@ public class Metadata {
                 String isClusteringKeyStr = columnName.equals(strClusteringKeyColumn) ? "True" : "False";
                 String minColValue = htblColNameMin.get(columnName);
                 String maxColValue = htblColNameMax.get(columnName);
+                Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
+                Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
+                columnsOfMetaData.add(col);
                 sb.append(strTableName);
                 sb.append(",");
                 sb.append(columnName);

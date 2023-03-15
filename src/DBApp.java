@@ -40,8 +40,8 @@ public class DBApp implements Serializable {
                 throw new DBAppException("This data type is not supported");
             }
         }
-
-        Metadata.writeMetaData(
+        Metadata metadata = new Metadata("metadata.csv");
+        metadata.writeMetaData(
                 "metadata.csv",
                 strTableName,
                 strClusteringKeyColumn,
