@@ -2,6 +2,9 @@ import exceptions.DBAppException;
 import SQLTerm.SQLTerm;
 import tableAndCo.Table;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -42,7 +45,7 @@ public class DBApp implements Serializable {
 //    public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 //
 //    }
-    public static void main(String[] args) throws DBAppException {
+    public static void main(String[] args) throws DBAppException, IOException {
         String strTableName = "CityShop";
         DBApp dbApp = new DBApp( );
         Hashtable htblColNameType = new Hashtable( );
@@ -71,5 +74,17 @@ public class DBApp implements Serializable {
         htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
         htblColNameMax.put("Address","ZZZZZZZZZZZ" );
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+
+
+        Properties prop = new Properties();
+        String fileName = "./resources/DBApp.config";
+        try(FileInputStream fis = new FileInputStream(fileName)){
+            prop.load(fis);
+        }
+        catch(FileNotFoundException ex){
+
+        }
+        System.out.println(prop.getProperty("./resources/DBApp.MaximumRowsCountinTablePage"));
+
     }
 }
