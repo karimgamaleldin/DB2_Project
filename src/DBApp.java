@@ -1,5 +1,5 @@
 import exceptions.DBAppException;
-
+import tableAndCo.Table;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,11 +9,12 @@ import java.util.*;
 public class DBApp implements Serializable {
 
     private Vector<String> tableNames;
+    private Metadata metaData;
 
 
     public DBApp(){
         tableNames = new Vector<String>();
-
+        init();
     }
     public void init(){
 
@@ -49,13 +50,27 @@ public class DBApp implements Serializable {
                 htblColNameMax
         );
         int maxPageSize = readFromConfig("MaximumRowsCountinTablePage");
-        //new Table();
+        new Table(strTableName , htblColNameType.size() , maxPageSize);
         tableNames.add(strTableName);
     }
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
 //
 //    }
     public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
+        if (!tableNames.contains(strTableName)){
+            throw new DBAppException("This Table is not present");
+        }
+        int tupleSize = metaData.getTupleSize(strTableName);
+        Vector<String> columnNames = metaData.getColumnNames(strTableName);
+        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
+        if(entrySet.size() != columnNames.size()){
+            throw new DBAppException("There are missing or extra column(s)");
+        }
+        for (Map.Entry<String, Object> entry : entrySet) {
+            if(!columnNames.contains(entry.getKey())){
+                throw new DBAppException("The Column names aren't correct");
+            }
+        }
 
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws DBAppException{
@@ -93,6 +108,7 @@ public class DBApp implements Serializable {
         return Integer.parseInt(prop.getProperty(cfgPath));
     }
 
+
     public static void main(String[] args) throws DBAppException, IOException {
         String strTableName = "CityShop";
         DBApp dbApp = new DBApp( );
@@ -122,10 +138,5 @@ public class DBApp implements Serializable {
         htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
         htblColNameMax.put("Address","ZZZZZZZZZZZ" );
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-
-
-
-
-
     }
 }

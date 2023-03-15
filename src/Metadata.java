@@ -3,9 +3,17 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Vector;
 
 public class Metadata {
-    public static void writeMetaData(String filePath,
+    private String filePath;
+    private Vector<Column> columnsOfMetaData;
+
+    public Metadata(String filePath){
+        this.filePath = filePath;
+        this.columnsOfMetaData = new Vector<Column>();
+    }
+    public void writeMetaData(String filePath,
                                            String strTableName,
                                            String strClusteringKeyColumn,
                                            Hashtable<String,String> htblColNameType,
@@ -63,7 +71,81 @@ public class Metadata {
         } catch (Exception e) {
             System.out.println(e);
         }
-
+    }
+    public int getTupleSize(String tableName){
+        int size = 0;
+        for (int i = 0 ; i < columnsOfMetaData.size() ; i++){
+            if(columnsOfMetaData.get(i).getTableName().equals(tableName)){
+                size++;
+            }
+        }
+        return size;
+    }
+    public Vector<String> getColumnNames(String strTableName){
+        Vector<String> columnsNames = new Vector<String>();
+        for(int i = 0 ; i < this.columnsOfMetaData.size() ; i++){
+            Column currentColumn = this.columnsOfMetaData.get(i);
+            if(currentColumn.getTableName().equals(strTableName))
+                columnsNames.add(currentColumn.getColumnName());
+        }
+        return columnsNames;
     }
 
+    public String getColumnType(String tableName ,String columnName){
+        String type = "";
+        for(int i = 0 ; i < this.columnsOfMetaData.size(); i++){
+            Column currentColumn = this.columnsOfMetaData.get(i);
+            if(tableName.equals(currentColumn.getTableName()) && columnName.equals(currentColumn.getColumnName())){
+                type = currentColumn.getColumnType();
+                break;
+            }
+        }
+        return type;
+    }
+
+}
+
+class Column{
+    private String tableName;
+    private String columnName;
+    private String columnType;
+    private boolean isClusteringKey;
+    private Object min;
+    private Object max;
+
+    public Column(String tableName , String columnName , String columnType , boolean isClusteringKey , Object min, Object max){
+        this.tableName = tableName;
+        this.columnName = columnName;
+        this.columnType = columnType;
+        this.isClusteringKey = isClusteringKey;
+        this.min = min;
+        this.max = max;
+    }
+    public String toString() {
+        return tableName + "," + columnName + "," + columnType + "," + (isClusteringKey ? "True" : "False") + "," + min.toString()+ ","+max.toString();
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public String getColumnName() {
+        return columnName;
+    }
+
+    public String getColumnType() {
+        return columnType;
+    }
+
+    public boolean isClusteringKey() {
+        return isClusteringKey;
+    }
+
+    public Object getMin() {
+        return min;
+    }
+
+    public Object getMax() {
+        return max;
+    }
 }
