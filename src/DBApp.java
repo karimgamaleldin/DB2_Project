@@ -1,9 +1,7 @@
 import exceptions.DBAppException;
 import tableAndCo.Table;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
+
+import java.io.*;
 import java.util.*;
 
 public class DBApp implements Serializable {
@@ -24,8 +22,6 @@ public class DBApp implements Serializable {
         }
 
     }
-
-
 
     public void createTable(String strTableName,
                             String strClusteringKeyColumn,

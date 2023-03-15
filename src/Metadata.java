@@ -14,11 +14,11 @@ public class Metadata {
         this.columnsOfMetaData = new Vector<Column>();
     }
     public void writeMetaData(String filePath,
-                                           String strTableName,
-                                           String strClusteringKeyColumn,
-                                           Hashtable<String,String> htblColNameType,
-                                           Hashtable<String,String> htblColNameMin,
-                                           Hashtable<String,String> htblColNameMax)
+                              String strTableName,
+                              String strClusteringKeyColumn,
+                              Hashtable<String,String> htblColNameType,
+                              Hashtable<String,String> htblColNameMin,
+                              Hashtable<String,String> htblColNameMax)
     {
         try {
             PrintWriter pw= new PrintWriter(new File("./"+filePath));
