@@ -8,23 +8,23 @@ public class Page implements Serializable{
     private int maxSizePerPage;
     private String file_path;
     private Vector<Tuple> pageTuples;
-    private int minIndex;
-    private  int maxIndex;
+    private Object minVal;
+    private Object maxVal;
 
-    public int getMinIndex() {
-        return minIndex;
+    public Object getMinVal() {
+        return minVal;
     }
 
-    public void setMinIndex(int minIndex) {
-        this.minIndex = minIndex;
+    public void setMinVal(Object minVal) {
+        this.minVal = minVal;
     }
 
-    public int getMaxIndex() {
-        return maxIndex;
+    public Object getMaxVal() {
+        return maxVal;
     }
 
-    public void setMaxIndex(int maxIndex) {
-        this.maxIndex = maxIndex;
+    public void setMaxVal(Object maxVal) {
+        this.maxVal = maxVal;
     }
 
     public Page(String path , int maxSizePerPage) {

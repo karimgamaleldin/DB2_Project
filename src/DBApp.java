@@ -8,7 +8,6 @@ import java.util.*;
 public class DBApp implements Serializable {
     private Table table;
 
-
     public void init(){
 
     };
@@ -18,6 +17,7 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameType,
                             Hashtable<String,String> htblColNameMin,
                             Hashtable<String,String> htblColNameMax ) throws DBAppException {
+
         MetaDataOperations.writeMetaData(
                 "metadata.csv",
                 strTableName,

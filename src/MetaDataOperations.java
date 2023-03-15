@@ -32,7 +32,8 @@ public class MetaDataOperations {
             sb.append(",");
             sb.append("max");
             sb.append("\r\n");
-            Set<Entry<String, String> > entrySet = htblColNameType.entrySet();
+
+            Set<Entry<String, String>> entrySet = htblColNameType.entrySet();
             for (Entry<String, String> entry : entrySet) {
                 String columnName = entry.getKey();
                 String dataType = entry.getValue();
