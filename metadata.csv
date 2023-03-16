@@ -1,0 +1,22 @@
+Table Name,Column Name,Column Type,ClusteringKey,IndexName,IndexType,min,max
+CityShop,Specialization,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop,Name,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop,ID,java.lang.Integer,True,null,null,0,10000
+CityShop,Z,java.lang.Double,False,null,null,0,10000
+CityShop,Y,java.lang.Double,False,null,null,0,10000
+CityShop,Address,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop,X,java.lang.Double,False,null,null,0,10000
+CityShop2,Specialization,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop2,Name,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop2,ID,java.lang.Integer,True,null,null,0,10000
+CityShop2,Z,java.lang.Double,False,null,null,0,10000
+CityShop2,Y,java.lang.Double,False,null,null,0,10000
+CityShop2,Address,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop2,X,java.lang.Double,False,null,null,0,10000
+CityShop3,Specialization,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop3,Name,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop3,ID,java.lang.Integer,True,null,null,0,10000
+CityShop3,Z,java.lang.Double,False,null,null,0,10000
+CityShop3,Y,java.lang.Double,False,null,null,0,10000
+CityShop3,Address,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
+CityShop3,X,java.lang.Double,False,null,null,0,10000
