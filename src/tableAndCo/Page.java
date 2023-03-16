@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
+    private int pageID;
     private int maxSizePerPage;
     private String file_path;
     private Vector<Tuple> pageTuples;
@@ -34,8 +35,11 @@ public class Page implements Serializable{
 
 
     // some helper methods
+    public int getSizeOfPage(){
+        return this.pageTuples.size();
+    }
     public boolean isPageFull(){
-        return this.pageTuples.size() == this.maxSizePerPage;
+        return this.getSizeOfPage() == this.maxSizePerPage;
     }
     public boolean isPageEmpty(){
         return this.pageTuples.isEmpty();
@@ -43,12 +47,40 @@ public class Page implements Serializable{
     public int sizeOfPage() {
         return this.pageTuples.size();
     }
-    public void insertIntoPage(Hashtable<String,String> tuple) {
-        for (Integer i = 0; i < pageTuples.size(); i++)
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple) {
+        boolean wasFull = this.isPageFull();
+        Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
+        Tuple insertedTuple = new Tuple(tuple, clusteringKey);
+        int start = 0 ;
+        int end = this.getSizeOfPage() - 1;
+        while(start <= end)
         {
             //adjust the sorting to insert the tuple in its correct position
+//            Tuple currentTuple = this.pageTuples.get(i);
+//            if(insertedTuple.compareTo(currentTuple) < 0){
+//                this.pageTuples.add(i , insertedTuple);
+//                break;
+//            } else if (i == this.getSizeOfPage() - 1){
+//                this.pageTuples.add(insertedTuple);
+//            }
+            int mid = (start + end) / 2;
+            Tuple currentTuple = this.pageTuples.get(mid);
+            if (insertedTuple.compareTo(currentTuple) > 0) {
+                start = mid + 1;
+            }
+            else if (insertedTuple.compareTo(currentTuple) < 0){
+                if ( mid == this.getSizeOfPage() - 1 ) {
+                    this.pageTuples.add(insertedTuple);
+                }
+                else if (insertedTuple.compareTo(this.pageTuples.get(mid + 1)) > 0) {
+                    this.pageTuples.add(mid+1,insertedTuple);
+                }
+                else {
+                    end = mid ;
+                }
+            }
         }
-        //pageTuples.add(tuple);
+        return lastTuple;
     }
     public void deleteFromPage(Hashtable<String,String> tuple) {
         pageTuples.remove(tuple);
