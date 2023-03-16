@@ -47,9 +47,7 @@ public class Page implements Serializable{
     public boolean isPageEmpty(){
         return this.pageTuples.isEmpty();
     }
-    public int sizeOfPage() {
-        return this.pageTuples.size();
-    }
+
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) {
         boolean wasFull = this.isPageFull();
         Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
@@ -72,15 +70,29 @@ public class Page implements Serializable{
                 start = mid + 1;
             }
             else if (insertedTuple.compareTo(currentTuple) < 0){
-                if ( mid == this.getSizeOfPage() - 1 ) {
-                    this.pageTuples.add(insertedTuple);
+//                if ( mid == this.getSizeOfPage() - 1 ) {
+//                    this.pageTuples.add(mid,insertedTuple);
+//                }
+//                else if (insertedTuple.compareTo(this.pageTuples.get(mid + 1)) > 0) {
+//                    this.pageTuples.add(mid+1,insertedTuple);
+//                }
+//                else {
+//                    end = mid ;
+//                }
+                boolean isInserted = false;
+                for(int i=mid;i>=start;i--){
+                    currentTuple = this.pageTuples.get(i);
+                    if(insertedTuple.compareTo(currentTuple)>0){
+                        this.pageTuples.add(i+1,insertedTuple);
+                        isInserted=true;
+                        break;
+                    }
                 }
-                else if (insertedTuple.compareTo(this.pageTuples.get(mid + 1)) > 0) {
-                    this.pageTuples.add(mid+1,insertedTuple);
+                if(!isInserted){
+                    this.pageTuples.add(start-1,insertedTuple);
                 }
-                else {
-                    end = mid ;
-                }
+            }else {
+                this.pageTuples.add(mid,insertedTuple);
             }
         }
         return lastTuple;
