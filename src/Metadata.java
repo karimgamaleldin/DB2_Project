@@ -86,9 +86,8 @@ public class Metadata {
                 sb.append("\r\n");
                 System.out.println(sb);
             }
-           fw.append(sb.toString()).flush();
 
-
+            fw.append(sb.toString()).flush();
             System.out.println("finished");
         } catch (Exception e) {
             System.out.println(e);
