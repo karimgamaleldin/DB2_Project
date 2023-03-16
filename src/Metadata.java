@@ -53,7 +53,7 @@ public class Metadata {
     {
         try {
 
-            fw= new FileWriter(metafile,true);
+//            fw= new FileWriter(metafile,true);
             StringBuilder sb= new StringBuilder();
 
             Set<Entry<String, String>> entrySet = htblColNameType.entrySet();
@@ -83,7 +83,7 @@ public class Metadata {
                 sb.append(",");
                 sb.append(maxColValue);
                 sb.append("\r\n");
-                System.out.println(sb);
+
             }
 
             fw.append(sb.toString()).flush();
