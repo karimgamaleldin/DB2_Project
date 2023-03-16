@@ -1,19 +1,50 @@
-import java.io.File;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
+
 public class Metadata {
     private String filePath;
     private Vector<Column> columnsOfMetaData;
+    private File metafile;
+    private FileWriter fw;
 
-    public Metadata(String filePath){
+
+    public Metadata(String filePath) throws IOException {
         this.filePath = filePath;
         this.columnsOfMetaData = new Vector<Column>();
+        this.metafile=new File("./"+filePath);
+        this.fw=new FileWriter(metafile);
+        writeHeaders();
     }
-    public void writeMetaData(String filePath,
+    public void writeHeaders() throws IOException {
+
+        StringBuilder sb= new StringBuilder();
+        //Table Name, Column Name, Column Type, ClusteringKey, IndexName,IndexType, min, max
+        sb.append("Table Name");
+        sb.append(",");
+        sb.append("Column Name");
+        sb.append(",");
+        sb.append("Column Type");
+        sb.append(",");
+        sb.append("ClusteringKey");
+        sb.append(",");
+        sb.append("IndexName");
+        sb.append(",");
+        sb.append("IndexType");
+        sb.append(",");
+        sb.append("min");
+        sb.append(",");
+        sb.append("max");
+        sb.append("\r\n");
+        fw.write(sb.toString());
+
+
+    }
+
+    public void writeMetaData(
                               String strTableName,
                               String strClusteringKeyColumn,
                               Hashtable<String,String> htblColNameType,
@@ -21,27 +52,13 @@ public class Metadata {
                               Hashtable<String,String> htblColNameMax)
     {
         try {
-            PrintWriter pw= new PrintWriter(new File("./"+filePath));
+
+            fw= new FileWriter(metafile,true);
             StringBuilder sb= new StringBuilder();
-            //Table Name, Column Name, Column Type, ClusteringKey, IndexName,IndexType, min, max
-            sb.append("Table Name");
-            sb.append(",");
-            sb.append("Column Name");
-            sb.append(",");
-            sb.append("Column Type");
-            sb.append(",");
-            sb.append("ClusteringKey");
-            sb.append(",");
-            sb.append("IndexName");
-            sb.append(",");
-            sb.append("IndexType");
-            sb.append(",");
-            sb.append("min");
-            sb.append(",");
-            sb.append("max");
-            sb.append("\r\n");
+
 
             Set<Entry<String, String>> entrySet = htblColNameType.entrySet();
+
             for (Entry<String, String> entry : entrySet) {
                 String columnName = entry.getKey();
                 String dataType = entry.getValue();
@@ -67,9 +84,11 @@ public class Metadata {
                 sb.append(",");
                 sb.append(maxColValue);
                 sb.append("\r\n");
+                System.out.println(sb);
             }
-            pw.write(sb.toString());
-            pw.close();
+           fw.write(sb.toString());
+
+
             System.out.println("finished");
         } catch (Exception e) {
             System.out.println(e);

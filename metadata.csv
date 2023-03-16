@@ -1,8 +1,0 @@
-Table Name,Column Name,Column Type,ClusteringKey,IndexName,IndexType,min,max
-CityShop,Specialization,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
-CityShop,Name,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
-CityShop,ID,java.lang.Integer,True,null,null,0,10000
-CityShop,Z,java.lang.Double,False,null,null,0,10000
-CityShop,Y,java.lang.Double,False,null,null,0,10000
-CityShop,Address,java.lang.String,False,null,null,A,ZZZZZZZZZZZ
-CityShop,X,java.lang.Double,False,null,null,0,10000

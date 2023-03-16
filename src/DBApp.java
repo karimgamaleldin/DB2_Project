@@ -6,7 +6,7 @@ import java.util.*;
 
 public class DBApp implements Serializable {
 
-    private Vector<Table> tables;
+    private static Vector<Table> tables;
     private Metadata metaData;
 
     public DBApp(){
@@ -15,7 +15,7 @@ public class DBApp implements Serializable {
     }
     public void init(){
         try {
-            metaData = new Metadata("data/metadata.csv");
+            metaData = new Metadata("metadata.csv");
 
         }catch(Exception e){
             System.out.println(e.getMessage());
@@ -27,7 +27,7 @@ public class DBApp implements Serializable {
                             String strClusteringKeyColumn,
                             Hashtable<String,String> htblColNameType,
                             Hashtable<String,String> htblColNameMin,
-                            Hashtable<String,String> htblColNameMax ) throws DBAppException {
+                            Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException {
 
         for(int i = 0; i< tables.size(); i++){
             String currentTableName = tables.get(i).getTableName();
@@ -42,9 +42,8 @@ public class DBApp implements Serializable {
                 throw new DBAppException("This data type is not supported");
             }
         }
-        Metadata metadata = new Metadata("metadata.csv");
-        metadata.writeMetaData(
-                "metadata.csv",
+//        Metadata metadata = new Metadata("metadata.csv");
+        metaData.writeMetaData(
                 strTableName,
                 strClusteringKeyColumn,
                 htblColNameType,
@@ -133,6 +132,8 @@ public class DBApp implements Serializable {
 
     public static void main(String[] args) throws DBAppException, IOException {
         String strTableName = "CityShop";
+        String strTableName2="CityShop2";
+        String strTableName3="CityShop3";
         DBApp dbApp = new DBApp( );
         Hashtable htblColNameType = new Hashtable( );
         htblColNameType.put("ID", "java.lang.Integer");
@@ -159,6 +160,38 @@ public class DBApp implements Serializable {
         htblColNameMax.put("Z", "10000");
         htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
         htblColNameMax.put("Address","ZZZZZZZZZZZ" );
+
+
+        Hashtable htblColNameType2 = new Hashtable( );
+        htblColNameType.put("ID", "java.lang.Integer");
+        htblColNameType.put("Name", "java.lang.String");
+        htblColNameType.put("X", "java.lang.Double");
+        htblColNameType.put("Y", "java.lang.Double");
+        htblColNameType.put("Z", "java.lang.Double");
+        htblColNameType.put("Specialization", "java.lang.String");
+        htblColNameType.put("Address", "java.lang.String");
+
+        Hashtable htblColNameMin2 = new Hashtable();
+        htblColNameMin.put("ID", "0");
+        htblColNameMin.put("Name", "A");
+        htblColNameMin.put("X", "0");
+        htblColNameMin.put("Y", "0");
+        htblColNameMin.put("Z", "0");
+        htblColNameMin.put("Specialization", "A");
+        htblColNameMin.put("Address", "A");
+        Hashtable htblColNameMax2 = new Hashtable();
+        htblColNameMax.put("ID", "10000");
+        htblColNameMax.put("Name", "ZZZZZZZZZZZ");
+        htblColNameMax.put("X", "10000");
+        htblColNameMax.put("Y", "10000");
+        htblColNameMax.put("Z", "10000");
+        htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
+        htblColNameMax.put("Address","ZZZZZZZZZZZ" );
+
+
+
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+        dbApp.createTable( strTableName2, "ID", htblColNameType2, htblColNameMin2, htblColNameMax2 );
+
     }
 }
