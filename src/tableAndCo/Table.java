@@ -1,27 +1,31 @@
 package tableAndCo;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Hashtable;
 import java.util.Vector;
 
 public class Table implements Serializable {
-    private Vector<String> tablePages; // Contain the file names of the pages
+    private Vector<Page> tablePages; // Contain the unloaded pages
     private String tableName;
     private int tuplesSize;
-    private int maxPageSize;
+    private int maxSizePerPage;
     private int numberOfTuples;
     private int numberOfPages;
     private String clusteringKey;
+    private int nextPageID;
 
     public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey){
         this.tableName = tableName;
-        this.tablePages = new Vector<String>();
+        this.tablePages = new Vector<Page>();
         this.tuplesSize = tuplesSize;
-        this.maxPageSize = maxPageSize;
+        this.maxSizePerPage = maxPageSize;
         this.numberOfPages = 0;
         this.numberOfTuples = 0;
         this.clusteringKey = clusteringKey;
+        this.nextPageID = 0;
     }
-    public Vector<String> getTablePages() {
+    public Vector<Page> getTablePages() {
         return tablePages;
     }
 
@@ -33,13 +37,42 @@ public class Table implements Serializable {
         return tuplesSize;
     }
 
-    public int getMaxPageSize() {
-        return maxPageSize;
+    public int getMaxSizePerPage() {
+        return maxSizePerPage;
+    }
+
+    public String getClusteringKey() {
+        return clusteringKey;
+    }
+
+    public void setClusteringKey(String clusteringKey) {
+        this.clusteringKey = clusteringKey;
+    }
+    public boolean isTableEmpty() {
+        return this.getTablePages().isEmpty();
+    }
+    public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException {
+        if(isTableEmpty()){
+            Page page = createNewPage();
+            page.insertIntoPage(htblColNameValue);
+            return;
+        }
+        int start =0;
+        int end = this.getTablePages().size()-1;
+        while(start<=end){
+            int mid = (start + end) / 2;
+
+        }
     }
     public boolean needsNewPage(){
-        return numberOfTuples == (maxPageSize * numberOfPages);
+        return numberOfTuples == (maxSizePerPage * numberOfPages);
     }
-    public void createNewPage(){
+    public Page createNewPage(){
+        String path = "page"+nextPageID;
+        Page page = new Page(nextPageID,path,maxSizePerPage);
+        nextPageID++;
+        this.getTablePages().add(page);
+        return page;
         // method to create new page
 
     }

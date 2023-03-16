@@ -5,19 +5,21 @@ import java.util.*;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
-    private int pageID;
-    private int maxSizePerPage;
-    private String file_path;
+    protected int pageID;
+    protected int maxSizePerPage;
+    protected String filepath;
     private Vector<Tuple> pageTuples;
-    private Object minVal;
-    private Object maxVal;
-    private String clusteringKey;
+    protected Object minVal;
+    protected Object maxVal;
+    protected String clusteringKey;
 
-    public Page(int pageID, String path , int maxSizePerPage) {
+    public Page(int pageID, String filepath , int maxSizePerPage) {
         this.pageID = pageID;
-        this.pageTuples = new Vector<>();
+//        this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        this.file_path = path + ".class" ;
+        this.filepath = filepath + ".class" ;
+        this.minVal = null;
+        this.maxVal = null;
     }
 
     public Object getMinVal() {
@@ -40,15 +42,30 @@ public class Page implements Serializable{
     // some helper methods
     public int getSizeOfPage(){
         return this.pageTuples.size();
-    }
+   }
     public boolean isPageFull(){
         return this.getSizeOfPage() == this.maxSizePerPage;
     }
     public boolean isPageEmpty(){
         return this.pageTuples.isEmpty();
     }
+    public void loadIntoPage() throws IOException, ClassNotFoundException {
+        FileInputStream file = new FileInputStream(this.getFilepath());
+        ObjectInputStream on = new ObjectInputStream(file);
+        this.setPageTuples((Vector<Tuple>) on.readObject());
+    }
 
-    public Tuple insertIntoPage(Hashtable<String,Object> tuple) {
+    public void saveIntoPageFilepath() throws IOException {
+        //save the newly inserted tuple in the file itself
+        FileOutputStream file = new FileOutputStream(this.getFilepath());
+        ObjectOutputStream out = new ObjectOutputStream(file);
+        out.writeObject(this.getPageTuples());
+        out.close();
+        file.close();
+        this.setPageTuples(null);
+    }
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
+        loadIntoPage();
         boolean wasFull = this.isPageFull();
         Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
         Tuple insertedTuple = new Tuple(tuple, clusteringKey);
@@ -95,6 +112,19 @@ public class Page implements Serializable{
                 this.pageTuples.add(mid,insertedTuple);
             }
         }
+        if(start>end) {
+            this.pageTuples.add(insertedTuple);
+        }
+
+        String insertedTupleKey = insertedTuple.getClusteringKey();
+        Object insertedTupleValueOfKey = insertedTuple.getTupleAttributes().get(insertedTupleKey);
+        if(minVal==null||insertedTuple.compareTo(minVal)<0){
+            minVal = insertedTupleValueOfKey;
+        }
+        if(maxVal==null||insertedTuple.compareTo(maxVal)>0){
+            maxVal = insertedTupleValueOfKey;
+        }
+        saveIntoPageFilepath();
         return lastTuple;
     }
     public void deleteFromPage(Hashtable<String,String> tuple) {
@@ -105,8 +135,8 @@ public class Page implements Serializable{
         return maxSizePerPage;
     }
 
-    public String getFile_path() {
-        return file_path;
+    public String getFilepath() {
+        return filepath;
     }
 
     public Vector<Tuple> getPageTuples() {
@@ -117,13 +147,19 @@ public class Page implements Serializable{
         this.maxSizePerPage = maxSizePerPage;
     }
 
-    public void setFile_path(String file_path) {
-        this.file_path = file_path;
+    public void setFilepath(String filepath) {
+        this.filepath = filepath;
     }
 
     public void setPageTuples(Vector<Tuple> pageTuples) {
         this.pageTuples = pageTuples;
     }
 
+    public int getPageID() {
+        return pageID;
+    }
 
+    public String getClusteringKey() {
+        return clusteringKey;
+    }
 }
