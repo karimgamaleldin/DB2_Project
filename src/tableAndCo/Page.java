@@ -112,4 +112,6 @@ public class Page implements Serializable{
     public void setPageTuples(Vector<Tuple> pageTuples) {
         this.pageTuples = pageTuples;
     }
+
+
 }
