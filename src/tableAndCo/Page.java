@@ -97,7 +97,7 @@ public class Page implements Serializable{
 //                    end = mid ;
 //                }
                 boolean isInserted = false;
-                for(int i=mid;i>=start;i--){
+                for(int i=mid-1;i>=start;i--){
                     currentTuple = this.pageTuples.get(i);
                     if(insertedTuple.compareTo(currentTuple)>0){
                         this.pageTuples.add(i+1,insertedTuple);
