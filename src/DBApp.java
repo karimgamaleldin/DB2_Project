@@ -188,8 +188,6 @@ public class DBApp implements Serializable {
         htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
         htblColNameMax.put("Address","ZZZZZZZZZZZ" );
 
-
-
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
         dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
         dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
