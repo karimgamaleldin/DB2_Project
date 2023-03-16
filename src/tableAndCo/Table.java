@@ -10,14 +10,16 @@ public class Table implements Serializable {
     private int maxPageSize;
     private int numberOfTuples;
     private int numberOfPages;
+    private String clusteringKey;
 
-    public Table(String tableName , int tuplesSize , int maxPageSize){
+    public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey){
         this.tableName = tableName;
         this.tablePages = new Vector<String>();
         this.tuplesSize = tuplesSize;
         this.maxPageSize = maxPageSize;
         this.numberOfPages = 0;
         this.numberOfTuples = 0;
+        this.clusteringKey = clusteringKey;
     }
     public Vector<String> getTablePages() {
         return tablePages;
@@ -39,6 +41,7 @@ public class Table implements Serializable {
     }
     public void createNewPage(){
         // method to create new page
+
     }
     public int getPageNumberToInsert(){
         // method to get the page that we need to insert in

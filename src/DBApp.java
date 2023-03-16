@@ -50,7 +50,7 @@ public class DBApp implements Serializable {
                 htblColNameMax
         );
         int maxPageSize = readFromConfig("MaximumRowsCountinTablePage");
-        Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize);
+        Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
         tables.add(newTable);
     }
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{

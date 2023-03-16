@@ -11,7 +11,10 @@ public class Page implements Serializable{
     private Vector<Tuple> pageTuples;
     private Object minVal;
     private Object maxVal;
-    public Page(String path , int maxSizePerPage) {
+    private String clusteringKey;
+
+    public Page(int pageID, String path , int maxSizePerPage) {
+        this.pageID = pageID;
         this.pageTuples = new Vector<>();
         this.maxSizePerPage = maxSizePerPage;
         this.file_path = path + ".class" ;
