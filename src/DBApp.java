@@ -6,11 +6,11 @@ import java.util.*;
 
 public class DBApp implements Serializable {
 
-    private Vector<String> tableNames;
+    private Vector<Table> tables;
     private Metadata metaData;
 
     public DBApp(){
-        this.tableNames = new Vector<String>();
+        this.tables = new Vector<Table>();
         init();
     }
     public void init(){
@@ -29,8 +29,9 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameMin,
                             Hashtable<String,String> htblColNameMax ) throws DBAppException {
 
-        for(int i = 0;i<tableNames.size();i++){
-            if (tableNames.get(i).equals(strTableName)){
+        for(int i = 0; i< tables.size(); i++){
+            String currentTableName = tables.get(i).getTableName();
+            if (currentTableName.equals(strTableName)){
                 throw new DBAppException("This table already exists");
             }
         }
@@ -51,14 +52,27 @@ public class DBApp implements Serializable {
                 htblColNameMax
         );
         int maxPageSize = readFromConfig("MaximumRowsCountinTablePage");
-        new Table(strTableName , htblColNameType.size() , maxPageSize);
-        tableNames.add(strTableName);
+        Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize);
+        tables.add(newTable);
     }
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
 //
 //    }
     public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
-        if (!tableNames.contains(strTableName)){
+//        if (!tables.contains(strTableName)){
+//            throw new DBAppException("This Table is not present");
+//        }
+        boolean found = false;
+        int tableIndex = -1;
+        for(int i = 0; i< tables.size(); i++){
+            String currentTableName = tables.get(i).getTableName();
+            if (currentTableName.equals(strTableName)){
+                found = true;
+                tableIndex = i;
+                break;
+            }
+        }
+        if (!found) {
             throw new DBAppException("This Table is not present");
         }
         int tupleSize = metaData.getTupleSize(strTableName);
@@ -72,6 +86,13 @@ public class DBApp implements Serializable {
                 throw new DBAppException("The Column names aren't correct");
             }
         }
+        Table toBeInsertedInTable = this.tables.get(tableIndex);
+        if(toBeInsertedInTable.needsNewPage()){
+            toBeInsertedInTable.createNewPage();
+        }
+//        if()
+
+
 
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws DBAppException{

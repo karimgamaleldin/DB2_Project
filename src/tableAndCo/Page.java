@@ -10,6 +10,11 @@ public class Page implements Serializable{
     private Vector<Tuple> pageTuples;
     private Object minVal;
     private Object maxVal;
+    public Page(String path , int maxSizePerPage) {
+        this.pageTuples = new Vector<>();
+        this.maxSizePerPage = maxSizePerPage;
+        this.file_path = path + ".class" ;
+    }
 
     public Object getMinVal() {
         return minVal;
@@ -27,11 +32,6 @@ public class Page implements Serializable{
         this.maxVal = maxVal;
     }
 
-    public Page(String path , int maxSizePerPage) {
-        this.pageTuples = new Vector<>();
-        this.maxSizePerPage = maxSizePerPage;
-        this.file_path = path + ".class" ;
-    }
 
     // some helper methods
     public boolean isPageFull(){
