@@ -39,7 +39,7 @@ public class Metadata {
         sb.append(",");
         sb.append("max");
         sb.append("\r\n");
-        fw.write(sb.toString());
+        fw.append(sb.toString()).flush();
 
 
     }
@@ -86,7 +86,7 @@ public class Metadata {
                 sb.append("\r\n");
                 System.out.println(sb);
             }
-           fw.write(sb.toString());
+           fw.append(sb.toString()).flush();
 
 
             System.out.println("finished");

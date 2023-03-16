@@ -191,7 +191,7 @@ public class DBApp implements Serializable {
 
 
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-        dbApp.createTable( strTableName2, "ID", htblColNameType2, htblColNameMin2, htblColNameMax2 );
-
+        dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+        dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
     }
 }
