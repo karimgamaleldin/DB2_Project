@@ -60,17 +60,17 @@ public class DBApp implements Serializable {
 //        if (!tables.contains(strTableName)){
 //            throw new DBAppException("This Table is not present");
 //        }
-        boolean found = false;
+
         int tableIndex = -1;
         for(int i = 0; i< tables.size(); i++){
             String currentTableName = tables.get(i).getTableName();
             if (currentTableName.equals(strTableName)){
-                found = true;
+
                 tableIndex = i;
                 break;
             }
         }
-        if (!found) {
+        if (tableIndex==-1) {
             throw new DBAppException("This Table is not present");
         }
         int tupleSize = metaData.getTupleSize(strTableName);
