@@ -16,13 +16,25 @@ public class DBApp implements Serializable {
     public void init(){
         try {
             metaData = new Metadata("metadata.csv");
-
+            createDataDirectory();
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
 
     }
 
+    public void createDataDirectory() {
+        File dataDirectory = new File("data");
+
+        // check if the directory can be created
+        // using the specified path name
+        if (dataDirectory.mkdir() == true) {
+            System.out.println("Directory has been created successfully");
+        }
+        else {
+            System.out.println("Directory cannot be created");
+        }
+    }
     public void createTable(String strTableName,
                             String strClusteringKeyColumn,
                             Hashtable<String,String> htblColNameType,
@@ -56,7 +68,7 @@ public class DBApp implements Serializable {
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
 //
 //    }
-    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
+    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
 //        if (!tables.contains(strTableName)){
 //            throw new DBAppException("This Table is not present");
 //        }
@@ -88,6 +100,7 @@ public class DBApp implements Serializable {
         if(toBeInsertedInTable.needsNewPage()){
             toBeInsertedInTable.createNewPage();
         }
+        toBeInsertedInTable.insert(htblColNameValue);
 //        if()
 
 
@@ -129,7 +142,7 @@ public class DBApp implements Serializable {
     }
 
 
-    public static void main(String[] args) throws DBAppException, IOException {
+    public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
         String strTableName = "CityShop";
         String strTableName2="CityShop2";
         String strTableName3="CityShop3";
@@ -163,5 +176,14 @@ public class DBApp implements Serializable {
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
         dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
         dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+        Hashtable htblColNameValue = new Hashtable( );
+        htblColNameValue.put("ID", new Integer( 2343432 ));
+        htblColNameValue.put("Name", "ZZZZZZZZZZZ");
+        htblColNameValue.put("X", new Integer(1000));
+        htblColNameValue.put("Y", new Integer(1000));
+        htblColNameValue.put("Z", new Integer(1000));
+        htblColNameValue.put("Specialization", "b");
+        htblColNameValue.put("Address","c" );
+        dbApp.insertIntoTable( strTableName , htblColNameValue );
     }
 }

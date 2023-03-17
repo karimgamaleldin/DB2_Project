@@ -1,5 +1,6 @@
 package tableAndCo;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Hashtable;
@@ -24,6 +25,20 @@ public class Table implements Serializable {
         this.numberOfTuples = 0;
         this.clusteringKey = clusteringKey;
         this.nextPageID = 0;
+        createTableDirectory();
+    }
+
+    public void createTableDirectory() {
+        File tableDirectory = new File("data/"+this.getTableName());
+
+        // check if the directory can be created
+        // using the specified path name
+        if (tableDirectory.mkdir() == true) {
+            System.out.println("Directory has been created successfully");
+        }
+        else {
+            System.out.println("Directory cannot be created");
+        }
     }
     public Vector<Page> getTablePages() {
         return tablePages;
@@ -52,24 +67,27 @@ public class Table implements Serializable {
         return this.getTablePages().isEmpty();
     }
     public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException {
-        if(isTableEmpty()){
-            Page page = createNewPage();
-            page.insertIntoPage(htblColNameValue);
-            return;
-        }
+//        if(isTableEmpty()){
+//            Page page = createNewPage();
+//            page.insertIntoPage(htblColNameValue);
+//            return;
+//        }
         int start =0;
         int end = this.getTablePages().size()-1;
-        while(start<=end){
-            int mid = (start + end) / 2;
+//        System.out.println("in table");
+//        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
-        }
+//        while(start<=end){
+//            int mid = (start + end) / 2;
+//
+//        }
     }
     public boolean needsNewPage(){
         return numberOfTuples == (maxSizePerPage * numberOfPages);
     }
     public Page createNewPage(){
         String path = "page"+nextPageID;
-        Page page = new Page(nextPageID,path,maxSizePerPage);
+        Page page = new Page(nextPageID,path,maxSizePerPage,clusteringKey,tableName);
         nextPageID++;
         this.getTablePages().add(page);
         return page;

@@ -5,23 +5,38 @@ import java.util.*;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
-    protected int pageID;
-    protected int maxSizePerPage;
-    protected String filepath;
+    private int pageID;
+    private int maxSizePerPage;
+    private String filepath;
     private Vector<Tuple> pageTuples;
-    protected Object minVal;
-    protected Object maxVal;
-    protected String clusteringKey;
+    private Object minVal;
+    private Object maxVal;
+    private String clusteringKey;
+    private String tableName;
 
-    public Page(int pageID, String filepath , int maxSizePerPage) {
+    public Page(int pageID, String filepath , int maxSizePerPage,String clusteringKey, String tableName) {
         this.pageID = pageID;
-//        this.pageTuples = new Vector<Tuple>();
+        this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        this.filepath = filepath + ".class" ;
+        this.filepath = "data/"+tableName+"/"+filepath+".class" ;
         this.minVal = null;
         this.maxVal = null;
+        this.clusteringKey = clusteringKey;
+        this.tableName = tableName;
+        createPageFile();
     }
-
+    public void createPageFile(){
+        try{
+            File pageFile = new File(this.getFilepath());
+            if (pageFile.createNewFile()) {
+                System.out.println("File created: " + pageFile.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
     public Object getMinVal() {
         return minVal;
     }
@@ -51,12 +66,25 @@ public class Page implements Serializable{
     }
     public void loadIntoPage() throws IOException, ClassNotFoundException {
         FileInputStream file = new FileInputStream(this.getFilepath());
-        ObjectInputStream on = new ObjectInputStream(file);
-        this.setPageTuples((Vector<Tuple>) on.readObject());
+        if(file.available()!=0){
+            ObjectInputStream on = new ObjectInputStream(file);
+            //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
+            try {
+//                System.out.println(on);
+                Vector<Tuple> tmp = (Vector<Tuple>) on.readObject();
+//                System.out.println(tmp.size());
+                this.setPageTuples(tmp);
+            }
+            catch (EOFException e) {
+                System.out.println("error:"+e.getMessage());
+            }
+        };
+
     }
 
     public void saveIntoPageFilepath() throws IOException {
         //save the newly inserted tuple in the file itself
+        File f = new File(filepath);
         FileOutputStream file = new FileOutputStream(this.getFilepath());
         ObjectOutputStream out = new ObjectOutputStream(file);
         out.writeObject(this.getPageTuples());
@@ -66,9 +94,20 @@ public class Page implements Serializable{
     }
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
         loadIntoPage();
+//        System.out.println("in page");
         boolean wasFull = this.isPageFull();
+//        System.out.println("before is full");
         Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
+//        System.out.println("after is full");
         Tuple insertedTuple = new Tuple(tuple, clusteringKey);
+//        System.out.println("after tuple");
+        //System.out.println(this.pageTuples.get(0).getTupleAttributes().get(this.pageTuples.get(0).getClusteringKey()));
+        if(this.isPageEmpty()){
+//            System.out.println("in if");
+            this.pageTuples.add(insertedTuple);
+            saveIntoPageFilepath();
+            return null;
+        }
         int start = 0 ;
         int end = this.getSizeOfPage() - 1;
         while(start <= end)
@@ -107,9 +146,11 @@ public class Page implements Serializable{
                 }
                 if(!isInserted){
                     this.pageTuples.add(start-1,insertedTuple);
+                    break;
                 }
             }else {
                 this.pageTuples.add(mid,insertedTuple);
+                break;
             }
         }
         if(start>end) {
@@ -124,6 +165,8 @@ public class Page implements Serializable{
         if(maxVal==null||insertedTuple.compareTo(maxVal)>0){
             maxVal = insertedTupleValueOfKey;
         }
+        //System.out.println(insertedTupleValueOfKey);
+//        System.out.println(this.pageTuples.size());
         saveIntoPageFilepath();
         return lastTuple;
     }
