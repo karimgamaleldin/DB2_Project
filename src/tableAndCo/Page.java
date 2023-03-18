@@ -118,14 +118,6 @@ public class Page implements Serializable{
        else
         {
             while (start <= end) {
-                //adjust the sorting to insert the tuple in its correct position
-//            Tuple currentTuple = this.pageTuples.get(i);
-//            if(insertedTuple.compareTo(currentTuple) < 0){
-//                this.pageTuples.add(i , insertedTuple);
-//                break;
-//            } else if (i == this.getSizeOfPage() - 1){
-//                this.pageTuples.add(insertedTuple);
-//            }
                 int mid = (start + end) / 2;
                 Tuple currentTuple = this.pageTuples.get(mid);
                 if (insertedTuple.compareTo(currentTuple) > 0) {
@@ -199,20 +191,18 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return lastTuple;
     }
-    public boolean deleteFromPage(Hashtable<String,Object> t) throws DBAppException{
-        int indexDeleted = getIndexBinarySearch(t);
+    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException{
+        int indexDeleted = getIndexBinarySearch(htblColNameValue);
         if(indexDeleted == -1){
             throw new DBAppException("The tuple you specified is not present");
         }
-        Tuple tuple = new Tuple(t,this.getClusteringKey());
+        Tuple tupleToBeDeleted = new Tuple(htblColNameValue,this.getClusteringKey());
         pageTuples.remove(indexDeleted);
-        if(tuple.compareTo(minVal)==0) {
+        if(tupleToBeDeleted.compareTo(minVal)==0) {
             minVal = pageTuples.get(0);
         }
-        else if (tuple.compareTo(maxVal)==0){
+        else if (tupleToBeDeleted.compareTo(maxVal)==0){
             maxVal = pageTuples.get(this.getSizeOfPage()-1);
-
-
         }
         return true;
     }

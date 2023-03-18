@@ -7,14 +7,14 @@ import java.util.Vector;
 
 public class Metadata {
     private String filePath;
-    private Vector<Column> columnsOfMetaData;
+    private Hashtable<String,Vector<Column>> columnsOfMetaData;
     private File metafile;
     private FileWriter fw;
 
 
     public Metadata(String filePath) throws IOException {
         this.filePath = filePath;
-        this.columnsOfMetaData = new Vector<Column>();
+        this.columnsOfMetaData = new Hashtable<String,Vector<Column>>();
         this.metafile=new File("./"+filePath);
         this.fw=new FileWriter(metafile);
         writeHeaders();
@@ -53,9 +53,7 @@ public class Metadata {
 
 //            fw= new FileWriter(metafile,true);
             StringBuilder sb= new StringBuilder();
-
             Set<Entry<String, String>> entrySet = htblColNameType.entrySet();
-
             for (Entry<String, String> entry : entrySet) {
                 String columnName = entry.getKey();
                 String dataType = entry.getValue();
@@ -64,7 +62,9 @@ public class Metadata {
                 String maxColValue = htblColNameMax.get(columnName);
                 Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
                 Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
-                columnsOfMetaData.add(col);
+                Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
+                columns.add(col);
+                columnsOfMetaData.put(strTableName,columns);
                 sb.append(strTableName);
                 sb.append(",");
                 sb.append(columnName);
@@ -90,20 +90,22 @@ public class Metadata {
             System.out.println(e);
         }
     }
-    public int getTupleSize(String tableName){
-        int size = 0;
-        for (int i = 0 ; i < columnsOfMetaData.size() ; i++){
-            String currentTablename = columnsOfMetaData.get(i).getTableName();
-            if(currentTablename.equals(tableName)){
-                size++;
-            }
-        }
-        return size;
+    public int getTupleSize(String strTableName){
+//        int size = 0;
+//        for (int i = 0 ; i < columnsOfMetaData.size() ; i++){
+//            String currentTablename = columnsOfMetaData.get(i).getTableName();
+//            if(currentTablename.equals(strTableName)){
+//                size++;
+//            }
+//        }
+//        return size;
+        return this.columnsOfMetaData.get(strTableName).size();
     }
     public Vector<String> getColumnNames(String strTableName){
         Vector<String> columnsNames = new Vector<String>();
-        for(int i = 0 ; i < this.columnsOfMetaData.size() ; i++){
-            Column currentColumn = this.columnsOfMetaData.get(i);
+        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+        for(int i = 0 ; i < columns.size() ; i++){
+            Column currentColumn = columns.get(i);
             if(currentColumn.getTableName().equals(strTableName)){
                 columnsNames.add(currentColumn.getColumnName());
             }
@@ -111,11 +113,12 @@ public class Metadata {
         return columnsNames;
     }
 
-    public String getColumnType(String tableName ,String columnName){
+    public String getColumnType(String strTableName ,String columnName){
         String type = "";
-        for(int i = 0 ; i < this.columnsOfMetaData.size(); i++){
-            Column currentColumn = this.columnsOfMetaData.get(i);
-            if(tableName.equals(currentColumn.getTableName()) && columnName.equals(currentColumn.getColumnName())){
+        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+        for(int i = 0 ; i < columns.size(); i++){
+            Column currentColumn = columns.get(i);
+            if(strTableName.equals(currentColumn.getTableName()) && columnName.equals(currentColumn.getColumnName())){
                 type = currentColumn.getColumnType();
                 break;
             }

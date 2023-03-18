@@ -3,6 +3,8 @@ package tableAndCo;
 import java.io.*;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 public class Tuple implements Serializable {
     private Hashtable<String , Object> tupleAttributes ;
@@ -39,6 +41,18 @@ public class Tuple implements Serializable {
         }
     }
 
+    @Override
+    public String toString() {
+        String tupleInfo = "";
+        Set<Map.Entry<String, Object>> entrySet = this.getTupleAttributes().entrySet();
+        for (Map.Entry<String, Object> entry : entrySet) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            tupleInfo+=key+": "+value+",\n";
+        }
+        tupleInfo+="--------------------------------\n";
+        return tupleInfo;
+    }
 
 
 }
