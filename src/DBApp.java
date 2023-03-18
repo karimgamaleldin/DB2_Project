@@ -21,6 +21,7 @@ public class DBApp implements Serializable {
             System.out.println(e.getMessage());
         }
 
+
     }
 
     public void createDataDirectory() {
@@ -98,16 +99,16 @@ public class DBApp implements Serializable {
                 throw new DBAppException("The Column names aren't correct");
             }
             String columnType = metaData.getColumnType(strTableName,key);
-            String valClass = ""+value.ge
+            String valClass = ""+value.getClass();
+            if(valClass.compareTo(columnType)!=0){
+                throw new DBAppException("wrong entry datatype");
+            }
         }
         Table toBeInsertedInTable = this.tables.get(tableIndex);
-
+        toBeInsertedInTable.insert(htblColNameValue);
 //        if(toBeInsertedInTable.needsNewPage()){
 //            toBeInsertedInTable.createNewPage();
 //        }
-        toBeInsertedInTable.insert(htblColNameValue);
-//        if()
-
 
 
     }
