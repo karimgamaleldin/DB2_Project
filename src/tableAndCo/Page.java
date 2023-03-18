@@ -1,4 +1,6 @@
 package tableAndCo;
+import exceptions.DBAppException;
+
 import java.io.*;
 import java.util.*;
 
@@ -229,5 +231,24 @@ public class Page implements Serializable{
 
     public String getClusteringKey() {
         return clusteringKey;
+    }
+
+    public int getIndexBinarySearch(Hashtable<String,Object> tuple){
+        Tuple t = new Tuple(tuple , this.clusteringKey);
+        int start = 0;
+        int end = this.pageTuples.size() - 1;
+        while(start <= end){
+            int mid = (start + end) / 2 ;
+            if(t.compareTo(this.pageTuples.get(mid)) == 0){
+                return mid;
+            }
+            else if (t.compareTo(this.pageTuples.get(mid)) < 0){
+                end = mid - 1;
+            }
+            else {
+                start = mid + 1;
+            }
+        }
+        return t.compareTo(this.pageTuples.get(start)) == 0 ? start : -1;
     }
 }
