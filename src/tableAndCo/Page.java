@@ -39,7 +39,7 @@ public class Page implements Serializable{
             System.out.println(e.getMessage());
         }
     }
-    public Object getMinVal() {
+    public Tuple getMinVal() {
         return minVal;
     }
 
@@ -47,7 +47,7 @@ public class Page implements Serializable{
         this.minVal = minVal;
     }
 
-    public Object getMaxVal() {
+    public Tuple getMaxVal() {
         return maxVal;
     }
 
@@ -92,7 +92,7 @@ public class Page implements Serializable{
         out.writeObject(this.getPageTuples());
         out.close();
         file.close();
-        this.setPageTuples(null);
+        this.setPageTuples(null);//may give error
     }
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
         loadIntoPage();
