@@ -197,7 +197,12 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return lastTuple;
     }
-    public void deleteFromPage(Hashtable<String,String> tuple) {
+    public void deleteFromPage(Hashtable<String,Object> tuple) throws DBAppException{
+        int indexDeleted = getIndexBinarySearch(tuple);
+        if(indexDeleted == -1){
+            throw new DBAppException("The tuple you specified is not present");
+        }
+
         pageTuples.remove(tuple);
     }
 
