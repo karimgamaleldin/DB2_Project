@@ -1,4 +1,6 @@
 package tableAndCo;
+import exceptions.DBAppException;
+
 import java.io.*;
 import java.util.*;
 
@@ -110,9 +112,13 @@ public class Page implements Serializable{
         }
         int start = 0 ;
         int end = this.getSizeOfPage() - 1;
-        while(start <= end)
+        if(insertedTuple.compareTo(this.pageTuples.get(0)) < 0){
+            this.pageTuples.add(0, insertedTuple);
+        }
+       else
         {
-            //adjust the sorting to insert the tuple in its correct position
+            while (start <= end) {
+                //adjust the sorting to insert the tuple in its correct position
 //            Tuple currentTuple = this.pageTuples.get(i);
 //            if(insertedTuple.compareTo(currentTuple) < 0){
 //                this.pageTuples.add(i , insertedTuple);
@@ -120,12 +126,21 @@ public class Page implements Serializable{
 //            } else if (i == this.getSizeOfPage() - 1){
 //                this.pageTuples.add(insertedTuple);
 //            }
-            int mid = (start + end) / 2;
-            Tuple currentTuple = this.pageTuples.get(mid);
-            if (insertedTuple.compareTo(currentTuple) > 0) {
-                start = mid + 1;
-            }
-            else if (insertedTuple.compareTo(currentTuple) < 0){
+                int mid = (start + end) / 2;
+                Tuple currentTuple = this.pageTuples.get(mid);
+                if (insertedTuple.compareTo(currentTuple) > 0) {
+                    int temp = mid+1;
+                    if(temp>this.getSizeOfPage()){
+                        this.pageTuples.add(insertedTuple);
+                        break;
+                    }
+                    Tuple nextTuple = this.pageTuples.get(temp);
+                    if(insertedTuple.compareTo(nextTuple)<=0){
+                        this.pageTuples.add(temp, insertedTuple);
+                        break;
+                    }
+                    start = mid + 1;
+                } else if (insertedTuple.compareTo(currentTuple) < 0) {
 //                if ( mid == this.getSizeOfPage() - 1 ) {
 //                    this.pageTuples.add(mid,insertedTuple);
 //                }
@@ -135,27 +150,39 @@ public class Page implements Serializable{
 //                else {
 //                    end = mid ;
 //                }
-                boolean isInserted = false;
-                for(int i=mid-1;i>=start;i--){
-                    currentTuple = this.pageTuples.get(i);
-                    if(insertedTuple.compareTo(currentTuple)>0){
-                        this.pageTuples.add(i+1,insertedTuple);
-                        isInserted=true;
+//                boolean isInserted = false;
+//                for(int i=mid-1;i>=start;i--){
+//                    currentTuple = this.pageTuples.get(i);
+//                    if(insertedTuple.compareTo(currentTuple)>0){
+//                        this.pageTuples.add(i+1,insertedTuple);
+//                        isInserted=true;
+//                        break;
+//                    }
+//                }
+//                if(!isInserted){
+//                    this.pageTuples.add(start-1,insertedTuple);
+//                    break;
+//                }
+                    int temp = mid-1;
+                    if(temp<0){
+                        this.pageTuples.add(0,insertedTuple);
                         break;
                     }
-                }
-                if(!isInserted){
-                    this.pageTuples.add(start-1,insertedTuple);
+                    Tuple nextTuple = this.pageTuples.get(temp);
+                    if(insertedTuple.compareTo(nextTuple)>=0){
+                        this.pageTuples.add(temp, insertedTuple);
+                        break;
+                    }
+                    end = mid - 1;
+                } else {
+                    this.pageTuples.add(mid, insertedTuple);
                     break;
                 }
-            }else {
-                this.pageTuples.add(mid,insertedTuple);
-                break;
             }
         }
-        if(start>end) {
-            this.pageTuples.add(insertedTuple);
-        }
+//        if(start>end) {
+//            this.pageTuples.add(start,insertedTuple);
+//        }
 
         String insertedTupleKey = insertedTuple.getClusteringKey();
         Object insertedTupleValueOfKey = insertedTuple.getTupleAttributes().get(insertedTupleKey);
@@ -170,7 +197,12 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return lastTuple;
     }
-    public void deleteFromPage(Hashtable<String,String> tuple) {
+    public void deleteFromPage(Hashtable<String,Object> tuple) throws DBAppException{
+        int indexDeleted = getIndexBinarySearch(tuple);
+        if(indexDeleted == -1){
+            throw new DBAppException("The tuple you specified is not present");
+        }
+
         pageTuples.remove(tuple);
     }
 
@@ -204,5 +236,24 @@ public class Page implements Serializable{
 
     public String getClusteringKey() {
         return clusteringKey;
+    }
+
+    public int getIndexBinarySearch(Hashtable<String,Object> tuple){
+        Tuple t = new Tuple(tuple , this.clusteringKey);
+        int start = 0;
+        int end = this.pageTuples.size() - 1;
+        while(start <= end){
+            int mid = (start + end) / 2 ;
+            if(t.compareTo(this.pageTuples.get(mid)) == 0){
+                return mid;
+            }
+            else if (t.compareTo(this.pageTuples.get(mid)) < 0){
+                end = mid - 1;
+            }
+            else {
+                start = mid + 1;
+            }
+        }
+        return t.compareTo(this.pageTuples.get(start)) == 0 ? start : -1;
     }
 }

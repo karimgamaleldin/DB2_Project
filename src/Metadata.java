@@ -40,8 +40,6 @@ public class Metadata {
         sb.append("max");
         sb.append("\r\n");
         fw.append(sb.toString()).flush();
-
-
     }
 
     public void writeMetaData(
