@@ -92,9 +92,13 @@ public class DBApp implements Serializable {
             throw new DBAppException("There are missing or extra column(s)");
         }
         for (Map.Entry<String, Object> entry : entrySet) {
-            if(!columnNames.contains(entry.getKey())){
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            if(!columnNames.contains(key)){
                 throw new DBAppException("The Column names aren't correct");
             }
+            String columnType = metaData.getColumnType(strTableName,key);
+            String valClass = ""+value.ge
         }
         Table toBeInsertedInTable = this.tables.get(tableIndex);
 

@@ -104,8 +104,9 @@ public class Metadata {
         Vector<String> columnsNames = new Vector<String>();
         for(int i = 0 ; i < this.columnsOfMetaData.size() ; i++){
             Column currentColumn = this.columnsOfMetaData.get(i);
-            if(currentColumn.getTableName().equals(strTableName))
+            if(currentColumn.getTableName().equals(strTableName)){
                 columnsNames.add(currentColumn.getColumnName());
+            }
         }
         return columnsNames;
     }
