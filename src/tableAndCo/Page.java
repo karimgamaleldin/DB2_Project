@@ -130,7 +130,7 @@ public class Page implements Serializable{
                 Tuple currentTuple = this.pageTuples.get(mid);
                 if (insertedTuple.compareTo(currentTuple) > 0) {
                     int temp = mid+1;
-                    if(temp>this.getSizeOfPage()){
+                    if(temp>=this.getSizeOfPage()){
                         this.pageTuples.add(insertedTuple);
                         break;
                     }
@@ -199,13 +199,21 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return lastTuple;
     }
-    public void deleteFromPage(Hashtable<String,Object> tuple) throws DBAppException{
+    public boolean deleteFromPage(Hashtable<String,Object> tuple) throws DBAppException{
         int indexDeleted = getIndexBinarySearch(tuple);
         if(indexDeleted == -1){
             throw new DBAppException("The tuple you specified is not present");
         }
+        pageTuples.remove(indexDeleted);
+        if(tuple.compareTo(minVal)==0) {
+            minVal = pageTuples.get(0);
+        }
+            else if (tuple.compareTo(maxVal)==0){
+                maxVal = pageTuples.get
 
-        pageTuples.remove(tuple);
+
+        }
+        return true;
     }
 
     public int getMaxSizePerPage() {
