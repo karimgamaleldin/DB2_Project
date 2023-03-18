@@ -11,8 +11,8 @@ public class Page implements Serializable{
     private int maxSizePerPage;
     private String filepath;
     private Vector<Tuple> pageTuples;
-    private Object minVal;
-    private Object maxVal;
+    private Tuple minVal;
+    private Tuple maxVal;
     private String clusteringKey;
     private String tableName;
 
@@ -43,7 +43,7 @@ public class Page implements Serializable{
         return minVal;
     }
 
-    public void setMinVal(Object minVal) {
+    public void setMinVal(Tuple minVal) {
         this.minVal = minVal;
     }
 
@@ -51,7 +51,7 @@ public class Page implements Serializable{
         return maxVal;
     }
 
-    public void setMaxVal(Object maxVal) {
+    public void setMaxVal(Tuple maxVal) {
         this.maxVal = maxVal;
     }
 
@@ -181,16 +181,18 @@ public class Page implements Serializable{
             }
         }
 //        if(start>end) {
-//            this.pageTuples.add(start,insertedTuple);
+//            if(start==this.getSizeOfPage()){
+//                this.pageTuples.add(insertedTuple);
+//            }else {
+//                this.pageTuples.add(start,insertedTuple);
+//            }
 //        }
 
-        String insertedTupleKey = insertedTuple.getClusteringKey();
-        Object insertedTupleValueOfKey = insertedTuple.getTupleAttributes().get(insertedTupleKey);
         if(minVal==null||insertedTuple.compareTo(minVal)<0){
-            minVal = insertedTupleValueOfKey;
+            this.setMinVal(insertedTuple);
         }
         if(maxVal==null||insertedTuple.compareTo(maxVal)>0){
-            maxVal = insertedTupleValueOfKey;
+            this.setMaxVal(insertedTuple);
         }
         //System.out.println(insertedTupleValueOfKey);
 //        System.out.println(this.pageTuples.size());

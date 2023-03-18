@@ -21,16 +21,10 @@ public class Tuple implements Serializable {
         return clusteringKey;
     }
 
-    public int compareTo(Object o) {
+    public int compareTo(Tuple o) {
         // return 0 if equal , returns -ve if instance object is less than the argument else +ve
         Object t1 = this.getTupleAttributes().get(this.getClusteringKey());
-        Object t2;
-        if(o instanceof Tuple){
-            Tuple tuple = (Tuple) o;
-            t2 = tuple.getTupleAttributes().get(tuple.getClusteringKey());
-        }else {
-            t2 = o;
-        }
+        Object t2 = o.getTupleAttributes().get(o.getClusteringKey());
         String type = t1.getClass().getName();
         if (type.equals("java.lang.Integer")) {
             return ((Integer) t1).compareTo((Integer) t2);

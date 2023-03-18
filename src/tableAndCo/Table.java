@@ -67,11 +67,11 @@ public class Table implements Serializable {
         return this.getTablePages().isEmpty();
     }
     public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException {
-//        if(isTableEmpty()){
-//            Page page = createNewPage();
-//            page.insertIntoPage(htblColNameValue);
-//            return;
-//        }
+        if(isTableEmpty()){
+            Page page = createNewPage();
+            page.insertIntoPage(htblColNameValue);
+            return;
+        }
         int start =0;
         int end = this.getTablePages().size()-1;
 //        System.out.println("in table");

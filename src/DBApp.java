@@ -97,9 +97,9 @@ public class DBApp implements Serializable {
             }
         }
         Table toBeInsertedInTable = this.tables.get(tableIndex);
-        if(toBeInsertedInTable.needsNewPage()){
-            toBeInsertedInTable.createNewPage();
-        }
+//        if(toBeInsertedInTable.needsNewPage()){
+//            toBeInsertedInTable.createNewPage();
+//        }
         toBeInsertedInTable.insert(htblColNameValue);
 //        if()
 
