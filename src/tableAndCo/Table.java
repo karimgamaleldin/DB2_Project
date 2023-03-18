@@ -75,7 +75,7 @@ public class Table implements Serializable {
         int start =0;
         int end = this.getTablePages().size()-1;
 //        System.out.println("in table");
-//        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
+        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
 //        while(start<=end){
 //            int mid = (start + end) / 2;

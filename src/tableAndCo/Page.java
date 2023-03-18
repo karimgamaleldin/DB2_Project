@@ -199,17 +199,18 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return lastTuple;
     }
-    public boolean deleteFromPage(Hashtable<String,Object> tuple) throws DBAppException{
-        int indexDeleted = getIndexBinarySearch(tuple);
+    public boolean deleteFromPage(Hashtable<String,Object> t) throws DBAppException{
+        int indexDeleted = getIndexBinarySearch(t);
         if(indexDeleted == -1){
             throw new DBAppException("The tuple you specified is not present");
         }
+        Tuple tuple = new Tuple(t,this.getClusteringKey());
         pageTuples.remove(indexDeleted);
         if(tuple.compareTo(minVal)==0) {
             minVal = pageTuples.get(0);
         }
-            else if (tuple.compareTo(maxVal)==0){
-                maxVal = pageTuples.get
+        else if (tuple.compareTo(maxVal)==0){
+            maxVal = pageTuples.get(this.getSizeOfPage()-1);
 
 
         }
@@ -264,6 +265,6 @@ public class Page implements Serializable{
                 start = mid + 1;
             }
         }
-        return t.compareTo(this.pageTuples.get(start)) == 0 ? start : -1;
+        return -1;
     }
 }
