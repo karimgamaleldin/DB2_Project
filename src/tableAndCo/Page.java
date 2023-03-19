@@ -192,19 +192,44 @@ public class Page implements Serializable{
         return lastTuple;
     }
     public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException{
+        // true: page is empty and deleted so delete from table
+        //false: page is not empty so don't delete from table
         int indexDeleted = getIndexBinarySearch(htblColNameValue);
         if(indexDeleted == -1){
             throw new DBAppException("The tuple you specified is not present");
         }
         Tuple tupleToBeDeleted = new Tuple(htblColNameValue,this.getClusteringKey());
         pageTuples.remove(indexDeleted);
-        if(tupleToBeDeleted.compareTo(minVal)==0) {
-            minVal = pageTuples.get(0);
+        if(isPageEmpty()){
+            this.deletePage();
+            return true;
         }
-        else if (tupleToBeDeleted.compareTo(maxVal)==0){
-            maxVal = pageTuples.get(this.getSizeOfPage()-1);
+//        if(tupleToBeDeleted.compareTo(minVal)==0) {
+        minVal = pageTuples.get(0);
+//        }
+//        else if (tupleToBeDeleted.compareTo(maxVal)==0){
+        maxVal = pageTuples.get(this.getSizeOfPage()-1);
+//        }
+        return false;
+    }
+    public void deletePage()
+    {
+        try
+        {
+            File f= new File(this.getFilepath());           //file to be delete
+            if(f.delete())                      //returns Boolean value
+            {
+                System.out.println(f.getName() + " deleted");   //getting and printing the file name
+            }
+            else
+            {
+                System.out.println("failed");
+            }
         }
-        return true;
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 
     public int getMaxSizePerPage() {
@@ -239,16 +264,19 @@ public class Page implements Serializable{
         return clusteringKey;
     }
 
-    public int getIndexBinarySearch(Hashtable<String,Object> tuple){
-        Tuple t = new Tuple(tuple , this.clusteringKey);
+    public int getIndexBinarySearch(Hashtable<String,Object> htblColNameValue){
+        // we need to adjust the case of duplicates
+        Tuple tuple = new Tuple(htblColNameValue , this.clusteringKey);
         int start = 0;
         int end = this.pageTuples.size() - 1;
         while(start <= end){
             int mid = (start + end) / 2 ;
-            if(t.compareTo(this.pageTuples.get(mid)) == 0){
+            if(tuple.compareTo(this.pageTuples.get(mid)) == 0){
+                // we should not return immediately need to check if whole tuples are equal
+                // made a method called isEqual in Tuple class
                 return mid;
             }
-            else if (t.compareTo(this.pageTuples.get(mid)) < 0){
+            else if (tuple.compareTo(this.pageTuples.get(mid)) < 0){
                 end = mid - 1;
             }
             else {

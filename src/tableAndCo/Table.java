@@ -162,7 +162,6 @@ public class Table implements Serializable {
                     if(toBeDeleted.compareTo(max)<=0){
                         this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
                         updateMinMax(this.getTablePages().get(mid),mid);
-
                         return;
                     }else{
                         start=mid+1;
@@ -174,11 +173,11 @@ public class Table implements Serializable {
                     if(toBeDeleted.compareTo(maxOfPreviousPage) > 0) {
                         this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
                         updateMinMax(this.getTablePages().get(mid),mid);
-
                         return;
                     }else{
                         end=mid-1;
                     }
+                    // throw new DBAppException("tuple is not in the table");
                 }else {
 
                     this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
