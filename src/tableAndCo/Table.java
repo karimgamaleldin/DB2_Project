@@ -1,5 +1,7 @@
 package tableAndCo;
 
+import exceptions.DBAppException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -134,6 +136,30 @@ public class Table implements Serializable {
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
     }
+
+    public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException {
+        if(isTableEmpty()){
+        throw new DBAppException("The table is empty");
+        }
+        Tuple toBeDeleted=new Tuple(htblColNameValue,clusteringKey);
+        int start =0;
+        int end = this.getTablePages().size()-1;
+        Tuple min=minValues.get(start);
+        Tuple max=maxValues.get(end);
+        if(toBeDeleted.compareTo(min) == 0){//if tuple equal than first tuple in table
+             this.getTablePages().get(0).deleteFromPage(htblColNameValue);
+            updateMinMax(this.getTablePages().get(0),0);
+
+        }
+        else if (toBeDeleted.compareTo(max) == 0) {//if tuple equal than biggest tuple in table
+            this.getTablePages().get(end).deleteFromPage(htblColNameValue);
+            updateMinMax(this.getTablePages().get(end),end);
+
+        }else{
+
+        }
+
+    }
     public boolean needsNewPage(){
         return numberOfTuples == (maxSizePerPage * numberOfPages);
     }
@@ -172,7 +198,7 @@ public class Table implements Serializable {
             return;
         }
         Hashtable<String, Object> shift=shifted.getTupleAttributes();
-        //if nextPage == table size befor entering loop
+        //if nextPage == table size before entering loop
         if(nextpage==this.getTablePages().size()){
             insertIntoCreatedPage(shift);
             return;
