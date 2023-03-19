@@ -146,14 +146,12 @@ public class Table implements Serializable {
         int end = this.getTablePages().size()-1;
         Tuple min=minValues.get(start);
         Tuple max=maxValues.get(end);
-        if(toBeDeleted.compareTo(min) == 0){//if tuple equal than first tuple in table
-             this.getTablePages().get(0).deleteFromPage(htblColNameValue);
-            updateMinMax(this.getTablePages().get(0),0);
+        if(toBeDeleted.compareTo(min) <0){//if tuple equal than first tuple in table
+            throw new DBAppException("tuple is not in the table");
 
         }
-        else if (toBeDeleted.compareTo(max) == 0) {//if tuple equal than biggest tuple in table
-            this.getTablePages().get(end).deleteFromPage(htblColNameValue);
-            updateMinMax(this.getTablePages().get(end),end);
+        else if (toBeDeleted.compareTo(max) >0) {//if tuple equal than biggest tuple in table
+            throw new DBAppException("tuple is not in the table");
 
         }else{
             while(start <= end){
