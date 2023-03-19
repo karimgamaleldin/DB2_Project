@@ -156,10 +156,41 @@ public class Table implements Serializable {
             updateMinMax(this.getTablePages().get(end),end);
 
         }else{
+            while(start <= end){
+                int mid = (start + end) / 2 ;
+                min=minValues.get(mid);
+                max=maxValues.get(mid);
+                if(toBeDeleted.compareTo(min) >0){
+                    if(toBeDeleted.compareTo(max)<=0){
+                        this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
+                        updateMinMax(this.getTablePages().get(mid),mid);
 
+                        return;
+                    }else{
+                        start=mid+1;
+                    }
+
+                }
+                else if (toBeDeleted.compareTo(min) < 0){
+                    Tuple maxOfPreviousPage = maxValues.get(mid-1);
+                    if(toBeDeleted.compareTo(maxOfPreviousPage) > 0) {
+                        this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
+                        updateMinMax(this.getTablePages().get(mid),mid);
+
+                        return;
+                    }else{
+                        end=mid-1;
+                    }
+                }else {
+
+                    this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
+                    updateMinMax(this.getTablePages().get(mid),mid);
+
+                    return;
+                }
         }
 
-    }
+    }}
     public boolean needsNewPage(){
         return numberOfTuples == (maxSizePerPage * numberOfPages);
     }
