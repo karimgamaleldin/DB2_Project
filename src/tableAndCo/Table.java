@@ -169,21 +169,17 @@ public class Table implements Serializable {
 
                 }
                 else if (toBeDeleted.compareTo(min) < 0){
-                    Tuple maxOfPreviousPage = maxValues.get(mid-1);
-                    if(toBeDeleted.compareTo(maxOfPreviousPage) > 0) {
-                        this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
-                        updateMinMax(this.getTablePages().get(mid),mid);
-                        return;
-                    }else{
-                        end=mid-1;
+                    end=mid-1;
                     }
-                    // throw new DBAppException("tuple is not in the table");
-                }else {
-
+                else {//if tuple == min then look at max of prev page to make sure it is bigger than the tuple for no duplicates
+                Tuple maxOfPreviousPage = maxValues.get(mid-1);
+                if(toBeDeleted.compareTo(maxOfPreviousPage) > 0) {
                     this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
-                    updateMinMax(this.getTablePages().get(mid),mid);
-
+                    updateMinMax(this.getTablePages().get(mid), mid);
                     return;
+                }
+
+
                 }
         }
 
