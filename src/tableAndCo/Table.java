@@ -171,13 +171,13 @@ public class Table implements Serializable {
                 else if (toBeDeleted.compareTo(min) < 0){
                     end=mid-1;
                     }
-                else {//if tuple == min then look at max of prev page to make sure it is bigger than the tuple for no duplicates
-                Tuple maxOfPreviousPage = maxValues.get(mid-1);
-                if(toBeDeleted.compareTo(maxOfPreviousPage) > 0) {
+                else {//if tuple == min
+
+
                     this.getTablePages().get(mid).deleteFromPage(htblColNameValue);
                     updateMinMax(this.getTablePages().get(mid), mid);
                     return;
-                }
+
 
 
                 }
