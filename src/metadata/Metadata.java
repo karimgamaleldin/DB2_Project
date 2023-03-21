@@ -1,3 +1,5 @@
+package metadata;
+
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -54,12 +56,12 @@ public class Metadata {
 
     public void writeHeaders() throws IOException {
         StringBuilder sb= new StringBuilder();
-        //Table Name, Column Name, Column Type, ClusteringKey, IndexName,IndexType, min, max
+        //Table Name, metadata.Column Name, metadata.Column Type, ClusteringKey, IndexName,IndexType, min, max
         sb.append("Table Name");
         sb.append(",");
-        sb.append("Column Name");
+        sb.append("metadata.Column Name");
         sb.append(",");
-        sb.append("Column Type");
+        sb.append("metadata.Column Type");
         sb.append(",");
         sb.append("ClusteringKey");
         sb.append(",");

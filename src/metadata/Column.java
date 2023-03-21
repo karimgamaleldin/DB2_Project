@@ -1,3 +1,5 @@
+package metadata;
+
 public class Column {
     private String tableName;
     private String columnName;

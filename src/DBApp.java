@@ -1,4 +1,6 @@
 import exceptions.DBAppException;
+import metadata.Column;
+import metadata.Metadata;
 import tableAndCo.Table;
 
 import java.io.*;
@@ -93,7 +95,7 @@ public class DBApp implements Serializable {
             String key = entry.getKey();
             Object value = entry.getValue();
             if(!columnNames.contains(key)){
-                throw new DBAppException("The Column names aren't correct");
+                throw new DBAppException("The metadata.Column names aren't correct");
             }
             String columnType = metaData.getColumnType(strTableName,key);
             String valClass = ""+value.getClass();
