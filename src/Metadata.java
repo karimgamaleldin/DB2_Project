@@ -19,8 +19,40 @@ public class Metadata {
         this.fw=new FileWriter(metafile);
         writeHeaders();
     }
-    public void writeHeaders() throws IOException {
 
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public Hashtable<String, Vector<Column>> getColumnsOfMetaData() {
+        return columnsOfMetaData;
+    }
+
+    public void setColumnsOfMetaData(Hashtable<String, Vector<Column>> columnsOfMetaData) {
+        this.columnsOfMetaData = columnsOfMetaData;
+    }
+
+    public File getMetafile() {
+        return metafile;
+    }
+
+    public void setMetafile(File metafile) {
+        this.metafile = metafile;
+    }
+
+    public FileWriter getFw() {
+        return fw;
+    }
+
+    public void setFw(FileWriter fw) {
+        this.fw = fw;
+    }
+
+    public void writeHeaders() throws IOException {
         StringBuilder sb= new StringBuilder();
         //Table Name, Column Name, Column Type, ClusteringKey, IndexName,IndexType, min, max
         sb.append("Table Name");

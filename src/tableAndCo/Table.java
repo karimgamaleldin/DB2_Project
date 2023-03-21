@@ -140,6 +140,9 @@ public class Table implements Serializable {
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
     }
+    public void updatePage (String clusteringKey,Hashtable<String,Object> htblColNameValue,Vector<Column> columns){
+
+    }
 
     private void deleteHelper(int mid, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         Page loadedPage = loadPages(this.getTablePages().get(mid));

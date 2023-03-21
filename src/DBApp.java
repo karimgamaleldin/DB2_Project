@@ -113,6 +113,7 @@ public class DBApp implements Serializable {
 
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws DBAppException{
+        Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
 
     }
     public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
