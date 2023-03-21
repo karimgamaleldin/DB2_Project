@@ -1,6 +1,7 @@
 package tableAndCo;
 
 import exceptions.DBAppException;
+import metadata.Column;
 
 import java.io.*;
 import java.util.Hashtable;

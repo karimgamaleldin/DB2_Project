@@ -2,8 +2,9 @@ package tableAndCo;
 import exceptions.DBAppException;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
-
+import metadata.Column;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
@@ -199,29 +200,28 @@ public class Page implements Serializable{
     public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
         // true: page is empty and deleted so delete from table
         //false: page is not empty so don't delete from table
-        int indexDeleted = getIndexBinarySearch(htblColNameValue);
-        if(indexDeleted == -1){
-            throw new DBAppException("The tuple you specified is not present");
+//        int indexDeleted = getIndexBinarySearch(htblColNameValue);
+//        if(indexDeleted == -1){
+//            throw new DBAppException("The tuple you specified is not present");
+//        }
+//        Tuple tupleToBeDeleted = new Tuple(htblColNameValue,this.getClusteringKey());
+//        pageTuples.remove(indexDeleted);
+        for(int i = 0 ; i<pageTuples.size();i++){
+            Tuple currentTuple = pageTuples.get(i);
+            boolean getDeleted = shouldBeDeleted(currentTuple,htblColNameValue);
+            if(getDeleted) {
+                pageTuples.remove(i);
+                i--;
+            }
         }
-        Tuple tupleToBeDeleted = new Tuple(htblColNameValue,this.getClusteringKey());
-        pageTuples.remove(indexDeleted);
-        if(isPageEmpty()){
+        if(isPageEmpty()) {
             this.deletePage();
             return true;
         }
-//        if(tupleToBeDeleted.compareTo(minVal)==0) {
         minVal = pageTuples.get(0);
-//        }
-//        else if (tupleToBeDeleted.compareTo(maxVal)==0){
         maxVal = pageTuples.get(this.getSizeOfPage()-1);
-//        }
         saveIntoPageFilepath();
         return false;
-    }
-    public void updatePage (String clusteringKey,Hashtable<String,Object> htblColNameValue,Vector<Column> columns){
-        Hashtable tupleKey=new Hashtable<String,Object>();
-        //String columntype=
-      //  tupleKey.put(this.clusteringKey,);
     }
 
     public void deletePage()
@@ -240,6 +240,59 @@ public class Page implements Serializable{
         }
     }
 
+    public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
+        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
+        for (Map.Entry<String, Object> entry : entrySet) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            Object currentColValue = currentTuple.getTupleAttributes().get(key);
+            if(!currentColValue.equals(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception{
+        Hashtable tupleHashtable = new Hashtable<String,Object>();
+        String clusterKeyDataType = "";
+        for(int i=0;i<columns.size();i++){
+            Column currentColumn = columns.get(i);
+            if(currentColumn.isClusteringKey()){
+                clusterKeyDataType = currentColumn.getColumnType();
+                break;
+            }
+        }
+        Object valueCorrectDataType= adjustDataType(strClusteringKeyValue,clusterKeyDataType);
+        tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
+        int indexToBeUpdated = getIndexBinarySearch(tupleHashtable);
+        if(indexToBeUpdated == -1) {
+            throw new DBAppException("The tuple you specified is not present");
+        }
+
+        Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
+        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
+        for (Map.Entry<String, Object> entry : entrySet) {
+            String keyToBeUpdated = entry.getKey();
+            Object newValue = entry.getValue();
+            tupleToBeUpdated.getTupleAttributes().put(keyToBeUpdated,newValue);
+        }
+    }
+
+    public Object adjustDataType(String strClusteringKeyValue,String clusterKeyDataType) throws Exception {
+        if (clusterKeyDataType.equals("java.lang.Integer")) {
+            return Integer.parseInt(strClusteringKeyValue);
+        } else if (clusterKeyDataType.equals("java.lang.String")) {
+            return strClusteringKeyValue;
+        } else if (clusterKeyDataType.equals("java.lang.Double")) {
+            return Double.parseDouble(strClusteringKeyValue);
+        } else if (clusterKeyDataType.equals("java.util.Date")) {
+            //YYYY-MM-DD
+            SimpleDateFormat formatter=new SimpleDateFormat("YYYY-MM-DD");
+            return formatter.parse(strClusteringKeyValue);
+        }
+        return null;
+    }
     public int getMaxSizePerPage() {
         return maxSizePerPage;
     }
@@ -272,12 +325,6 @@ public class Page implements Serializable{
         return clusteringKey;
     }
 
-    public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
-        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
-        for (Map.Entry<String, Object> entry : entrySet) {
-
-        }
-    }
     public int getIndexBinarySearch(Hashtable<String,Object> htblColNameValue){
         // we need to adjust the case of duplicates
         Tuple tuple = new Tuple(htblColNameValue , this.clusteringKey);
