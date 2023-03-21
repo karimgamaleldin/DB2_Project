@@ -217,6 +217,10 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return false;
     }
+    public void updatePage (String clusteringKey,Hashtable<String,Object> htblColNameValue){
+
+    }
+
     public void deletePage()
     {
         try {
