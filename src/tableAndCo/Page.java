@@ -55,7 +55,21 @@ public class Page implements Serializable{
         this.maxVal = maxVal;
     }
 
+    public String getTableName() {
+        return tableName;
+    }
 
+    public void setPageID(int pageID) {
+        this.pageID = pageID;
+    }
+
+    public void setClusteringKey(String clusteringKey) {
+        this.clusteringKey = clusteringKey;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
     // some helper methods
     public int getSizeOfPage(){
         return this.pageTuples.size();
@@ -66,36 +80,26 @@ public class Page implements Serializable{
     public boolean isPageEmpty(){
         return this.pageTuples.isEmpty();
     }
-    public void loadIntoPage() throws IOException, ClassNotFoundException {
-        FileInputStream file = new FileInputStream(this.getFilepath());
-        if(file.available()!=0){
-            ObjectInputStream on = new ObjectInputStream(file);
-            //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
-            try {
-//                System.out.println(on);
-                Vector<Tuple> tmp = (Vector<Tuple>) on.readObject();
-//                System.out.println(tmp.size());
-                this.setPageTuples(tmp);
-            }
-            catch (EOFException e) {
-                System.out.println("error:"+e.getMessage());
-            }
-        };
-
-    }
 
     public void saveIntoPageFilepath() throws IOException {
         //save the newly inserted tuple in the file itself
         File f = new File(filepath);
         FileOutputStream file = new FileOutputStream(this.getFilepath());
         ObjectOutputStream out = new ObjectOutputStream(file);
-        out.writeObject(this.getPageTuples());
+        Page savedPage = new Page(
+                this.getPageID(),
+                this.getFilepath(),
+                this.getMaxSizePerPage(),
+                this.getClusteringKey(),
+                this.getTableName()
+        );
+        out.writeObject(savedPage);
         out.close();
         file.close();
-        this.setPageTuples(null);//may give error
+//        this.setPageTuples(null);//may give error
     }
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
-        loadIntoPage();
+//        loadIntoPage();
 //        System.out.println("in page");
         boolean wasFull = this.isPageFull();
 //        System.out.println("before is full");
@@ -191,7 +195,7 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return lastTuple;
     }
-    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException{
+    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
         // true: page is empty and deleted so delete from table
         //false: page is not empty so don't delete from table
         int indexDeleted = getIndexBinarySearch(htblColNameValue);
@@ -210,24 +214,21 @@ public class Page implements Serializable{
 //        else if (tupleToBeDeleted.compareTo(maxVal)==0){
         maxVal = pageTuples.get(this.getSizeOfPage()-1);
 //        }
+        saveIntoPageFilepath();
         return false;
     }
     public void deletePage()
     {
-        try
-        {
+        try {
             File f= new File(this.getFilepath());           //file to be delete
-            if(f.delete())                      //returns Boolean value
-            {
+            if(f.delete()) { //returns boolean value
                 System.out.println(f.getName() + " deleted");   //getting and printing the file name
             }
-            else
-            {
+            else {
                 System.out.println("failed");
             }
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -273,7 +274,7 @@ public class Page implements Serializable{
             int mid = (start + end) / 2 ;
             if(tuple.compareTo(this.pageTuples.get(mid)) == 0){
                 // we should not return immediately need to check if whole tuples are equal
-                // made a method called isEqual in Tuple class
+                // made a method called isEqual in Tuple class (indices maybe?)
                 return mid;
             }
             else if (tuple.compareTo(this.pageTuples.get(mid)) < 0){
