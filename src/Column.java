@@ -1,4 +1,4 @@
-public class Column{
+public class Column {
     private String tableName;
     private String columnName;
     private String columnType;

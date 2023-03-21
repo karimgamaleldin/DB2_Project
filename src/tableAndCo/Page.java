@@ -272,6 +272,12 @@ public class Page implements Serializable{
         return clusteringKey;
     }
 
+    public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
+        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
+        for (Map.Entry<String, Object> entry : entrySet) {
+
+        }
+    }
     public int getIndexBinarySearch(Hashtable<String,Object> htblColNameValue){
         // we need to adjust the case of duplicates
         Tuple tuple = new Tuple(htblColNameValue , this.clusteringKey);
