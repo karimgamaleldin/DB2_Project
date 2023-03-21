@@ -94,7 +94,7 @@ public class Page implements Serializable{
         file.close();
         this.setPageTuples(null);//may give error
     }
-    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException, DBAppException {
         loadIntoPage();
 //        System.out.println("in page");
         boolean wasFull = this.isPageFull();
@@ -167,8 +167,7 @@ public class Page implements Serializable{
                     }
                     end = mid - 1;
                 } else {
-                    this.pageTuples.add(mid, insertedTuple);
-                    break;
+                    throw new DBAppException("The entry is already there.");
                 }
             }
         }
