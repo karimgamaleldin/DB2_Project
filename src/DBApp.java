@@ -20,13 +20,10 @@ public class DBApp implements Serializable {
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
-
-
     }
 
     public void createDataDirectory() {
         File dataDirectory = new File("data");
-
         // check if the directory can be created
         // using the specified path name
         if (dataDirectory.mkdir() == true) {

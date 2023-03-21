@@ -9,7 +9,7 @@ import java.util.Vector;
 public class Table implements Serializable {
     private Vector<String> tablePages; // Contain the unloaded pages
     private String tableName;
-    private int tuplesSize;
+    private int tuplesSize; // number of columns
     private int maxSizePerPage;
     private int numberOfTuples;
     private int numberOfPages;

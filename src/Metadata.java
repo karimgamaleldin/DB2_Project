@@ -113,9 +113,7 @@ public class Metadata {
                 sb.append(",");
                 sb.append(maxColValue);
                 sb.append("\r\n");
-
             }
-
             fw.append(sb.toString()).flush();
             System.out.println("finished");
         } catch (Exception e) {
@@ -138,7 +136,7 @@ public class Metadata {
         Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
-            if(currentColumn.getTableName().equals(strTableName)){
+            if(currentColumn.getTableName().equals(strTableName)) {
                 columnsNames.add(currentColumn.getColumnName());
             }
         }

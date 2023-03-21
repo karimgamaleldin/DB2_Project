@@ -218,8 +218,10 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
         return false;
     }
-    public void updatePage (String clusteringKey,Hashtable<String,Object> htblColNameValue){
-
+    public void updatePage (String clusteringKey,Hashtable<String,Object> htblColNameValue,Vector<Column> columns){
+        Hashtable tupleKey=new Hashtable<String,Object>();
+        //String columntype=
+      //  tupleKey.put(this.clusteringKey,);
     }
 
     public void deletePage()
