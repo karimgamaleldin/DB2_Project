@@ -113,7 +113,7 @@ public class DBApp implements Serializable {
         Table toBeInsertedInTable = this.tables.get(tableIndex);
         toBeInsertedInTable.insert(htblColNameValue);
     }
-    public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws DBAppException{
+    public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws Exception {
         Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);

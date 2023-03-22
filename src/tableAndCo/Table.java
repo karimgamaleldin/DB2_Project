@@ -5,6 +5,8 @@ import metadata.Column;
 
 import java.io.*;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 public class Table implements Serializable {
@@ -13,7 +15,6 @@ public class Table implements Serializable {
     private int tuplesSize; // number of columns
     private int maxSizePerPage;
     private int numberOfTuples;
-    private int numberOfPages;
     private Vector<Tuple> minValues;
     private Vector<Tuple> maxValues;
     private String clusteringKey;
@@ -55,7 +56,6 @@ public class Table implements Serializable {
     public int getTuplesSize() {
         return tuplesSize;
     }
-
     public int getMaxSizePerPage() {
         return maxSizePerPage;
     }
@@ -139,7 +139,8 @@ public class Table implements Serializable {
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
     }
-    public void update (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws DBAppException {
+    public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception {
+        boolean clusteringKeyExist=false;
         if(isTableEmpty()){
             throw new DBAppException("The table is empty");
         }
@@ -173,7 +174,10 @@ public class Table implements Serializable {
                 max=maxValues.get(mid);
                 if(toBeUpdated.compareTo(min) >0){
                     if(toBeUpdated.compareTo(max)<=0){
-//                        this.deleteHelper(mid,htblColNameValue);
+                        updateHelper(mid,strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
+//                        if(clusteringKeyExist){
+//                            updateMinMax(loadedPage,mid);
+//                        }
                         return;
                     }else{
                         start=mid+1;

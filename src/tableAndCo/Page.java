@@ -232,17 +232,10 @@ public class Page implements Serializable{
         return true;
     }
 
-    public void updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception{
+    public Tuple updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
+        boolean clusteringKeyExist=false;
         Hashtable tupleHashtable = new Hashtable<String,Object>();
-        String clusterKeyDataType = "";
-        for(int i=0;i<columns.size();i++){
-            Column currentColumn = columns.get(i);
-            if(currentColumn.isClusteringKey()){
-                clusterKeyDataType = currentColumn.getColumnType();
-                break;
-            }
-        }
-        Object valueCorrectDataType= adjustDataType(strClusteringKeyValue,clusterKeyDataType);
+        Object valueCorrectDataType= Page.adjustDataType(strClusteringKeyValue,dataType);
         tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
         int indexToBeUpdated = getIndexBinarySearch(tupleHashtable);
         if(indexToBeUpdated == -1) {
