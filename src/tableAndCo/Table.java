@@ -81,7 +81,6 @@ public class Table implements Serializable {
 //            maxValues.add(page.getMaxVal());
             return;
         }
-
         int start =0;
         int end = this.getTablePages().size()-1;
         Tuple min=minValues.get(start);
@@ -159,7 +158,7 @@ public class Table implements Serializable {
 
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
-        throw new DBAppException("The table is empty");
+            throw new DBAppException("The table is empty");
         }
         Tuple toBeDeleted=new Tuple(htblColNameValue,clusteringKey);
         int start =0;

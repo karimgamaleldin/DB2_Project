@@ -121,70 +121,47 @@ public class Page implements Serializable{
         if(insertedTuple.compareTo(this.pageTuples.get(0)) < 0){
             this.pageTuples.add(0, insertedTuple);
         }
-       else
-        {
-            while (start <= end) {
-                int mid = (start + end) / 2;
-                Tuple currentTuple = this.pageTuples.get(mid);
-                if (insertedTuple.compareTo(currentTuple) > 0) {
-                    int temp = mid+1;
-                    if(temp>=this.getSizeOfPage()){
-                        this.pageTuples.add(insertedTuple);
-                        break;
-                    }
-                    Tuple nextTuple = this.pageTuples.get(temp);
-                    if(insertedTuple.compareTo(nextTuple)<=0){
-                        this.pageTuples.add(temp, insertedTuple);
-                        break;
-                    }
-                    start = mid + 1;
-                } else if (insertedTuple.compareTo(currentTuple) < 0) {
-//                if ( mid == this.getSizeOfPage() - 1 ) {
-//                    this.pageTuples.add(mid,insertedTuple);
-//                }
-//                else if (insertedTuple.compareTo(this.pageTuples.get(mid + 1)) > 0) {
-//                    this.pageTuples.add(mid+1,insertedTuple);
-//                }
-//                else {
-//                    end = mid ;
-//                }
-//                boolean isInserted = false;
-//                for(int i=mid-1;i>=start;i--){
-//                    currentTuple = this.pageTuples.get(i);
-//                    if(insertedTuple.compareTo(currentTuple)>0){
-//                        this.pageTuples.add(i+1,insertedTuple);
-//                        isInserted=true;
-//                        break;
-//                    }
-//                }
-//                if(!isInserted){
-//                    this.pageTuples.add(start-1,insertedTuple);
-//                    break;
-//                }
-                    int temp = mid-1;
-                    if(temp<0){
-                        this.pageTuples.add(0,insertedTuple);
-                        break;
-                    }
-                    Tuple nextTuple = this.pageTuples.get(temp);
-                    if(insertedTuple.compareTo(nextTuple)>=0){
-                        this.pageTuples.add(temp, insertedTuple);
-                        break;
-                    }
-                    end = mid - 1;
-                } else {
-                    this.pageTuples.add(mid, insertedTuple);
-                    break;
-                }
+        else {
+           while (start <= end) {
+               int mid = (start + end) / 2;
+               Tuple currentTuple = this.pageTuples.get(mid);
+               if (insertedTuple.compareTo(currentTuple) > 0) {
+//                   int temp = mid+1;
+//                   if(temp>=this.getSizeOfPage()){
+//                       this.pageTuples.add(insertedTuple);
+//                       break;
+//                   }
+//                   Tuple nextTuple = this.pageTuples.get(temp);
+//                   if(insertedTuple.compareTo(nextTuple)<=0){
+//                       this.pageTuples.add(temp, insertedTuple);
+//                       break;
+//                   }
+                   start = mid + 1;
+               } else if (insertedTuple.compareTo(currentTuple) < 0) {
+//                   int temp = mid-1;
+//                   if(temp<0){
+//                       this.pageTuples.add(0,insertedTuple);
+//                       break;
+//                   }
+//                   Tuple nextTuple = this.pageTuples.get(temp);
+//                   if(insertedTuple.compareTo(nextTuple)>=0){
+//                       this.pageTuples.add(temp, insertedTuple);
+//                       break;
+//                   }
+                   end = mid - 1;
+               } else {
+                   this.pageTuples.add(mid, insertedTuple);
+                   break;
+               }
+           }
+        }
+        if(start>end) {
+            if(start==this.getSizeOfPage()){
+                this.pageTuples.add(insertedTuple);
+            }else {
+                this.pageTuples.add(start,insertedTuple);
             }
         }
-//        if(start>end) {
-//            if(start==this.getSizeOfPage()){
-//                this.pageTuples.add(insertedTuple);
-//            }else {
-//                this.pageTuples.add(start,insertedTuple);
-//            }
-//        }
 
         if(minVal==null||insertedTuple.compareTo(minVal)<0){
             this.setMinVal(insertedTuple);
@@ -200,18 +177,20 @@ public class Page implements Serializable{
     public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
         // true: page is empty and deleted so delete from table
         //false: page is not empty so don't delete from table
-//        int indexDeleted = getIndexBinarySearch(htblColNameValue);
-//        if(indexDeleted == -1){
-//            throw new DBAppException("The tuple you specified is not present");
-//        }
-//        Tuple tupleToBeDeleted = new Tuple(htblColNameValue,this.getClusteringKey());
-//        pageTuples.remove(indexDeleted);
-        for(int i = 0 ; i<pageTuples.size();i++){
-            Tuple currentTuple = pageTuples.get(i);
-            boolean getDeleted = shouldBeDeleted(currentTuple,htblColNameValue);
-            if(getDeleted) {
-                pageTuples.remove(i);
-                i--;
+        if(htblColNameValue.containsKey(this.getClusteringKey())){
+            int indexDeleted = getIndexBinarySearch(htblColNameValue);
+            if(indexDeleted == -1){
+                throw new DBAppException("The tuple you specified is not present");
+            }
+            pageTuples.remove(indexDeleted);
+        } else {
+            for(int i = 0 ; i<pageTuples.size();i++){
+                Tuple currentTuple = pageTuples.get(i);
+                boolean getDeleted = shouldBeDeleted(currentTuple,htblColNameValue);
+                if(getDeleted) {
+                    pageTuples.remove(i);
+                    i--;
+                }
             }
         }
         if(isPageEmpty()) {
@@ -345,5 +324,23 @@ public class Page implements Serializable{
             }
         }
         return -1;
+    }
+
+    @Override
+    public String toString() {
+        String pageInfo = "";
+        pageInfo+= "page id: "+this.getPageID()+"\n";
+        pageInfo+= "max page size: "+this.getMaxSizePerPage()+"\n";
+        pageInfo+= "filepath: "+this.getFilepath()+"\n";
+        pageInfo+= "min: "+this.getMinVal().toString()+"\n";
+        pageInfo+= "max: "+this.getMaxVal().toString()+"\n";
+        pageInfo+= "cluster key: "+this.getClusteringKey()+"\n";
+        pageInfo+= "table name: "+this.getTableName()+"\n";
+        pageInfo+= "tuples:\n";
+        for(int i=0;i<this.getSizeOfPage();i++){
+            pageInfo+=this.getPageTuples().get(i).toString()+"\n";
+        }
+        pageInfo+= this.getFilepath()+"done ...................... \n\n";
+        return pageInfo;
     }
 }

@@ -68,16 +68,11 @@ public class DBApp implements Serializable {
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
 //
 //    }
-    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
-//        if (!tables.contains(strTableName)){
-//            throw new DBAppException("This Table is not present");
-//        }
-
+    public int checkTablePresent(String strTableName) throws DBAppException {
         int tableIndex = -1;
         for(int i = 0; i< tables.size(); i++){
             String currentTableName = tables.get(i).getTableName();
             if (currentTableName.equals(strTableName)){
-
                 tableIndex = i;
                 break;
             }
@@ -85,11 +80,15 @@ public class DBApp implements Serializable {
         if (tableIndex==-1) {
             throw new DBAppException("This Table is not present");
         }
-        int tupleSize = metaData.getTupleSize(strTableName);
+        return tableIndex;
+    }
+    public void checkHtblValid(String strTableName, Hashtable<String,Object> htblColNameValue, boolean insert) throws DBAppException {
         Vector<String> columnNames = metaData.getColumnNames(strTableName);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
-        if(entrySet.size() != columnNames.size()){
-            throw new DBAppException("There are missing or extra column(s)");
+        if (insert) {
+            if(entrySet.size() != columnNames.size()){
+                throw new DBAppException("There are missing or extra column(s)");
+            }
         }
         for (Map.Entry<String, Object> entry : entrySet) {
             String key = entry.getKey();
@@ -103,20 +102,29 @@ public class DBApp implements Serializable {
                 throw new DBAppException("wrong entry datatype");
             }
         }
+    }
+    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
+//        if (!tables.contains(strTableName)){
+//            throw new DBAppException("This Table is not present");
+//        }
+        int tableIndex = checkTablePresent(strTableName);
+        int tupleSize = metaData.getTupleSize(strTableName);
+        checkHtblValid(strTableName, htblColNameValue, true);
         Table toBeInsertedInTable = this.tables.get(tableIndex);
         toBeInsertedInTable.insert(htblColNameValue);
-//        if(toBeInsertedInTable.needsNewPage()){
-//            toBeInsertedInTable.createNewPage();
-//        }
-
-
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws DBAppException{
         Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
-
+        int tableIndex = checkTablePresent(strTableName);
+        checkHtblValid(strTableName, htblColNameValue, false);
+        Table toBeInsertedInTable = this.tables.get(tableIndex);
+        toBeInsertedInTable.update(strClusteringKeyValue, htblColNameValue, columns);
     }
-    public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
-
+    public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception{
+        int tableIndex = checkTablePresent(strTableName);
+        checkHtblValid(strTableName, htblColNameValue, false);
+        Table toBeInsertedInTable = this.tables.get(tableIndex);
+        toBeInsertedInTable.delete(htblColNameValue);
     }
 //  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 //
