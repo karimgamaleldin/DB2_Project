@@ -194,7 +194,7 @@ public class Page implements Serializable{
             }
         }
         if(isPageEmpty()) {
-            this.deletePage();
+            this.deleteEntirePage();
             return true;
         }
         minVal = pageTuples.get(0);
@@ -203,7 +203,7 @@ public class Page implements Serializable{
         return false;
     }
 
-    public void deletePage()
+    public void deleteEntirePage()
     {
         try {
             File f= new File(this.getFilepath());           //file to be delete
@@ -248,7 +248,9 @@ public class Page implements Serializable{
         if(indexToBeUpdated == -1) {
             throw new DBAppException("The tuple you specified is not present");
         }
-
+        if(htblColNameValue.containsKey(this.getClusteringKey())){
+            clusteringKeyExist=true;
+        }
         Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
@@ -256,9 +258,16 @@ public class Page implements Serializable{
             Object newValue = entry.getValue();
             tupleToBeUpdated.getTupleAttributes().put(keyToBeUpdated,newValue);
         }
+        if(clusteringKeyExist) {
+            this.getPageTuples().remove(indexToBeUpdated);
+            saveIntoPageFilepath();
+            return tupleToBeUpdated;
+        }
+        saveIntoPageFilepath();
+        return null;
     }
 
-    public Object adjustDataType(String strClusteringKeyValue,String clusterKeyDataType) throws Exception {
+    public static Object adjustDataType(String strClusteringKeyValue,String clusterKeyDataType) throws Exception {
         if (clusterKeyDataType.equals("java.lang.Integer")) {
             return Integer.parseInt(strClusteringKeyValue);
         } else if (clusterKeyDataType.equals("java.lang.String")) {

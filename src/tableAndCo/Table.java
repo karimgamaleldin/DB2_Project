@@ -24,7 +24,6 @@ public class Table implements Serializable {
         this.tablePages = new Vector<String>();
         this.tuplesSize = tuplesSize;
         this.maxSizePerPage = maxPageSize;
-        this.numberOfPages = 0;
         this.numberOfTuples = 0;
         this.clusteringKey = clusteringKey;
         this.nextPageID = 0;
@@ -144,8 +143,21 @@ public class Table implements Serializable {
         if(isTableEmpty()){
             throw new DBAppException("The table is empty");
         }
-//        htblColNameValue.put(clusteringKey,);
-        Tuple toBeUpdated=new Tuple(htblColNameValue,clusteringKey);
+        if(htblColNameValue.containsKey(this.getClusteringKey())){
+            clusteringKeyExist=true;
+        }
+
+        String clusterKeyDataType = "";
+        for(int i=0;i<columns.size();i++){
+            Column currentColumn = columns.get(i);
+            if(currentColumn.isClusteringKey()){
+                clusterKeyDataType = currentColumn.getColumnType();
+                break;
+            }
+        }
+        Object correctValType = Page.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
+        htblColNameValue.put(clusteringKey,correctValType);
+        Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey);
         int start =0;
         int end = this.getTablePages().size()-1;
         Tuple min=minValues.get(start);
@@ -171,7 +183,10 @@ public class Table implements Serializable {
                     end=mid-1;
                 }
                 else {//if tuple == min
-//                    this.deleteHelper(mid,htblColNameValue);
+                    updateHelper(mid,strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
+//                    if(clusteringKeyExist){
+//                        updateMinMax(loadedPage,mid);
+//                    }
                     return;
                 }
             }
@@ -180,15 +195,17 @@ public class Table implements Serializable {
     }
 
 
-    private void deleteHelper(int mid, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
+    private void updateHelper(int mid, String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue, String clusterKeyDataType) throws Exception {
         Page loadedPage = loadPages(this.getTablePages().get(mid));
-        boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
-        if(isPageDeleted){
-            this.getTablePages().remove(mid);
-            this.maxValues.remove(mid);
-            this.minValues.remove(mid);
-        }else{
-            updateMinMax(loadedPage, mid);
+        Tuple updatedTuple = loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
+        if(loadedPage.isPageEmpty()){
+            loadedPage.deleteEntirePage();
+            tablePages.remove(mid);
+            minValues.remove(mid);
+            maxValues.remove(mid);
+        }
+        if(updatedTuple!=null){
+            insert(updatedTuple.getTupleAttributes());
         }
     }
 
@@ -206,31 +223,40 @@ public class Table implements Serializable {
         } else if (toBeDeleted.compareTo(max) >0) {//if tuple equal than biggest tuple in table
             throw new DBAppException("tuple is not in the table");
         } else{
-            while(start <= end){
-                int mid = (start + end) / 2 ;
-                min=minValues.get(mid);
-                max=maxValues.get(mid);
-                if(toBeDeleted.compareTo(min) >0){
-                    if(toBeDeleted.compareTo(max)<=0){
-                        this.deleteHelper(mid,htblColNameValue);
-                        return;
-                    }else{
-                        start=mid+1;
-                    }
-                }
-                else if (toBeDeleted.compareTo(min) < 0){
-                    end=mid-1;
-                }
-                else {//if tuple == min
-                    this.deleteHelper(mid,htblColNameValue);
-                    return;
+//            while(start <= end){
+//                int mid = (start + end) / 2 ;
+//                min=minValues.get(mid);
+//                max=maxValues.get(mid);
+//                if(toBeDeleted.compareTo(min) >0){
+//                    if(toBeDeleted.compareTo(max)<=0){
+//                        this.deleteHelper(mid,htblColNameValue);
+//                        return;
+//                    }else{
+//                        start=mid+1;
+//                    }
+//                }
+//                else if (toBeDeleted.compareTo(min) < 0){
+//                    end=mid-1;
+//                }
+//                else {//if tuple == min
+//                    this.deleteHelper(mid,htblColNameValue);
+//                    return;
+//                }
+//            }
+            for(int i=0;i<this.getTablePages().size();i++){
+                Page loadedPage = loadPages(this.getTablePages().get(i));
+                boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
+                if(isPageDeleted){
+                    this.getTablePages().remove(i);
+                    minValues.remove(i);
+                    maxValues.remove(i);
+                    i--;
+                }else {
+                    updateMinMax(loadedPage,i);
                 }
             }
             throw new DBAppException("tuple is not in the table");
         }
-    }
-    public boolean needsNewPage(){
-        return numberOfTuples == (maxSizePerPage * numberOfPages);
     }
     public Page createNewPage(){
         String path = "page"+nextPageID;
@@ -240,13 +266,8 @@ public class Table implements Serializable {
         this.minValues.add(null);
         this.maxValues.add(null);
         return page;
-        // method to create new page
+    }
 
-    }
-    public int getPageNumberToInsert(){
-        // method to get the page that we need to insert in
-        return 0;
-    }
     public void updateMinMax(Page p, int index){
         Tuple min=p.getMinVal();
         Tuple max=p.getMaxVal();
