@@ -140,9 +140,45 @@ public class Table implements Serializable {
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
     }
-    public void updatePage (String clusteringKey,Hashtable<String,Object> htblColNameValue,Vector<Column> columns){
-
+    public void update (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws DBAppException {
+        if(isTableEmpty()){
+            throw new DBAppException("The table is empty");
+        }
+//        htblColNameValue.put(clusteringKey,);
+        Tuple toBeUpdated=new Tuple(htblColNameValue,clusteringKey);
+        int start =0;
+        int end = this.getTablePages().size()-1;
+        Tuple min=minValues.get(start);
+        Tuple max=maxValues.get(end);
+        if(toBeUpdated.compareTo(min) <0){//if tuple less than first tuple in table
+            throw new DBAppException("tuple is not in the table");
+        } else if (toBeUpdated.compareTo(max) >0) {//if tuple equal than biggest tuple in table
+            throw new DBAppException("tuple is not in the table");
+        } else{
+            while(start <= end){
+                int mid = (start + end) / 2 ;
+                min=minValues.get(mid);
+                max=maxValues.get(mid);
+                if(toBeUpdated.compareTo(min) >0){
+                    if(toBeUpdated.compareTo(max)<=0){
+//                        this.deleteHelper(mid,htblColNameValue);
+                        return;
+                    }else{
+                        start=mid+1;
+                    }
+                }
+                else if (toBeUpdated.compareTo(min) < 0){
+                    end=mid-1;
+                }
+                else {//if tuple == min
+//                    this.deleteHelper(mid,htblColNameValue);
+                    return;
+                }
+            }
+            throw new DBAppException("tuple is not in the table");
+        }
     }
+
 
     private void deleteHelper(int mid, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         Page loadedPage = loadPages(this.getTablePages().get(mid));
