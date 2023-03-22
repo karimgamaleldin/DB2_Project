@@ -1,4 +1,6 @@
-public class Column{
+package metadata;
+
+public class Column {
     private String tableName;
     private String columnName;
     private String columnType;

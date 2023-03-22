@@ -1,3 +1,5 @@
+package metadata;
+
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -19,15 +21,47 @@ public class Metadata {
         this.fw=new FileWriter(metafile);
         writeHeaders();
     }
-    public void writeHeaders() throws IOException {
 
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public Hashtable<String, Vector<Column>> getColumnsOfMetaData() {
+        return columnsOfMetaData;
+    }
+
+    public void setColumnsOfMetaData(Hashtable<String, Vector<Column>> columnsOfMetaData) {
+        this.columnsOfMetaData = columnsOfMetaData;
+    }
+
+    public File getMetafile() {
+        return metafile;
+    }
+
+    public void setMetafile(File metafile) {
+        this.metafile = metafile;
+    }
+
+    public FileWriter getFw() {
+        return fw;
+    }
+
+    public void setFw(FileWriter fw) {
+        this.fw = fw;
+    }
+
+    public void writeHeaders() throws IOException {
         StringBuilder sb= new StringBuilder();
-        //Table Name, Column Name, Column Type, ClusteringKey, IndexName,IndexType, min, max
+        //Table Name, metadata.Column Name, metadata.Column Type, ClusteringKey, IndexName,IndexType, min, max
         sb.append("Table Name");
         sb.append(",");
-        sb.append("Column Name");
+        sb.append("metadata.Column Name");
         sb.append(",");
-        sb.append("Column Type");
+        sb.append("metadata.Column Type");
         sb.append(",");
         sb.append("ClusteringKey");
         sb.append(",");
@@ -81,9 +115,7 @@ public class Metadata {
                 sb.append(",");
                 sb.append(maxColValue);
                 sb.append("\r\n");
-
             }
-
             fw.append(sb.toString()).flush();
             System.out.println("finished");
         } catch (Exception e) {
@@ -106,7 +138,7 @@ public class Metadata {
         Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
-            if(currentColumn.getTableName().equals(strTableName)){
+            if(currentColumn.getTableName().equals(strTableName)) {
                 columnsNames.add(currentColumn.getColumnName());
             }
         }
