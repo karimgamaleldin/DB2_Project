@@ -1,4 +1,6 @@
 import exceptions.DBAppException;
+import helpers.Comparison;
+import helpers.FileManipulation;
 import metadata.Column;
 import metadata.Metadata;
 import tableAndCo.Table;
@@ -18,23 +20,14 @@ public class DBApp implements Serializable {
     public void init(){
         try {
             metaData = new Metadata("metadata.csv");
-            createDataDirectory();
+            FileManipulation.createDirectory("data");
+            FileManipulation.createDirectory("data/pages");
+            FileManipulation.createDirectory("data/tables");
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
     }
 
-    public void createDataDirectory() {
-        File dataDirectory = new File("data");
-        // check if the directory can be created
-        // using the specified path name
-        if (dataDirectory.mkdir() == true) {
-            System.out.println("Directory has been created successfully");
-        }
-        else {
-            System.out.println("Directory cannot be created");
-        }
-    }
     public void createTable(String strTableName,
                             String strClusteringKeyColumn,
                             Hashtable<String,String> htblColNameType,
@@ -82,7 +75,7 @@ public class DBApp implements Serializable {
         }
         return tableIndex;
     }
-    public void checkHtblValid(String strTableName, Hashtable<String,Object> htblColNameValue, boolean insert) throws DBAppException {
+    public void checkHtblValid(String strTableName, Hashtable<String,Object> htblColNameValue, boolean insert) throws Exception {
         Vector<String> columnNames = metaData.getColumnNames(strTableName);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         if (insert) {
@@ -101,9 +94,17 @@ public class DBApp implements Serializable {
             if(valClass.compareTo(columnType)!=0){
                 throw new DBAppException("wrong entry datatype");
             }
+            Vector<Object> columnMinAndMax = metaData.getColumnMinAndMax(strTableName,key,columnType);
+            Object min = columnMinAndMax.get(0);
+            Object max = columnMinAndMax.get(1);
+            boolean lessThanMin = Comparison.compareTo(value,min,columnType)<0;
+            boolean greaterThanMax = Comparison.compareTo(value,max,columnType)>0;
+            if(lessThanMin || greaterThanMax){
+                throw new DBAppException("entry is less than min or greater than max");
+            }
         }
     }
-    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
+    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception {
 //        if (!tables.contains(strTableName)){
 //            throw new DBAppException("This Table is not present");
 //        }

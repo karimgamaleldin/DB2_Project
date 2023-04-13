@@ -158,6 +158,24 @@ public class Metadata {
         return type;
     }
 
+    public Vector<Object> getColumnMinAndMax(String strTableName, String columnName, String columnType) throws Exception {
+        Vector<Object> columnsMinAndMax = new Vector<Object>();
+        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+        for(int i = 0 ; i < columns.size() ; i++){
+            Column currentColumn = columns.get(i);
+            String currentColumnTableName = currentColumn.getTableName();
+            String currentColumnName = currentColumn.getColumnName();
+            if(currentColumnTableName.equals(strTableName) && columnName.equals(currentColumnName)) {
+                Object min = Column.adjustDataType(currentColumn.getMin(),columnType);
+                Object max = Column.adjustDataType(currentColumn.getMin(),columnType);
+                columnsMinAndMax.add(min);
+                columnsMinAndMax.add(max);
+                break;
+            }
+        }
+        return columnsMinAndMax;
+    }
+
 }
 
 

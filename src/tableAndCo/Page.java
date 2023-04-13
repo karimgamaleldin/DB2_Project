@@ -4,6 +4,8 @@ import exceptions.DBAppException;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import helpers.FileManipulation;
 import metadata.Column;
 
 public class Page implements Serializable{
@@ -22,25 +24,14 @@ public class Page implements Serializable{
         this.pageID = pageID;
         this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        this.filepath = "data/"+tableName+"/"+filepath+".class" ;
+        this.filepath = "data/pages/"+tableName+"/"+filepath+".class" ;
         this.minVal = null;
         this.maxVal = null;
         this.clusteringKey = clusteringKey;
         this.tableName = tableName;
-        createPageFile();
+        FileManipulation.createSerFile(this.filepath);
     }
-    public void createPageFile(){
-        try{
-            File pageFile = new File(this.getFilepath());
-            if (pageFile.createNewFile()) {
-                System.out.println("File created: " + pageFile.getName());
-            } else {
-                System.out.println("File already exists.");
-            }
-        }catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+
     public Tuple getMinVal() {
         return minVal;
     }
@@ -85,19 +76,7 @@ public class Page implements Serializable{
 
     public void saveIntoPageFilepath() throws IOException {
         //save the newly inserted tuple in the file itself
-        File f = new File(filepath);
-        FileOutputStream file = new FileOutputStream(this.getFilepath());
-        ObjectOutputStream out = new ObjectOutputStream(file);
-        Page savedPage = new Page(
-                this.getPageID(),
-                this.getFilepath(),
-                this.getMaxSizePerPage(),
-                this.getClusteringKey(),
-                this.getTableName()
-        );
-        out.writeObject(savedPage);
-        out.close();
-        file.close();
+        FileManipulation.saveIntoFilepath(this,this.filepath);
 //        this.setPageTuples(null);//may give error
     }
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
@@ -233,17 +212,17 @@ public class Page implements Serializable{
     }
 
     public Tuple updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
-        boolean clusteringKeyExist=false;
+//        boolean clusteringKeyExist=false;
         Hashtable tupleHashtable = new Hashtable<String,Object>();
-        Object valueCorrectDataType= Page.adjustDataType(strClusteringKeyValue,dataType);
+        Object valueCorrectDataType= Column.adjustDataType(strClusteringKeyValue,dataType);
         tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
         int indexToBeUpdated = getIndexBinarySearch(tupleHashtable);
         if(indexToBeUpdated == -1) {
             throw new DBAppException("The tuple you specified is not present");
         }
-        if(htblColNameValue.containsKey(this.getClusteringKey())){
-            clusteringKeyExist=true;
-        }
+//        if(htblColNameValue.containsKey(this.getClusteringKey())){
+//            clusteringKeyExist=true;
+//        }
         Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
@@ -251,29 +230,15 @@ public class Page implements Serializable{
             Object newValue = entry.getValue();
             tupleToBeUpdated.getTupleAttributes().put(keyToBeUpdated,newValue);
         }
-        if(clusteringKeyExist) {
-            this.getPageTuples().remove(indexToBeUpdated);
-            saveIntoPageFilepath();
-            return tupleToBeUpdated;
-        }
+//        if(clusteringKeyExist) {
+//            this.getPageTuples().remove(indexToBeUpdated);
+//            saveIntoPageFilepath();
+//            return tupleToBeUpdated;
+//        }
         saveIntoPageFilepath();
         return null;
     }
 
-    public static Object adjustDataType(String strClusteringKeyValue,String clusterKeyDataType) throws Exception {
-        if (clusterKeyDataType.equals("java.lang.Integer")) {
-            return Integer.parseInt(strClusteringKeyValue);
-        } else if (clusterKeyDataType.equals("java.lang.String")) {
-            return strClusteringKeyValue;
-        } else if (clusterKeyDataType.equals("java.lang.Double")) {
-            return Double.parseDouble(strClusteringKeyValue);
-        } else if (clusterKeyDataType.equals("java.util.Date")) {
-            //YYYY-MM-DD
-            SimpleDateFormat formatter=new SimpleDateFormat("YYYY-MM-DD");
-            return formatter.parse(strClusteringKeyValue);
-        }
-        return null;
-    }
     public int getMaxSizePerPage() {
         return maxSizePerPage;
     }

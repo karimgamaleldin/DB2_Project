@@ -1,6 +1,7 @@
 package tableAndCo;
 
 import exceptions.DBAppException;
+import helpers.FileManipulation;
 import metadata.Column;
 
 import java.io.*;
@@ -19,8 +20,9 @@ public class Table implements Serializable {
     private Vector<Tuple> maxValues;
     private String clusteringKey;
     private int nextPageID;
+    private String filepath;
 
-    public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey){
+    public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey) throws IOException {
         this.tableName = tableName;
         this.tablePages = new Vector<String>();
         this.tuplesSize = tuplesSize;
@@ -30,20 +32,15 @@ public class Table implements Serializable {
         this.nextPageID = 0;
         this.minValues=new Vector<Tuple>();
         this.maxValues=new Vector<Tuple>();
-        createTableDirectory();
+        this.filepath = "data/tables/"+tableName+".class";
+        this.saveIntoTableFilepath();
+        FileManipulation.createDirectory("data/pages/"+tableName);
     }
 
-    public void createTableDirectory() {
-        File tableDirectory = new File("data/"+this.getTableName());
-
-        // check if the directory can be created
-        // using the specified path name
-        if (tableDirectory.mkdir() == true) {
-            System.out.println("Directory has been created successfully");
-        }
-        else {
-            System.out.println("Directory cannot be created");
-        }
+    public void saveIntoTableFilepath() throws IOException {
+        //save the newly inserted tuple in the file itself
+        FileManipulation.saveIntoFilepath(this,this.filepath);
+//        this.setPageTuples(null);//may give error
     }
     public Vector<String> getTablePages() {
         return tablePages;
@@ -140,13 +137,13 @@ public class Table implements Serializable {
 
     }
     public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception {
-        boolean clusteringKeyExist=false;
+//        boolean clusteringKeyExist=false;
         if(isTableEmpty()){
             throw new DBAppException("The table is empty");
         }
-        if(htblColNameValue.containsKey(this.getClusteringKey())){
-            clusteringKeyExist=true;
-        }
+//        if(htblColNameValue.containsKey(this.getClusteringKey())){
+//            clusteringKeyExist=true;
+//        }
 
         String clusterKeyDataType = "";
         for(int i=0;i<columns.size();i++){
@@ -156,7 +153,7 @@ public class Table implements Serializable {
                 break;
             }
         }
-        Object correctValType = Page.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
+        Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
         htblColNameValue.put(clusteringKey,correctValType);
         Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey);
         int start =0;
@@ -167,7 +164,7 @@ public class Table implements Serializable {
             throw new DBAppException("tuple is not in the table");
         } else if (toBeUpdated.compareTo(max) >0) {//if tuple equal than biggest tuple in table
             throw new DBAppException("tuple is not in the table");
-        } else{
+        } else {
             while(start <= end){
                 int mid = (start + end) / 2 ;
                 min=minValues.get(mid);
@@ -201,21 +198,36 @@ public class Table implements Serializable {
 
     private void updateHelper(int mid, String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue, String clusterKeyDataType) throws Exception {
         Page loadedPage = loadPages(this.getTablePages().get(mid));
-        Tuple updatedTuple = loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
+//        Tuple updatedTuple =
+        loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
         if(loadedPage.isPageEmpty()){
             loadedPage.deleteEntirePage();
             tablePages.remove(mid);
             minValues.remove(mid);
             maxValues.remove(mid);
         }
-        if(updatedTuple!=null){
-            insert(updatedTuple.getTupleAttributes());
-        }
+//        if(updatedTuple!=null){
+//            insert(updatedTuple.getTupleAttributes());
+//        }
     }
-
+    public void deleteEntireTable() throws IOException {
+        Table emptyTable = new Table(
+                this.tableName,
+                this.tuplesSize,
+                this.maxSizePerPage,
+                this.clusteringKey
+        );
+        FileManipulation.saveIntoFilepath(emptyTable,this.filepath);
+    }
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
-            throw new DBAppException("The table is empty");
+//            throw new DBAppException("The table is empty");
+            return;
+        }
+        if(htblColNameValue.size()==0){
+            deleteEntireTable();
+
+            return;
         }
         Tuple toBeDeleted=new Tuple(htblColNameValue,clusteringKey);
         int start =0;
@@ -288,12 +300,14 @@ public class Table implements Serializable {
     }
     public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException {
         if(shifted==null) {
+            saveIntoTableFilepath();
             return;
         }
         Hashtable<String, Object> shift=shifted.getTupleAttributes();
         //if nextPage == table size before entering loop
         if(nextPage==this.getTablePages().size()){
             insertIntoCreatedPage(shift);
+            saveIntoTableFilepath();
             return;
 //                this.minValues.add(page.getMinVal());
 //                this.maxValues.add(page.getMaxVal());
@@ -305,6 +319,7 @@ public class Table implements Serializable {
             nextPage++;
             if(nextPage==this.getTablePages().size()){
                 insertIntoCreatedPage(shift);
+                saveIntoTableFilepath();
                 return;
 //                this.minValues.add(page.getMinVal());
 //                this.maxValues.add(page.getMaxVal());
