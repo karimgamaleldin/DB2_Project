@@ -173,7 +173,7 @@ public class Page implements Serializable{
             }
         }
         if(isPageEmpty()) {
-            this.deleteEntirePage();
+            FileManipulation.deleteEntireFile(this.filepath);
             return true;
         }
         minVal = pageTuples.get(0);
@@ -182,21 +182,7 @@ public class Page implements Serializable{
         return false;
     }
 
-    public void deleteEntirePage()
-    {
-        try {
-            File f= new File(this.getFilepath());           //file to be delete
-            if(f.delete()) { //returns boolean value
-                System.out.println(f.getName() + " deleted");   //getting and printing the file name
-            }
-            else {
-                System.out.println("failed");
-            }
-        }
-        catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+
 
     public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();

@@ -10,19 +10,23 @@ import java.util.*;
 
 public class DBApp implements Serializable {
 
-    private static Vector<Table> tables;
+    private static Vector<String> tables;
     private Metadata metaData;
-
+    private String pagesFilepath;
+    private String tablesFilepath;
     public DBApp(){
-        this.tables = new Vector<Table>();
+        this.tables = new Vector<String>();
+        this.pagesFilepath = "data/pages";
+        this.tablesFilepath = "data/tables";
         init();
     }
     public void init(){
         try {
             metaData = new Metadata("metadata.csv");
             FileManipulation.createDirectory("data");
-            FileManipulation.createDirectory("data/pages");
-            FileManipulation.createDirectory("data/tables");
+            FileManipulation.createDirectory(this.pagesFilepath);
+            FileManipulation.createDirectory(this.tablesFilepath);
+            FileManipulation.loadFilesFromDirectory(this.tablesFilepath,this.tables);
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
@@ -32,10 +36,11 @@ public class DBApp implements Serializable {
                             String strClusteringKeyColumn,
                             Hashtable<String,String> htblColNameType,
                             Hashtable<String,String> htblColNameMin,
-                            Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException {
+                            Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException, ClassNotFoundException {
 
         for(int i = 0; i< tables.size(); i++){
-            String currentTableName = tables.get(i).getTableName();
+            Table currTable = FileManipulation.loadTable(tables.get(i));
+            String currentTableName = currTable.getTableName();
             if (currentTableName.equals(strTableName)){
                 throw new DBAppException("This table already exists");
             }
@@ -56,15 +61,16 @@ public class DBApp implements Serializable {
         );
         int maxPageSize = readFromConfig("MaximumRowsCountinTablePage");
         Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
-        tables.add(newTable);
+        tables.add(newTable.getFilepath());
     }
 //    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
 //
 //    }
-    public int checkTablePresent(String strTableName) throws DBAppException {
+    public int checkTablePresent(String strTableName) throws DBAppException, IOException, ClassNotFoundException {
         int tableIndex = -1;
         for(int i = 0; i< tables.size(); i++){
-            String currentTableName = tables.get(i).getTableName();
+            Table currTable = FileManipulation.loadTable(this.tables.get(i));
+            String currentTableName = currTable.getTableName();
             if (currentTableName.equals(strTableName)){
                 tableIndex = i;
                 break;
@@ -111,21 +117,22 @@ public class DBApp implements Serializable {
         int tableIndex = checkTablePresent(strTableName);
         int tupleSize = metaData.getTupleSize(strTableName);
         checkHtblValid(strTableName, htblColNameValue, true);
-        Table toBeInsertedInTable = this.tables.get(tableIndex);
+        Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
         toBeInsertedInTable.insert(htblColNameValue);
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws Exception {
         Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);
-        Table toBeInsertedInTable = this.tables.get(tableIndex);
-        toBeInsertedInTable.update(strClusteringKeyValue, htblColNameValue, columns);
+        Table currTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        currTable.update(strClusteringKeyValue, htblColNameValue, columns);
     }
     public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception{
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);
-        Table toBeInsertedInTable = this.tables.get(tableIndex);
-        toBeInsertedInTable.delete(htblColNameValue);
+        Table currTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        currTable.delete(htblColNameValue);
+
     }
 //  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
 //
