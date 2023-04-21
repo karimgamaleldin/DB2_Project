@@ -5,10 +5,7 @@ import helpers.FileManipulation;
 import metadata.Column;
 
 import java.io.*;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class Table implements Serializable {
     private Vector<String> tablePages; // Contain the unloaded pages
@@ -85,6 +82,7 @@ public class Table implements Serializable {
 
             return;
         }
+
         int start =0;
         int end = this.tablePages.size()-1;
         Tuple min=minValues.get(start);
@@ -246,30 +244,30 @@ public class Table implements Serializable {
             return;
         }
         Tuple toBeDeleted=new Tuple(htblColNameValue,clusteringKey);
-        int start =0;
-        int end = this.getTablePages().size()-1;
-        Tuple min=minValues.get(start);
-        Tuple max=maxValues.get(end);
-        if(toBeDeleted.compareTo(min) <0){//if tuple equal than first tuple in table
-            throw new DBAppException("tuple is not in the table");
-        } else if (toBeDeleted.compareTo(max) >0) {//if tuple equal than biggest tuple in table
-            throw new DBAppException("tuple is not in the table");
-        } else{
-            for(int i=0;i<this.getTablePages().size();i++){
-                Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
-                boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
-                if(isPageDeleted){
-                    this.getTablePages().remove(i);
-                    minValues.remove(i);
-                    maxValues.remove(i);
-                    i--;
-                }else {
-                    updateMinMax(loadedPage,i);
-                }
+//        int start =0;
+//        int end = this.getTablePages().size()-1;
+//        Tuple min=minValues.get(start);
+//        Tuple max=maxValues.get(end);
+//        if(toBeDeleted.compareTo(min) <0){//if tuple less than first tuple in table
+//            throw new DBAppException("tuple is not in the table");
+//        } else if (toBeDeleted.compareTo(max) >0) {//if tuple more than biggest tuple in table
+//            throw new DBAppException("tuple is not in the table");
+//        } else{
+        for(int i=0;i<this.getTablePages().size();i++){
+            Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
+            boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
+            if(isPageDeleted){
+                this.getTablePages().remove(i);
+                minValues.remove(i);
+                maxValues.remove(i);
+                i--;
+            }else {
+                updateMinMax(loadedPage,i);
             }
-            saveIntoTableFilepath();
         }
+        saveIntoTableFilepath();
     }
+//    }
     public Page createNewPage(){
         String path = "page"+nextPageID;
         Page page = new Page(nextPageID,path,maxSizePerPage,clusteringKey,tableName);
@@ -288,13 +286,13 @@ public class Table implements Serializable {
         maxValues.remove(index);
         maxValues.add(index,max);
     }
-    public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws IOException, ClassNotFoundException {
+    public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws IOException, ClassNotFoundException, DBAppException {
         Page page = createNewPage();
         page.insertIntoPage(shift);
         int lastIndex = this.tablePages.size()-1;
         updateMinMax(page,lastIndex);
     }
-    public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException {
+    public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException, DBAppException {
         if(shifted==null) {
             return;
         }

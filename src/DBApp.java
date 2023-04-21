@@ -23,13 +23,13 @@ public class DBApp implements Serializable {
     }
     public void init(){
         try {
-            metaData = new Metadata("metadata.csv");
             FileManipulation.createDirectory("data");
             FileManipulation.createDirectory(this.pagesFilepath);
             FileManipulation.createDirectory(this.tablesFilepath);
+            metaData = new Metadata("data/metadata.csv");
             FileManipulation.loadFilesFromDirectory(this.tablesFilepath,this.tables);
         }catch(Exception e){
-            System.out.println(e.getMessage());
+            System.out.println(e);
         }
     }
 
@@ -39,14 +39,13 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameMin,
                             Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException, ClassNotFoundException {
 
-//        for(int i = 0; i< tables.size(); i++){
-//            Table currTable = FileManipulation.loadTable(tables.get(i));
-//            String currentTableName = currTable.getTableName();
-//            if (currentTableName.equals(strTableName)){
-//                ;
-//                throw new DBAppException("This table already exists");
-//            }
-//        }
+        for(int i = 0; i< tables.size(); i++){
+            Table currTable = FileManipulation.loadTable(tables.get(i));
+            String currentTableName = currTable.getTableName();
+            if (currentTableName.equals(strTableName)){
+                throw new DBAppException("This table already exists");
+            }
+        }
 
         Set<Map.Entry<String, String>> entrySet = htblColNameType.entrySet();
         for (Map.Entry<String, String> entry : entrySet) {
@@ -54,6 +53,7 @@ public class DBApp implements Serializable {
                 throw new DBAppException("This data type is not supported");
             }
         }
+
         metaData.writeMetaData(
                 strTableName,
                 strClusteringKeyColumn,
@@ -61,6 +61,7 @@ public class DBApp implements Serializable {
                 htblColNameMin,
                 htblColNameMax
         );
+
         int maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
         Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
         tables.add(newTable.getFilepath());
@@ -156,6 +157,7 @@ public class DBApp implements Serializable {
         String strTableName = "CityShop";
         String strTableName2="CityShop2";
         String strTableName3="CityShop3";
+        String strTableName4="CityShop4";
         DBApp dbApp = new DBApp( );
         Hashtable htblColNameType = new Hashtable( );
         htblColNameType.put("ID", "java.lang.Integer");
@@ -183,9 +185,10 @@ public class DBApp implements Serializable {
         htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
         htblColNameMax.put("Address","ZZZZZZZZZZZ" );
 
-        dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-        dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-        dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+//        dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+//        dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+//        dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
+//        dbApp.createTable( strTableName4, "ID", htblColNameType, htblColNameMin, htblColNameMax );
 
         Hashtable htblColNameValue = new Hashtable( );
         Hashtable htblColNameValue2 = new Hashtable( );
@@ -211,7 +214,7 @@ public class DBApp implements Serializable {
 
         htblColNameValue3.put("ID", new Integer( 3 ));
         htblColNameValue3.put("Name", "dfgfd");
-        htblColNameValue3.put("X", new Double(1000));
+        htblColNameValue3.put("X", new Double(2000));
         htblColNameValue3.put("Y", new Double(1000));
         htblColNameValue3.put("Z", new Double(1000));
         htblColNameValue3.put("Specialization", "b");
@@ -227,22 +230,43 @@ public class DBApp implements Serializable {
 
         htblColNameValue5.put("ID", new Integer( 4 ));
         htblColNameValue5.put("Name", "sefdsd");
-        htblColNameValue5.put("X", new Double(1000));
+        htblColNameValue5.put("X", new Double(2000));
         htblColNameValue5.put("Y", new Double(1000));
         htblColNameValue5.put("Z", new Double(1000));
         htblColNameValue5.put("Specialization", "b");
         htblColNameValue5.put("Address","c" );
 
-        System.out.println("insert 1");
-        dbApp.insertIntoTable( strTableName , htblColNameValue );
-        System.out.println("insert 5");
-        dbApp.insertIntoTable( strTableName , htblColNameValue2 );
-        System.out.println("insert 3");
-        dbApp.insertIntoTable( strTableName , htblColNameValue3 );
-        System.out.println("insert 2");
-        dbApp.insertIntoTable( strTableName , htblColNameValue4 );
-        System.out.println("insert 4");
-        dbApp.insertIntoTable( strTableName , htblColNameValue5 );
+//        System.out.println("insert 1");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue );
+//        System.out.println("insert 5");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue2 );
+//        System.out.println("insert 3");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue3 );
+//        System.out.println("insert 2");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue4 );
+//        System.out.println("insert 4");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue5 );
 
+
+//        Hashtable htblColNameValueDelete = new Hashtable( );
+//        htblColNameValueDelete.put("X", new Double(1000));
+//        System.out.println("delete all");
+//        dbApp.deleteFromTable( strTableName , htblColNameValueDelete );
+
+//        Hashtable htblColNameValueDelete2 = new Hashtable( );
+//        htblColNameValueDelete2.put("X", new Double(2000));
+//        System.out.println("delete page 1");
+//        dbApp.deleteFromTable( strTableName , htblColNameValueDelete2 );
+
+//        System.out.println("insert 3");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue3 );
+//        System.out.println("insert 4");
+//        dbApp.insertIntoTable( strTableName , htblColNameValue5 );
+
+//        Hashtable htblColNameValueUpdate = new Hashtable( );
+//        htblColNameValueUpdate.put("X", new Double(500));
+//        htblColNameValueUpdate.put("Y", new Double(4000));
+//        System.out.println("update 4");
+//        dbApp.updateTable( strTableName ,"4", htblColNameValueUpdate );
     }
 }

@@ -5,6 +5,7 @@ import tableAndCo.Table;
 
 import java.io.*;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Vector;
 
 public abstract class FileManipulation {
@@ -34,7 +35,7 @@ public abstract class FileManipulation {
         File dir = new File(dirpath);
         // check if the directory can be created
         // using the specified path name
-        if (dir.mkdir() == true) {
+        if (dir.mkdir()) {
 //            System.out.println("Directory has been created successfully");
         }
         else {
@@ -69,6 +70,8 @@ public abstract class FileManipulation {
 //                    System.out.println(loadedPage.getPageTuples().get(i).getTupleAttributes().toString());
 //                }
 //                System.out.println("-------------------");
+                on.close();
+                file.close();
                 return loadedPage;
             }
             catch (EOFException e) {
@@ -100,6 +103,7 @@ public abstract class FileManipulation {
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 names.add(dirpath+child.getName());
+//                System.out.println(child.getName());
             }
         }
     }
@@ -120,4 +124,6 @@ public abstract class FileManipulation {
         }
         return Integer.parseInt(prop.getProperty(cfgPath));
     }
+
+
 }

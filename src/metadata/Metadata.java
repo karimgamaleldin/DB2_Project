@@ -1,10 +1,14 @@
 package metadata;
 
+import helpers.FileManipulation;
+
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 
 public class Metadata {
@@ -15,11 +19,60 @@ public class Metadata {
 
 
     public Metadata(String filePath) throws IOException {
-        this.filePath = filePath;
+        this.metafile=new File(filePath);
         this.columnsOfMetaData = new Hashtable<String,Vector<Column>>();
-        this.metafile=new File("./"+filePath);
-        this.fw=new FileWriter(metafile);
-        writeHeaders();
+        this.filePath = filePath;
+        this.fw=new FileWriter(metafile,true);
+//        System.out.println(metafile.length());
+        this.loadMetaData();
+//        System.out.println(metafile.length());
+        if(metafile.length()==0){
+            writeHeaders();
+        }
+
+    }
+    public void loadMetaData() throws FileNotFoundException {
+        // true: file empty
+        if(this.metafile.length()==0){
+            return;
+        }
+        Scanner sc = new Scanner(this.metafile);
+        sc.useDelimiter(",");
+        int i=1;
+        for(;i<=8;i++){
+            sc.next();
+//            System.out.print(sc.next()+":"+i+",");
+        }
+        while (sc.hasNext())  //returns a boolean value
+        {
+            Vector<String> temp = new Vector<String>();
+            for(int j=1;j<=8&&sc.hasNext();j++){
+                String curr = sc.next();
+                temp.add(curr.replace("\r\n",""));
+            }
+            if(!sc.hasNext()){
+                break;
+            }
+//            System.out.println();
+            String strTableName = temp.get(0);
+            String columnName = temp.get(1);
+            String dataType = temp.get(2);
+            String isClusteringKeyStr = temp.get(3);
+            Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
+            String indexName = temp.get(4);
+            String indexType = temp.get(5);
+            String minColValue = temp.get(6);
+            String maxColValue = temp.get(7);
+            Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
+            Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
+//            System.out.print(strTableName.contains("\r\n"));
+            columns.add(col);
+            columnsOfMetaData.put(strTableName,columns);
+//            System.out.println(columnsOfMetaData.get(strTableName));
+        }
+//        System.out.println(columnsOfMetaData);
+
+        sc.close();  //closes the scanner
     }
 
     public String getFilePath() {
@@ -72,7 +125,7 @@ public class Metadata {
         sb.append("min");
         sb.append(",");
         sb.append("max");
-        sb.append("\r\n");
+        sb.append(",\r\n");
         fw.append(sb.toString()).flush();
     }
 
@@ -114,10 +167,11 @@ public class Metadata {
                 sb.append(minColValue);
                 sb.append(",");
                 sb.append(maxColValue);
-                sb.append("\r\n");
+                sb.append(",\r\n");
             }
             fw.append(sb.toString()).flush();
-            System.out.println("finished");
+//            System.out.println("finished");
+            System.out.println(metafile.length());
         } catch (Exception e) {
             System.out.println(e);
         }

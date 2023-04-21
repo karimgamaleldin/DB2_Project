@@ -83,7 +83,14 @@ public class Page implements Serializable{
         minVal = this.pageTuples.get(0);
         maxVal = this.pageTuples.get(this.pageTuples.size()-1);
     }
-    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
+    public void printPageInfo(){
+        System.out.println("page "+this.getPageID());
+        for(int i=0;i<this.getPageTuples().size();i++){
+            System.out.println(this.getPageTuples().get(i).getTupleAttributes().toString());
+        }
+        System.out.println("-------------------");
+    }
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException, DBAppException {
         boolean wasFull = this.isPageFull();
         Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
         Tuple insertedTuple = new Tuple(tuple, clusteringKey);
@@ -92,11 +99,8 @@ public class Page implements Serializable{
         if(this.isPageEmpty()){
             this.pageTuples.add(insertedTuple);
             updateMinMax();
-//            System.out.println("page "+this.getPageID());
-//            for(int i=0;i<this.getPageTuples().size();i++){
-//                System.out.println(this.getPageTuples().get(i).getTupleAttributes().toString());
-//            }
-//            System.out.println("-------------------");
+            //print page -------------------
+            printPageInfo();
             saveIntoPageFilepath();
             return null;
         }
@@ -134,8 +138,9 @@ public class Page implements Serializable{
 //                   }
                    end = mid - 1;
                } else {
-                   this.pageTuples.add(mid, insertedTuple);
-                   break;
+                   throw new DBAppException("the key: "+insertedTuple.getClusteringKey()+" already exists.");
+//                   this.pageTuples.add(mid, insertedTuple);
+//                   break;
                }
            }
         }
@@ -150,17 +155,14 @@ public class Page implements Serializable{
 //        System.out.println("max of page "+pageID+": "+maxVal.getTupleAttributes());
         updateMinMax();;
         saveIntoPageFilepath();
-//        System.out.println("page "+this.getPageID());
-//        for(int i=0;i<this.getPageTuples().size();i++){
-//            System.out.println(this.getPageTuples().get(i).getTupleAttributes().toString());
-//        }
-//        System.out.println("-------------------");
+        //print page -------------------
+        printPageInfo();
 
         return lastTuple;
     }
     public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
         // true: page is empty and deleted so delete from table
-        //false: page is not empty so don't delete from table
+        // false: page is not empty so don't delete from table
         if(htblColNameValue.containsKey(this.getClusteringKey())){
             int indexDeleted = getIndexBinarySearch(htblColNameValue);
             if(indexDeleted == -1){
@@ -177,12 +179,14 @@ public class Page implements Serializable{
                 }
             }
         }
+        //print page -------------------
+        printPageInfo();
+
         if(isPageEmpty()) {
             FileManipulation.deleteEntireFile(this.filepath);
             return true;
         }
-        minVal = pageTuples.get(0);
-        maxVal = pageTuples.get(this.getSizeOfPage()-1);
+        updateMinMax();
         saveIntoPageFilepath();
         return false;
     }
@@ -221,6 +225,9 @@ public class Page implements Serializable{
             Object newValue = entry.getValue();
             tupleToBeUpdated.getTupleAttributes().put(keyToBeUpdated,newValue);
         }
+
+        //print page info -----------
+        this.printPageInfo();
 //        if(clusteringKeyExist) {
 //            this.getPageTuples().remove(indexToBeUpdated);
 //            saveIntoPageFilepath();
