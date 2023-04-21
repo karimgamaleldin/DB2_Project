@@ -68,34 +68,40 @@ public class Table implements Serializable {
     public boolean isTableEmpty() {
         return this.getTablePages().isEmpty();
     }
-    public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException {
+    public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException {
+        if(!htblColNameValue.containsKey(clusteringKey)){
+            throw new DBAppException("clustering key not found");
+        }
         Tuple wanted= new Tuple(htblColNameValue,clusteringKey);
         if(isTableEmpty()){
             Page page = createNewPage();
             page.insertIntoPage(htblColNameValue);
             updateMinMax(page,0);
+//            System.out.println(minValues.get(0));
 //            minValues.add(page.getMinVal());
 //            maxValues.add(page.getMaxVal());
+
             saveIntoTableFilepath();
+
             return;
         }
         int start =0;
-        int end = this.getTablePages().size()-1;
+        int end = this.tablePages.size()-1;
         Tuple min=minValues.get(start);
         Tuple max=maxValues.get(end);
         Page loadedPage;
         if(wanted.compareTo(min) < 0){//if tuple less than first tuple in table
-            loadedPage = FileManipulation.loadPage(this.getTablePages().get(0));
+            loadedPage = FileManipulation.loadPage(this.tablePages.get(0));
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
             updateMinMax(loadedPage,0);
             shift(1,shifted);
             saveIntoTableFilepath();
         }
         else if (wanted.compareTo(max) > 0) {//if tuple greater than biggest tuple in table
-            loadedPage = FileManipulation.loadPage(this.getTablePages().get(end));
+            loadedPage = FileManipulation.loadPage(this.tablePages.get(end));
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
             updateMinMax(loadedPage,end);
-            shift(++end,shifted);
+            shift(end+1,shifted);
             saveIntoTableFilepath();
         }
         else{
@@ -105,7 +111,7 @@ public class Table implements Serializable {
                  max=maxValues.get(mid);
                 if(wanted.compareTo(min) >0){
                     if(wanted.compareTo(max)<=0){
-                        loadedPage = FileManipulation.loadPage(this.getTablePages().get(mid));
+                        loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
                         Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
                         updateMinMax(loadedPage,mid);
                         shift(mid+1,shifted);
@@ -114,24 +120,24 @@ public class Table implements Serializable {
                     }else{
                         start=mid+1;
                     }
-
                 }
                 else if (wanted.compareTo(min) < 0){
                     Tuple maxOfPreviousPage = maxValues.get(mid-1);
                     if(wanted.compareTo(maxOfPreviousPage) > 0) {
-                        loadedPage = FileManipulation.loadPage(this.getTablePages().get(mid));
+                        loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
                         Tuple shifted = loadedPage.insertIntoPage(htblColNameValue);
                         updateMinMax(loadedPage,mid);
                         shift(mid+1,shifted);
                         saveIntoTableFilepath();
                         return;
-                    }else{
+                    }
+                    else{
                         end=mid-1;
                     }
                 }
                 else {
                     //tuple = the min value
-                    loadedPage = FileManipulation.loadPage(this.getTablePages().get(mid));
+                    loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
                     Tuple shifted=  loadedPage.insertIntoPage(htblColNameValue);
                     updateMinMax(loadedPage,mid);
                     shift(mid+1,shifted);
@@ -268,7 +274,7 @@ public class Table implements Serializable {
         String path = "page"+nextPageID;
         Page page = new Page(nextPageID,path,maxSizePerPage,clusteringKey,tableName);
         nextPageID++;
-        this.getTablePages().add(path);
+        this.getTablePages().add(page.getFilepath());
         this.minValues.add(null);
         this.maxValues.add(null);
         return page;
@@ -285,28 +291,33 @@ public class Table implements Serializable {
     public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws IOException, ClassNotFoundException {
         Page page = createNewPage();
         page.insertIntoPage(shift);
-        int lastIndex = this.getTablePages().size()-1;
+        int lastIndex = this.tablePages.size()-1;
         updateMinMax(page,lastIndex);
     }
     public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException {
         if(shifted==null) {
             return;
         }
-        Hashtable<String, Object> shift=shifted.getTupleAttributes();
+        Hashtable<String, Object> shift=null;
         //if nextPage == table size before entering loop
-        if(nextPage==this.getTablePages().size()){
+        if(nextPage==this.tablePages.size()){
+            shift=shifted.getTupleAttributes();
             insertIntoCreatedPage(shift);
             return;
 //                this.minValues.add(page.getMinVal());
 //                this.maxValues.add(page.getMaxVal());
         }
-        while(!(shifted ==null)){
-            Page currentPage = FileManipulation.loadPage(this.getTablePages().get(nextPage));
+        while(shifted !=null){
+            shift=shifted.getTupleAttributes();
+            Page currentPage = FileManipulation.loadPage(this.tablePages.get(nextPage));
             shifted=currentPage.insertIntoPage(shift);
             updateMinMax(currentPage,nextPage);
             nextPage++;
-            if(nextPage==this.getTablePages().size()){
-                insertIntoCreatedPage(shift);
+            if(nextPage==this.tablePages.size()){
+                if(shifted!=null){
+                    shift=shifted.getTupleAttributes();
+                    insertIntoCreatedPage(shift);
+                }
                 return;
 //                this.minValues.add(page.getMinVal());
 //                this.maxValues.add(page.getMaxVal());

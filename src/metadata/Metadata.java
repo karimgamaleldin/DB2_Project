@@ -167,7 +167,7 @@ public class Metadata {
             String currentColumnName = currentColumn.getColumnName();
             if(currentColumnTableName.equals(strTableName) && columnName.equals(currentColumnName)) {
                 Object min = Column.adjustDataType(currentColumn.getMin(),columnType);
-                Object max = Column.adjustDataType(currentColumn.getMin(),columnType);
+                Object max = Column.adjustDataType(currentColumn.getMax(),columnType);
                 columnsMinAndMax.add(min);
                 columnsMinAndMax.add(max);
                 break;

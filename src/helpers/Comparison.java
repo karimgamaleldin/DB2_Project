@@ -10,7 +10,7 @@ public abstract class Comparison {
         if (type.equals("java.lang.Integer")) {
             return ((Integer) o1).compareTo((Integer) o2);
         } else if (type.equals("java.lang.String")) {
-            return ((String) o1).compareTo((String) o2);
+            return (((String) o1).toLowerCase()).compareTo(((String) o2).toLowerCase());
         } else if (type.equals("java.lang.Double")) {
             return ((Double) o1).compareTo((Double) o2);
         } else if (type.equals("java.util.Date")) {

@@ -32,20 +32,6 @@ public class Tuple implements Serializable {
         String type = t1.getClass().getName();
         return Comparison.compareTo(t1,t2,type);
     }
-
-    public boolean isEqual(Tuple t) {
-        Set<Map.Entry<String, Object>> entrySet = this.getTupleAttributes().entrySet();
-        Hashtable<String ,Object> htbl = t.getTupleAttributes();
-        for (Map.Entry<String, Object> entry : entrySet) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            Object value2 = htbl.get(key);
-            if(!value.equals(value2)){
-                return false;
-            }
-        }
-        return true;
-    }
     @Override
     public String toString() {
         String tupleInfo = "";

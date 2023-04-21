@@ -3,6 +3,7 @@ import helpers.Comparison;
 import helpers.FileManipulation;
 import metadata.Column;
 import metadata.Metadata;
+import tableAndCo.Page;
 import tableAndCo.Table;
 
 import java.io.*;
@@ -16,8 +17,8 @@ public class DBApp implements Serializable {
     private String tablesFilepath;
     public DBApp(){
         this.tables = new Vector<String>();
-        this.pagesFilepath = "data/pages";
-        this.tablesFilepath = "data/tables";
+        this.pagesFilepath = "data/pages/";
+        this.tablesFilepath = "data/tables/";
         init();
     }
     public void init(){
@@ -38,13 +39,14 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameMin,
                             Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException, ClassNotFoundException {
 
-        for(int i = 0; i< tables.size(); i++){
-            Table currTable = FileManipulation.loadTable(tables.get(i));
-            String currentTableName = currTable.getTableName();
-            if (currentTableName.equals(strTableName)){
-                throw new DBAppException("This table already exists");
-            }
-        }
+//        for(int i = 0; i< tables.size(); i++){
+//            Table currTable = FileManipulation.loadTable(tables.get(i));
+//            String currentTableName = currTable.getTableName();
+//            if (currentTableName.equals(strTableName)){
+//                ;
+//                throw new DBAppException("This table already exists");
+//            }
+//        }
 
         Set<Map.Entry<String, String>> entrySet = htblColNameType.entrySet();
         for (Map.Entry<String, String> entry : entrySet) {
@@ -59,7 +61,7 @@ public class DBApp implements Serializable {
                 htblColNameMin,
                 htblColNameMax
         );
-        int maxPageSize = readFromConfig("MaximumRowsCountinTablePage");
+        int maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
         Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
         tables.add(newTable.getFilepath());
     }
@@ -96,26 +98,29 @@ public class DBApp implements Serializable {
                 throw new DBAppException("The metadata.Column names aren't correct");
             }
             String columnType = metaData.getColumnType(strTableName,key);
-            String valClass = ""+value.getClass();
+            String valClass = ((""+value.getClass()).replaceAll("class","")).replaceAll(" ","");
+//            System.out.println(key+": "+valClass+","+columnType);
             if(valClass.compareTo(columnType)!=0){
                 throw new DBAppException("wrong entry datatype");
             }
+//            System.out.println(key+": "+value);
             Vector<Object> columnMinAndMax = metaData.getColumnMinAndMax(strTableName,key,columnType);
             Object min = columnMinAndMax.get(0);
             Object max = columnMinAndMax.get(1);
+//            System.out.println(max.toString());
             boolean lessThanMin = Comparison.compareTo(value,min,columnType)<0;
             boolean greaterThanMax = Comparison.compareTo(value,max,columnType)>0;
+//            System.out.println(lessThanMin+" ,"+ greaterThanMax);
             if(lessThanMin || greaterThanMax){
                 throw new DBAppException("entry is less than min or greater than max");
             }
         }
     }
     public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception {
-//        if (!tables.contains(strTableName)){
-//            throw new DBAppException("This Table is not present");
-//        }
+        if (!tables.contains(this.tablesFilepath+strTableName+".class")){
+            throw new DBAppException("This Table is not present");
+        }
         int tableIndex = checkTablePresent(strTableName);
-        int tupleSize = metaData.getTupleSize(strTableName);
         checkHtblValid(strTableName, htblColNameValue, true);
         Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
         toBeInsertedInTable.insert(htblColNameValue);
@@ -146,25 +151,8 @@ public class DBApp implements Serializable {
         return supportedDataTypes.contains(dt);
     }
 
-    public int readFromConfig(String cfgPath){
-        Properties prop = new Properties();
-        String fileName = "src/resources/DBApp.config";
-        try{
-            FileInputStream fis = new FileInputStream(fileName);
-            prop.load(fis);
 
-        }
-        catch(FileNotFoundException ex){
-            System.out.println(ex);
-        }
-        catch(IOException io){
-            System.out.println(io);
-        }
-        return Integer.parseInt(prop.getProperty(cfgPath));
-    }
-
-
-    public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws Exception {
         String strTableName = "CityShop";
         String strTableName2="CityShop2";
         String strTableName3="CityShop3";
@@ -198,46 +186,63 @@ public class DBApp implements Serializable {
         dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
         dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
         dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-//        Hashtable htblColNameValue = new Hashtable( );
-//        Hashtable htblColNameValue2 = new Hashtable( );
-//        Hashtable htblColNameValue3 = new Hashtable( );
-//        Hashtable htblColNameValue4 = new Hashtable( );
-//        Hashtable htblColNameValue5 = new Hashtable( );
-//        htblColNameValue.put("ID", new Integer( 1 ));
-//        htblColNameValue.put("Name", "ZZZZZZZZZZZ");
-//        htblColNameValue.put("X", new Integer(1000));
-//        htblColNameValue.put("Y", new Integer(1000));
-//        htblColNameValue.put("Z", new Integer(1000));
-//        htblColNameValue.put("Specialization", "b");
-//        htblColNameValue.put("Address","c" );
-//        htblColNameValue2.put("ID", new Integer( 2 ));
-//        htblColNameValue2.put("Name", "ZZZZZZZZZZZ");
-//        htblColNameValue2.put("X", new Integer(1000));
-//        htblColNameValue2.put("Y", new Integer(1000));
-//        htblColNameValue2.put("Z", new Integer(1000));
-//        htblColNameValue2.put("Specialization", "b");
-//        htblColNameValue2.put("Address","c" );
-//        htblColNameValue3.put("ID", new Integer( 3 ));
-//        htblColNameValue3.put("Name", "ZZZZZZZZZZZ");
-//        htblColNameValue3.put("X", new Integer(1000));
-//        htblColNameValue3.put("Y", new Integer(1000));
-//        htblColNameValue3.put("Z", new Integer(1000));
-//        htblColNameValue3.put("Specialization", "b");
-//        htblColNameValue3.put("Address","c" );
-//        htblColNameValue4.put("ID", new Integer( 4 ));
-//        htblColNameValue4.put("Name", "ZZZZZZZZZZZ");
-//        htblColNameValue4.put("X", new Integer(1000));
-//        htblColNameValue4.put("Y", new Integer(1000));
-//        htblColNameValue4.put("Z", new Integer(1000));
-//        htblColNameValue4.put("Specialization", "b");
-//        htblColNameValue4.put("Address","c" );
-//        htblColNameValue5.put("ID", new Integer( 5 ));
-//        htblColNameValue5.put("Name", "ZZZZZZZZZZZ");
-//        htblColNameValue5.put("X", new Integer(1000));
-//        htblColNameValue5.put("Y", new Integer(1000));
-//        htblColNameValue5.put("Z", new Integer(1000));
-//        htblColNameValue5.put("Specialization", "b");
-//        htblColNameValue5.put("Address","c" );
-//        dbApp.insertIntoTable( strTableName , htblColNameValue );
+
+        Hashtable htblColNameValue = new Hashtable( );
+        Hashtable htblColNameValue2 = new Hashtable( );
+        Hashtable htblColNameValue3 = new Hashtable( );
+        Hashtable htblColNameValue4 = new Hashtable( );
+        Hashtable htblColNameValue5 = new Hashtable( );
+
+        htblColNameValue.put("ID", new Integer( 1 ));
+        htblColNameValue.put("Name", "hgfhg");
+        htblColNameValue.put("X", new Double(1000));
+        htblColNameValue.put("Y", new Double(1000));
+        htblColNameValue.put("Z", new Double(1000));
+        htblColNameValue.put("Specialization", "b");
+        htblColNameValue.put("Address","c" );
+
+        htblColNameValue2.put("ID", new Integer( 5 ));
+        htblColNameValue2.put("Name", "dgdf");
+        htblColNameValue2.put("X", new Double(1000));
+        htblColNameValue2.put("Y", new Double(1000));
+        htblColNameValue2.put("Z", new Double(1000));
+        htblColNameValue2.put("Specialization", "b");
+        htblColNameValue2.put("Address","c" );
+
+        htblColNameValue3.put("ID", new Integer( 3 ));
+        htblColNameValue3.put("Name", "dfgfd");
+        htblColNameValue3.put("X", new Double(1000));
+        htblColNameValue3.put("Y", new Double(1000));
+        htblColNameValue3.put("Z", new Double(1000));
+        htblColNameValue3.put("Specialization", "b");
+        htblColNameValue3.put("Address","c" );
+
+        htblColNameValue4.put("ID", new Integer( 2 ));
+        htblColNameValue4.put("Name", "dfgdf");
+        htblColNameValue4.put("X", new Double(1000));
+        htblColNameValue4.put("Y", new Double(1000));
+        htblColNameValue4.put("Z", new Double(1000));
+        htblColNameValue4.put("Specialization", "b");
+        htblColNameValue4.put("Address","c" );
+
+        htblColNameValue5.put("ID", new Integer( 4 ));
+        htblColNameValue5.put("Name", "sefdsd");
+        htblColNameValue5.put("X", new Double(1000));
+        htblColNameValue5.put("Y", new Double(1000));
+        htblColNameValue5.put("Z", new Double(1000));
+        htblColNameValue5.put("Specialization", "b");
+        htblColNameValue5.put("Address","c" );
+
+        System.out.println("insert 1");
+        dbApp.insertIntoTable( strTableName , htblColNameValue );
+        System.out.println("insert 5");
+        dbApp.insertIntoTable( strTableName , htblColNameValue2 );
+        System.out.println("insert 3");
+        dbApp.insertIntoTable( strTableName , htblColNameValue3 );
+        System.out.println("insert 2");
+        dbApp.insertIntoTable( strTableName , htblColNameValue4 );
+        System.out.println("insert 4");
+        dbApp.insertIntoTable( strTableName , htblColNameValue5 );
+
     }
 }

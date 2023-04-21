@@ -79,19 +79,24 @@ public class Page implements Serializable{
         FileManipulation.saveIntoFilepath(this,this.filepath);
 //        this.setPageTuples(null);//may give error
     }
+    public void updateMinMax(){
+        minVal = this.pageTuples.get(0);
+        maxVal = this.pageTuples.get(this.pageTuples.size()-1);
+    }
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
-//        loadIntoPage();
-//        System.out.println("in page");
         boolean wasFull = this.isPageFull();
-//        System.out.println("before is full");
         Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
-//        System.out.println("after is full");
         Tuple insertedTuple = new Tuple(tuple, clusteringKey);
-//        System.out.println("after tuple");
-        //System.out.println(this.pageTuples.get(0).getTupleAttributes().get(this.pageTuples.get(0).getClusteringKey()));
+//        System.out.println(lastTuple!=null?"removed tuple: "+lastTuple.getTupleAttributes().toString():"no tuple");
+//        System.out.println("insert tuple: "+insertedTuple.getTupleAttributes().toString());
         if(this.isPageEmpty()){
-//            System.out.println("in if");
             this.pageTuples.add(insertedTuple);
+            updateMinMax();
+//            System.out.println("page "+this.getPageID());
+//            for(int i=0;i<this.getPageTuples().size();i++){
+//                System.out.println(this.getPageTuples().get(i).getTupleAttributes().toString());
+//            }
+//            System.out.println("-------------------");
             saveIntoPageFilepath();
             return null;
         }
@@ -141,16 +146,16 @@ public class Page implements Serializable{
                 this.pageTuples.add(start,insertedTuple);
             }
         }
-
-        if(minVal==null||insertedTuple.compareTo(minVal)<0){
-            this.setMinVal(insertedTuple);
-        }
-        if(maxVal==null||insertedTuple.compareTo(maxVal)>0){
-            this.setMaxVal(insertedTuple);
-        }
-        //System.out.println(insertedTupleValueOfKey);
-//        System.out.println(this.pageTuples.size());
+//        System.out.println("min of page "+pageID+": "+minVal.getTupleAttributes());
+//        System.out.println("max of page "+pageID+": "+maxVal.getTupleAttributes());
+        updateMinMax();;
         saveIntoPageFilepath();
+//        System.out.println("page "+this.getPageID());
+//        for(int i=0;i<this.getPageTuples().size();i++){
+//            System.out.println(this.getPageTuples().get(i).getTupleAttributes().toString());
+//        }
+//        System.out.println("-------------------");
+
         return lastTuple;
     }
     public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
