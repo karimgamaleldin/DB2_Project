@@ -21,7 +21,8 @@ public class Node {
         if(this.childPoints.size()<maxEntries){
             //insert in right sorted place in childPoints
         }else {
-            //divide x, y, z into halves and do it recursively according
+            //divide x, y, z into halves and do it recursively according to the objects
+            // if string then median needed and so on
         }
     }
     public Vector<Node> getChildPoints() {
