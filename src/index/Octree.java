@@ -2,61 +2,60 @@ package index;
 
 
 import java.util.Hashtable;
+import java.util.Vector;
 
 public class Octree {
-    private Node root;
-    private String col1, col2, col3;
-    private int maxEntries;
-    public Octree(String col1, String col2, String col3, int maxEntries){
-        root = new Node(null,null,null,true,maxEntries);;
-        this.col1 = col1;
-        this.col2 = col2;
-        this.col3 = col3;
-        this.maxEntries = maxEntries;
+    private Cube root;
+//    private String col1, col2, col3;
+    private int maxEntriesPerCube;
+    private boolean isDivided;
+    private Vector<Point> points;
+    private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eightOctant;
+    public Octree(Object minWidth, Object maxWidth,
+                  Object minLength, Object maxLength, Object minHeight, Object maxHeight, int maxEntriesPerCube){
+        this.root = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);;
+        this.maxEntriesPerCube = maxEntriesPerCube;
+        this.isDivided = false;
+        this.points = new Vector<Point>();
     }
-    public void insertIntoOctree(String strTableName, Hashtable<String,Object> htblColNameValue){
-        Object valOfCol1 = htblColNameValue.get(col1);
-        Object valOfCol2 = htblColNameValue.get(col2);
-        Object valOfCol3 = htblColNameValue.get(col3);
-        root.insertIntoNode(valOfCol1,valOfCol2,valOfCol3);
+    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3){
+        Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3);
+        if(!root.containsPoint(insertedPoint)){
+            return false;
+        }
+        if(points.size()<maxEntriesPerCube){
+            points.add(insertedPoint);
+            return true;
+        }else{
+            this.divide();
+            if(firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3)){
+              return true;
+            }else if(secondOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }else if(thirdOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }else if(fourthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }else if(fifthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }else if(sixthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }else if(seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }else if(eightOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
+                return true;
+            }
+        }
+        return false;
     }
-    public Node getRoot() {
+    public void divide(){
+        // calculate boundaries of each octant
+    }
+    public Cube getRoot() {
         return root;
     }
 
-    public void setRoot(Node root) {
+    public void setRoot(Cube root) {
         this.root = root;
-    }
-
-    public String getCol1() {
-        return col1;
-    }
-
-    public void setCol1(String col1) {
-        this.col1 = col1;
-    }
-
-    public String getCol2() {
-        return col2;
-    }
-
-    public void setCol2(String col2) {
-        this.col2 = col2;
-    }
-
-    public String getCol3() {
-        return col3;
-    }
-
-    public void setCol3(String col3) {
-        this.col3 = col3;
-    }
-
-    public int getMaxEntries() {
-        return maxEntries;
-    }
-
-    public void setMaxEntries(int maxEntries) {
-        this.maxEntries = maxEntries;
     }
 }
