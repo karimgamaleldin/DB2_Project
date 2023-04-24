@@ -58,6 +58,30 @@ public class Point {
         this.z = z;
     }
 
+    public Object getWidth() {
+        return width;
+    }
+
+    public void setWidth(Object width) {
+        this.width = width;
+    }
+
+    public Object getLength() {
+        return length;
+    }
+
+    public void setLength(Object length) {
+        this.length = length;
+    }
+
+    public Object getHeight() {
+        return height;
+    }
+
+    public void setHeight(Object height) {
+        this.height = height;
+    }
+
     public void insertDups(Point p) {
         this.references.add(p.getPageName());
     }

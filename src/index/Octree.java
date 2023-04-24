@@ -2,9 +2,7 @@ package index;
 
 
 import exceptions.DBAppException;
-import helpers.Comparison;
 
-import java.util.Hashtable;
 import java.util.Vector;
 
 public class Octree {
@@ -13,7 +11,7 @@ public class Octree {
     private int maxEntriesPerCube;
     private boolean isDivided;
     private Vector<Point> points;
-    private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eightOctant;
+    private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eighthOctant;
     public Octree(Object minWidth, Object maxWidth,
                   Object minLength, Object maxLength, Object minHeight, Object maxHeight, int maxEntriesPerCube){
         this.root = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);;
@@ -35,45 +33,95 @@ public class Octree {
             throw new DBAppException("one of the values inserted in octree is null");
         }
     }
-    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref){
+    public Octree getOctreeToBeInsertedIn(Point p){
+        if(!isDivided){
+            return this;
+        }
+        if(firstOctant.cube.pointInRange(p)){
+            return firstOctant.getOctreeToBeInsertedIn(p);
+        }
+        else if(secondOctant.cube.pointInRange(p)){
+            return secondOctant.getOctreeToBeInsertedIn(p);
+        }
+        else if(thirdOctant.cube.pointInRange(p)){
+            return thirdOctant.getOctreeToBeInsertedIn(p);
+        }
+        else if(fourthOctant.cube.pointInRange(p)){
+            return fourthOctant.getOctreeToBeInsertedIn(p);
+        }
+        else if(fifthOctant.cube.pointInRange(p)){
+            return fifthOctant.getOctreeToBeInsertedIn(p);
+        }
+        else if(sixthOctant.cube.pointInRange(p)){
+            return sixthOctant.getOctreeToBeInsertedIn(p);
+        }
+        else if(seventhOctant.cube.pointInRange(p)){
+            return seventhOctant.getOctreeToBeInsertedIn(p);
+        }
+        return eighthOctant.getOctreeToBeInsertedIn(p);
+    }
+    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException {
+        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
         if(!root.pointInRange(insertedPoint)){
             return false;
         }
         int indexOfPoint = this.containsPoint(insertedPoint);
         if(indexOfPoint!=-1){
-            Point currPoint = this.points.get(indexOfPoint);
+            Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
             currPoint.insertDups(insertedPoint);
             return true;
-        }else if(points.size()<maxEntriesPerCube){
-            points.add(insertedPoint);
+        }else if(octreeToBeInsertedIn.points.size()<octreeToBeInsertedIn.maxEntriesPerCube){
+            octreeToBeInsertedIn.points.add(insertedPoint);
             return true;
         }else{
-            this.divide();
+            octreeToBeInsertedIn.divide();
         }
-
-        if(firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        if(octreeToBeInsertedIn.firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(secondOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.secondOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(thirdOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.thirdOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(fourthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.fourthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(fifthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.fifthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(sixthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.sixthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
         }else if(eightOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
         }
-        return false;
     }
-    public void divide(){
+    public void divide() throws DBAppException {
         // calculate boundaries of each octant
         this.isDivided = true;
+        Point center = this.cube.getCenter();
+        this.firstOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
+        this.secondOctant = new Octree(center.getWidth(), this.cube.getMaxWidth() ,this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
+        this.thirdOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
+        this.fourthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
+        this.fifthOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() ,this.maxEntriesPerCube);
+        this.sixthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube);
+        this.seventhOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube);
+        this.eighthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube);
+        for(int i=0;i<points.size();i++){
+            Object valOfCol1 = points.get(i).getWidth();
+            Object valOfCol2 = points.get(i).getLength();
+            Object valOfCol3 = points.get(i).getHeight();
+            String ref = points.get(i).getPageName();
+            boolean temp = firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || secondOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || thirdOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || fourthOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || fifthOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || sixthOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || seventhOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
+            || eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
+        }
+        this.points.clear();
     }
     public int getMaxEntriesPerCube() {
         return maxEntriesPerCube;
@@ -155,12 +203,12 @@ public class Octree {
         this.seventhOctant = seventhOctant;
     }
 
-    public Octree getEightOctant() {
-        return eightOctant;
+    public Octree getEighthOctant() {
+        return eighthOctant;
     }
 
-    public void setEightOctant(Octree eightOctant) {
-        this.eightOctant = eightOctant;
+    public void setEighthOctant(Octree eighthOctant) {
+        this.eighthOctant = eighthOctant;
     }
 
     public Cube getRoot() {

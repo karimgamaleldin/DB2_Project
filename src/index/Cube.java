@@ -20,12 +20,12 @@ public class Cube {
         Object centerX = this.getMiddleObject(minWidth,maxWidth);
         Object centerY = this.getMiddleObject(minLength,maxLength);
         Object centerZ = this.getMiddleObject(minHeight,maxHeight);
-//        this.center = new Point(centerX,centerY,centerZ);
+        this.center = new Point(centerX,centerY,centerZ, null);
     }
     public boolean pointInRange(Point p){
-        boolean xInsideCube = Comparison.compareTo(p.getX(),minWidth,null)>=0&&Comparison.compareTo(p.getX(),maxWidth,null)<0;
-        boolean yInsideCube = Comparison.compareTo(p.getY(),minLength,null)>=0&&Comparison.compareTo(p.getY(),maxLength,null)<0;
-        boolean zInsideCube = Comparison.compareTo(p.getZ(),minHeight,null)>=0&&Comparison.compareTo(p.getZ(),maxHeight,null)<0;
+        boolean xInsideCube = Comparison.compareTo(p.getWidth(),minWidth,null)>=0&&Comparison.compareTo(p.getWidth(),maxWidth,null)<0;
+        boolean yInsideCube = Comparison.compareTo(p.getLength(),minLength,null)>=0&&Comparison.compareTo(p.getLength(),maxLength,null)<0;
+        boolean zInsideCube = Comparison.compareTo(p.getHeight(),minHeight,null)>=0&&Comparison.compareTo(p.getHeight(),maxHeight,null)<0;
         return xInsideCube && yInsideCube && zInsideCube;
     }
 
