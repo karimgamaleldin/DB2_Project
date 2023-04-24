@@ -3,6 +3,7 @@ package index;
 
 import exceptions.DBAppException;
 
+import java.text.ParseException;
 import java.util.Vector;
 
 public class Octree {
@@ -13,7 +14,7 @@ public class Octree {
     private Vector<Point> points;
     private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eighthOctant;
     public Octree(Object minWidth, Object maxWidth,
-                  Object minLength, Object maxLength, Object minHeight, Object maxHeight, int maxEntriesPerCube){
+                  Object minLength, Object maxLength, Object minHeight, Object maxHeight, int maxEntriesPerCube) throws ParseException {
         this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
@@ -60,7 +61,7 @@ public class Octree {
         }
         return eighthOctant.getOctreeToBeInsertedIn(p);
     }
-    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException {
+    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException, ParseException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
         Octree octreeToBeInsertedIn = getOctreeToBeInsertedIn(insertedPoint);
@@ -93,7 +94,7 @@ public class Octree {
             return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
         }
     }
-    public void divide() throws DBAppException {
+    public void divide() throws DBAppException, ParseException {
         // calculate boundaries of each octant
         this.isDivided = true;
         Point center = this.cube.getCenter();
