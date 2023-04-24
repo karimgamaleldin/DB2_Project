@@ -20,14 +20,15 @@ public class Cube {
         Object centerX = this.getMiddleObject(minWidth,maxWidth);
         Object centerY = this.getMiddleObject(minLength,maxLength);
         Object centerZ = this.getMiddleObject(minHeight,maxHeight);
-        this.center = new Point(centerX,centerY,centerZ);
+//        this.center = new Point(centerX,centerY,centerZ);
     }
-    public boolean containsPoint(Point p){
+    public boolean pointInRange(Point p){
         boolean xInsideCube = Comparison.compareTo(p.getX(),minWidth,null)>=0&&Comparison.compareTo(p.getX(),maxWidth,null)<0;
         boolean yInsideCube = Comparison.compareTo(p.getY(),minLength,null)>=0&&Comparison.compareTo(p.getY(),maxLength,null)<0;
         boolean zInsideCube = Comparison.compareTo(p.getZ(),minHeight,null)>=0&&Comparison.compareTo(p.getZ(),maxHeight,null)<0;
         return xInsideCube && yInsideCube && zInsideCube;
     }
+
     public Object getMiddleObject(Object o1, Object o2){
         String type = ((""+o1.getClass())
                 .replaceAll("class",""))
