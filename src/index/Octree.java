@@ -6,7 +6,7 @@ import exceptions.DBAppException;
 import java.util.Vector;
 
 public class Octree {
-    private Cube root;
+    private Cube cube;
 //    private String col1, col2, col3;
     private int maxEntriesPerCube;
     private boolean isDivided;
@@ -14,7 +14,7 @@ public class Octree {
     private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eighthOctant;
     public Octree(Object minWidth, Object maxWidth,
                   Object minLength, Object maxLength, Object minHeight, Object maxHeight, int maxEntriesPerCube){
-        this.root = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);;
+        this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
         this.points = new Vector<Point>();
@@ -63,10 +63,8 @@ public class Octree {
     public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
-        if(!root.pointInRange(insertedPoint)){
-            return false;
-        }
-        int indexOfPoint = this.containsPoint(insertedPoint);
+        Octree octreeToBeInsertedIn = getOctreeToBeInsertedIn(insertedPoint);
+        int indexOfPoint = octreeToBeInsertedIn.containsPoint(insertedPoint);
         if(indexOfPoint!=-1){
             Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
             currPoint.insertDups(insertedPoint);
@@ -91,8 +89,8 @@ public class Octree {
             return true;
         }else if(octreeToBeInsertedIn.seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
             return true;
-        }else if(eightOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
-            return true;
+        }else {
+            return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
         }
     }
     public void divide() throws DBAppException {
@@ -211,11 +209,11 @@ public class Octree {
         this.eighthOctant = eighthOctant;
     }
 
-    public Cube getRoot() {
-        return root;
+    public Cube getCube() {
+        return cube;
     }
 
-    public void setRoot(Cube root) {
-        this.root = root;
+    public void setCube(Cube root) {
+        this.cube = root;
     }
 }
