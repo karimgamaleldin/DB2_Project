@@ -51,6 +51,94 @@ public class Octree {
     public void divide(){
         // calculate boundaries of each octant
     }
+    public int getMaxEntriesPerCube() {
+        return maxEntriesPerCube;
+    }
+
+    public void setMaxEntriesPerCube(int maxEntriesPerCube) {
+        this.maxEntriesPerCube = maxEntriesPerCube;
+    }
+
+    public boolean isDivided() {
+        return isDivided;
+    }
+
+    public void setDivided(boolean divided) {
+        isDivided = divided;
+    }
+
+    public Vector<Point> getPoints() {
+        return points;
+    }
+
+    public void setPoints(Vector<Point> points) {
+        this.points = points;
+    }
+
+    public Octree getFirstOctant() {
+        return firstOctant;
+    }
+
+    public void setFirstOctant(Octree firstOctant) {
+        this.firstOctant = firstOctant;
+    }
+
+    public Octree getSecondOctant() {
+        return secondOctant;
+    }
+
+    public void setSecondOctant(Octree secondOctant) {
+        this.secondOctant = secondOctant;
+    }
+
+    public Octree getThirdOctant() {
+        return thirdOctant;
+    }
+
+    public void setThirdOctant(Octree thirdOctant) {
+        this.thirdOctant = thirdOctant;
+    }
+
+    public Octree getFourthOctant() {
+        return fourthOctant;
+    }
+
+    public void setFourthOctant(Octree fourthOctant) {
+        this.fourthOctant = fourthOctant;
+    }
+
+    public Octree getFifthOctant() {
+        return fifthOctant;
+    }
+
+    public void setFifthOctant(Octree fifthOctant) {
+        this.fifthOctant = fifthOctant;
+    }
+
+    public Octree getSixthOctant() {
+        return sixthOctant;
+    }
+
+    public void setSixthOctant(Octree sixthOctant) {
+        this.sixthOctant = sixthOctant;
+    }
+
+    public Octree getSeventhOctant() {
+        return seventhOctant;
+    }
+
+    public void setSeventhOctant(Octree seventhOctant) {
+        this.seventhOctant = seventhOctant;
+    }
+
+    public Octree getEightOctant() {
+        return eightOctant;
+    }
+
+    public void setEightOctant(Octree eightOctant) {
+        this.eightOctant = eightOctant;
+    }
+
     public Cube getRoot() {
         return root;
     }
