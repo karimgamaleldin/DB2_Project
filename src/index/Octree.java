@@ -1,6 +1,9 @@
 package index;
 
 
+import exceptions.DBAppException;
+import helpers.Comparison;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -18,38 +21,59 @@ public class Octree {
         this.isDivided = false;
         this.points = new Vector<Point>();
     }
-    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3){
-        Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3);
-        if(!root.containsPoint(insertedPoint)){
+    public int containsPoint(Point p){
+        for(int i=0;i<points.size();i++){
+            Point currPoint = points.get(i);
+            if(p.isEqual(currPoint)){
+                return i;
+            }
+        }
+        return -1;
+    }
+    public void checkInsertedValues(Object valOfCol1, Object valOfCol2, Object valOfCol3) throws DBAppException {
+        if(valOfCol1==null || valOfCol2==null || valOfCol3==null) {
+            throw new DBAppException("one of the values inserted in octree is null");
+        }
+    }
+    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref){
+        Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
+        if(!root.pointInRange(insertedPoint)){
             return false;
         }
-        if(points.size()<maxEntriesPerCube){
+        int indexOfPoint = this.containsPoint(insertedPoint);
+        if(indexOfPoint!=-1){
+            Point currPoint = this.points.get(indexOfPoint);
+            currPoint.insertDups(insertedPoint);
+            return true;
+        }else if(points.size()<maxEntriesPerCube){
             points.add(insertedPoint);
             return true;
         }else{
             this.divide();
-            if(firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3)){
-              return true;
-            }else if(secondOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }else if(thirdOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }else if(fourthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }else if(fifthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }else if(sixthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }else if(seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }else if(eightOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3)){
-                return true;
-            }
+        }
+
+        if(firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(secondOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(thirdOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(fourthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(fifthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(sixthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
+        }else if(eightOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+            return true;
         }
         return false;
     }
     public void divide(){
         // calculate boundaries of each octant
+        this.isDivided = true;
     }
     public int getMaxEntriesPerCube() {
         return maxEntriesPerCube;

@@ -1,13 +1,37 @@
 package index;
 
+import helpers.Comparison;
+
+import java.util.Vector;
+
 public class Point {
     private Object x,y,z;
+    private Vector<String> references;
+    private String pageName;
 
-    public Point(Object x, Object y, Object z) {
+    public Point(Object x, Object y, Object z, String ref) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.references = new Vector<String>();
+        this.references.add(ref);
+        this.pageName = ref;
+    }
 
+    public Vector<String> getReferences() {
+        return references;
+    }
+
+    public void setReferences(Vector<String> references) {
+        this.references = references;
+    }
+
+    public String getPageName() {
+        return pageName;
+    }
+
+    public void setPageName(String pageName) {
+        this.pageName = pageName;
     }
 
     public Object getX() {
@@ -32,5 +56,15 @@ public class Point {
 
     public void setZ(Object z) {
         this.z = z;
+    }
+
+    public void insertDups(Point p) {
+        this.references.add(p.getPageName());
+    }
+    public boolean isEqual(Point p){
+        boolean xEqual = Comparison.compareTo(this.x,p.getX(),null)==0;
+        boolean yEqual = Comparison.compareTo(this.y,p.getY(),null)==0;
+        boolean zEqual = Comparison.compareTo(this.z,p.getZ(),null)==0;
+        return xEqual && yEqual && zEqual;
     }
 }
