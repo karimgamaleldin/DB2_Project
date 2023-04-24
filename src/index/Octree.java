@@ -34,37 +34,37 @@ public class Octree {
             throw new DBAppException("one of the values inserted in octree is null");
         }
     }
-    public Octree getOctreeToBeInsertedIn(Point p){
+    public Octree searchForOctree(Point p){
         if(!isDivided){
             return this;
         }
         if(firstOctant.cube.pointInRange(p)){
-            return firstOctant.getOctreeToBeInsertedIn(p);
+            return firstOctant.searchForOctree(p);
         }
         else if(secondOctant.cube.pointInRange(p)){
-            return secondOctant.getOctreeToBeInsertedIn(p);
+            return secondOctant.searchForOctree(p);
         }
         else if(thirdOctant.cube.pointInRange(p)){
-            return thirdOctant.getOctreeToBeInsertedIn(p);
+            return thirdOctant.searchForOctree(p);
         }
         else if(fourthOctant.cube.pointInRange(p)){
-            return fourthOctant.getOctreeToBeInsertedIn(p);
+            return fourthOctant.searchForOctree(p);
         }
         else if(fifthOctant.cube.pointInRange(p)){
-            return fifthOctant.getOctreeToBeInsertedIn(p);
+            return fifthOctant.searchForOctree(p);
         }
         else if(sixthOctant.cube.pointInRange(p)){
-            return sixthOctant.getOctreeToBeInsertedIn(p);
+            return sixthOctant.searchForOctree(p);
         }
         else if(seventhOctant.cube.pointInRange(p)){
-            return seventhOctant.getOctreeToBeInsertedIn(p);
+            return seventhOctant.searchForOctree(p);
         }
-        return eighthOctant.getOctreeToBeInsertedIn(p);
+        return eighthOctant.searchForOctree(p);
     }
     public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException, ParseException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
-        Octree octreeToBeInsertedIn = getOctreeToBeInsertedIn(insertedPoint);
+        Octree octreeToBeInsertedIn = searchForOctree(insertedPoint);
         int indexOfPoint = octreeToBeInsertedIn.containsPoint(insertedPoint);
         if(indexOfPoint!=-1){
             Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
