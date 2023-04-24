@@ -2,6 +2,10 @@ package index;
 
 import helpers.Comparison;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Vector;
 
@@ -10,7 +14,7 @@ public class Cube {
 //    private Object halfWidth, halfHeight, halfLength;
     private Object minWidth, maxWidth, minLength, maxLength, minHeight, maxHeight; //boundaries of cube
     public Cube(Object minWidth, Object maxWidth,
-                Object minLength, Object maxLength, Object minHeight, Object maxHeight) {
+                Object minLength, Object maxLength, Object minHeight, Object maxHeight) throws ParseException {
         this.minWidth = minWidth;
         this.maxWidth = maxWidth;
         this.minLength = minLength;
@@ -20,16 +24,16 @@ public class Cube {
         Object centerX = this.getMiddleObject(minWidth,maxWidth);
         Object centerY = this.getMiddleObject(minLength,maxLength);
         Object centerZ = this.getMiddleObject(minHeight,maxHeight);
-//        this.center = new Point(centerX,centerY,centerZ);
+        this.center = new Point(centerX,centerY,centerZ, null);
     }
     public boolean pointInRange(Point p){
-        boolean xInsideCube = Comparison.compareTo(p.getX(),minWidth,null)>=0&&Comparison.compareTo(p.getX(),maxWidth,null)<0;
-        boolean yInsideCube = Comparison.compareTo(p.getY(),minLength,null)>=0&&Comparison.compareTo(p.getY(),maxLength,null)<0;
-        boolean zInsideCube = Comparison.compareTo(p.getZ(),minHeight,null)>=0&&Comparison.compareTo(p.getZ(),maxHeight,null)<0;
+        boolean xInsideCube = Comparison.compareTo(p.getWidth(),minWidth,null)>=0&&Comparison.compareTo(p.getWidth(),maxWidth,null)<0;
+        boolean yInsideCube = Comparison.compareTo(p.getLength(),minLength,null)>=0&&Comparison.compareTo(p.getLength(),maxLength,null)<0;
+        boolean zInsideCube = Comparison.compareTo(p.getHeight(),minHeight,null)>=0&&Comparison.compareTo(p.getHeight(),maxHeight,null)<0;
         return xInsideCube && yInsideCube && zInsideCube;
     }
 
-    public Object getMiddleObject(Object o1, Object o2){
+    public Object getMiddleObject(Object o1, Object o2) throws ParseException {
         String type = ((""+o1.getClass())
                 .replaceAll("class",""))
                 .replaceAll(" ","");
@@ -51,8 +55,10 @@ public class Cube {
     public Double getMiddleDouble(Double a1, Double a2) {
         return (a1+a2)/2.0;
     }
-    public Date getMiddleDate(Date d1, Date d2){
-        return null;
+    public Date getMiddleDate(Date d1, Date d2) throws ParseException {
+        Long diff = Math.abs(d1.getTime() - d2.getTime()) / 2;
+        Date median = new SimpleDateFormat("yyyy-MM-dd").parse(diff.toString());
+        return median;
     }
     public String getMiddleString(String S, String T)
     {

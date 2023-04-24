@@ -5,14 +5,14 @@ import helpers.Comparison;
 import java.util.Vector;
 
 public class Point {
-    private Object x,y,z;
+    private Object width,length,height;
     private Vector<String> references;
     private String pageName;
 
-    public Point(Object x, Object y, Object z, String ref) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Point(Object width , Object length, Object height, String ref) {
+        this.width = width;
+        this.length = length;
+        this.height = height;
         this.references = new Vector<String>();
         this.references.add(ref);
         this.pageName = ref;
@@ -34,37 +34,38 @@ public class Point {
         this.pageName = pageName;
     }
 
-    public Object getX() {
-        return x;
+
+    public Object getWidth() {
+        return width;
     }
 
-    public void setX(Object x) {
-        this.x = x;
+    public void setWidth(Object width) {
+        this.width = width;
     }
 
-    public Object getY() {
-        return y;
+    public Object getLength() {
+        return length;
     }
 
-    public void setY(Object y) {
-        this.y = y;
+    public void setLength(Object length) {
+        this.length = length;
     }
 
-    public Object getZ() {
-        return z;
+    public Object getHeight() {
+        return height;
     }
 
-    public void setZ(Object z) {
-        this.z = z;
+    public void setHeight(Object height) {
+        this.height = height;
     }
 
     public void insertDups(Point p) {
         this.references.add(p.getPageName());
     }
     public boolean isEqual(Point p){
-        boolean xEqual = Comparison.compareTo(this.x,p.getX(),null)==0;
-        boolean yEqual = Comparison.compareTo(this.y,p.getY(),null)==0;
-        boolean zEqual = Comparison.compareTo(this.z,p.getZ(),null)==0;
+        boolean xEqual = Comparison.compareTo(this.width,p.getWidth(),null)==0;
+        boolean yEqual = Comparison.compareTo(this.height,p.getLength(),null)==0;
+        boolean zEqual = Comparison.compareTo(this.height,p.getHeight(),null)==0;
         return xEqual && yEqual && zEqual;
     }
 }
