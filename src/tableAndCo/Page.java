@@ -2,8 +2,11 @@ package tableAndCo;
 import exceptions.DBAppException;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
+import helpers.FileManipulation;
+import metadata.Column;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
@@ -16,29 +19,19 @@ public class Page implements Serializable{
     private String clusteringKey;
     private String tableName;
 
+
     public Page(int pageID, String filepath , int maxSizePerPage,String clusteringKey, String tableName) {
         this.pageID = pageID;
         this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        this.filepath = "data/"+tableName+"/"+filepath+".class" ;
+        this.filepath = "data/pages/"+tableName+"/"+filepath+".class" ;
         this.minVal = null;
         this.maxVal = null;
         this.clusteringKey = clusteringKey;
         this.tableName = tableName;
-        createPageFile();
+        FileManipulation.createSerFile(this.filepath);
     }
-    public void createPageFile(){
-        try{
-            File pageFile = new File(this.getFilepath());
-            if (pageFile.createNewFile()) {
-                System.out.println("File created: " + pageFile.getName());
-            } else {
-                System.out.println("File already exists.");
-            }
-        }catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+
     public Tuple getMinVal() {
         return minVal;
     }
@@ -55,7 +48,21 @@ public class Page implements Serializable{
         this.maxVal = maxVal;
     }
 
+    public String getTableName() {
+        return tableName;
+    }
 
+    public void setPageID(int pageID) {
+        this.pageID = pageID;
+    }
+
+    public void setClusteringKey(String clusteringKey) {
+        this.clusteringKey = clusteringKey;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
     // some helper methods
     public int getSizeOfPage(){
         return this.pageTuples.size();
@@ -66,47 +73,34 @@ public class Page implements Serializable{
     public boolean isPageEmpty(){
         return this.pageTuples.isEmpty();
     }
-    public void loadIntoPage() throws IOException, ClassNotFoundException {
-        FileInputStream file = new FileInputStream(this.getFilepath());
-        if(file.available()!=0){
-            ObjectInputStream on = new ObjectInputStream(file);
-            //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
-            try {
-//                System.out.println(on);
-                Vector<Tuple> tmp = (Vector<Tuple>) on.readObject();
-//                System.out.println(tmp.size());
-                this.setPageTuples(tmp);
-            }
-            catch (EOFException e) {
-                System.out.println("error:"+e.getMessage());
-            }
-        };
-
-    }
 
     public void saveIntoPageFilepath() throws IOException {
         //save the newly inserted tuple in the file itself
-        File f = new File(filepath);
-        FileOutputStream file = new FileOutputStream(this.getFilepath());
-        ObjectOutputStream out = new ObjectOutputStream(file);
-        out.writeObject(this.getPageTuples());
-        out.close();
-        file.close();
-        this.setPageTuples(null);//may give error
+        FileManipulation.saveIntoFilepath(this,this.filepath);
+//        this.setPageTuples(null);//may give error
     }
-    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException {
-        loadIntoPage();
-//        System.out.println("in page");
+    public void updateMinMax(){
+        minVal = this.pageTuples.get(0);
+        maxVal = this.pageTuples.get(this.pageTuples.size()-1);
+    }
+    public void printPageInfo(){
+        System.out.println("page "+this.getPageID());
+        for(int i=0;i<this.getPageTuples().size();i++){
+            System.out.println(this.getPageTuples().get(i).getTupleAttributes().toString());
+        }
+        System.out.println("-------------------");
+    }
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException, DBAppException {
         boolean wasFull = this.isPageFull();
-//        System.out.println("before is full");
         Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
-//        System.out.println("after is full");
         Tuple insertedTuple = new Tuple(tuple, clusteringKey);
-//        System.out.println("after tuple");
-        //System.out.println(this.pageTuples.get(0).getTupleAttributes().get(this.pageTuples.get(0).getClusteringKey()));
+//        System.out.println(lastTuple!=null?"removed tuple: "+lastTuple.getTupleAttributes().toString():"no tuple");
+//        System.out.println("insert tuple: "+insertedTuple.getTupleAttributes().toString());
         if(this.isPageEmpty()){
-//            System.out.println("in if");
             this.pageTuples.add(insertedTuple);
+            updateMinMax();
+            //print page -------------------
+            printPageInfo();
             saveIntoPageFilepath();
             return null;
         }
@@ -115,121 +109,132 @@ public class Page implements Serializable{
         if(insertedTuple.compareTo(this.pageTuples.get(0)) < 0){
             this.pageTuples.add(0, insertedTuple);
         }
-       else
-        {
-            while (start <= end) {
-                int mid = (start + end) / 2;
-                Tuple currentTuple = this.pageTuples.get(mid);
-                if (insertedTuple.compareTo(currentTuple) > 0) {
-                    int temp = mid+1;
-                    if(temp>=this.getSizeOfPage()){
-                        this.pageTuples.add(insertedTuple);
-                        break;
-                    }
-                    Tuple nextTuple = this.pageTuples.get(temp);
-                    if(insertedTuple.compareTo(nextTuple)<=0){
-                        this.pageTuples.add(temp, insertedTuple);
-                        break;
-                    }
-                    start = mid + 1;
-                } else if (insertedTuple.compareTo(currentTuple) < 0) {
-//                if ( mid == this.getSizeOfPage() - 1 ) {
-//                    this.pageTuples.add(mid,insertedTuple);
-//                }
-//                else if (insertedTuple.compareTo(this.pageTuples.get(mid + 1)) > 0) {
-//                    this.pageTuples.add(mid+1,insertedTuple);
-//                }
-//                else {
-//                    end = mid ;
-//                }
-//                boolean isInserted = false;
-//                for(int i=mid-1;i>=start;i--){
-//                    currentTuple = this.pageTuples.get(i);
-//                    if(insertedTuple.compareTo(currentTuple)>0){
-//                        this.pageTuples.add(i+1,insertedTuple);
-//                        isInserted=true;
-//                        break;
-//                    }
-//                }
-//                if(!isInserted){
-//                    this.pageTuples.add(start-1,insertedTuple);
-//                    break;
-//                }
-                    int temp = mid-1;
-                    if(temp<0){
-                        this.pageTuples.add(0,insertedTuple);
-                        break;
-                    }
-                    Tuple nextTuple = this.pageTuples.get(temp);
-                    if(insertedTuple.compareTo(nextTuple)>=0){
-                        this.pageTuples.add(temp, insertedTuple);
-                        break;
-                    }
-                    end = mid - 1;
-                } else {
-                    this.pageTuples.add(mid, insertedTuple);
-                    break;
+        else {
+           while (start <= end) {
+               int mid = (start + end) / 2;
+               Tuple currentTuple = this.pageTuples.get(mid);
+               if (insertedTuple.compareTo(currentTuple) > 0) {
+//                   int temp = mid+1;
+//                   if(temp>=this.getSizeOfPage()){
+//                       this.pageTuples.add(insertedTuple);
+//                       break;
+//                   }
+//                   Tuple nextTuple = this.pageTuples.get(temp);
+//                   if(insertedTuple.compareTo(nextTuple)<=0){
+//                       this.pageTuples.add(temp, insertedTuple);
+//                       break;
+//                   }
+                   start = mid + 1;
+               } else if (insertedTuple.compareTo(currentTuple) < 0) {
+//                   int temp = mid-1;
+//                   if(temp<0){
+//                       this.pageTuples.add(0,insertedTuple);
+//                       break;
+//                   }
+//                   Tuple nextTuple = this.pageTuples.get(temp);
+//                   if(insertedTuple.compareTo(nextTuple)>=0){
+//                       this.pageTuples.add(temp, insertedTuple);
+//                       break;
+//                   }
+                   end = mid - 1;
+               } else {
+                   throw new DBAppException("the key: "+insertedTuple.getClusteringKey()+" already exists.");
+//                   this.pageTuples.add(mid, insertedTuple);
+//                   break;
+               }
+           }
+        }
+        if(start>end) {
+            if(start==this.getSizeOfPage()){
+                this.pageTuples.add(insertedTuple);
+            }else {
+                this.pageTuples.add(start,insertedTuple);
+            }
+        }
+//        System.out.println("min of page "+pageID+": "+minVal.getTupleAttributes());
+//        System.out.println("max of page "+pageID+": "+maxVal.getTupleAttributes());
+        updateMinMax();;
+        saveIntoPageFilepath();
+        //print page -------------------
+        printPageInfo();
+
+        return lastTuple;
+    }
+    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
+        // true: page is empty and deleted so delete from table
+        // false: page is not empty so don't delete from table
+        if(htblColNameValue.containsKey(this.getClusteringKey())){
+            int indexDeleted = getIndexBinarySearch(htblColNameValue);
+            if(indexDeleted == -1){
+                throw new DBAppException("The tuple you specified is not present");
+            }
+            pageTuples.remove(indexDeleted);
+        } else {
+            for(int i = 0 ; i<pageTuples.size();i++){
+                Tuple currentTuple = pageTuples.get(i);
+                boolean getDeleted = shouldBeDeleted(currentTuple,htblColNameValue);
+                if(getDeleted) {
+                    pageTuples.remove(i);
+                    i--;
                 }
             }
         }
-//        if(start>end) {
-//            if(start==this.getSizeOfPage()){
-//                this.pageTuples.add(insertedTuple);
-//            }else {
-//                this.pageTuples.add(start,insertedTuple);
-//            }
-//        }
+        //print page -------------------
+        printPageInfo();
 
-        if(minVal==null||insertedTuple.compareTo(minVal)<0){
-            this.setMinVal(insertedTuple);
-        }
-        if(maxVal==null||insertedTuple.compareTo(maxVal)>0){
-            this.setMaxVal(insertedTuple);
-        }
-        //System.out.println(insertedTupleValueOfKey);
-//        System.out.println(this.pageTuples.size());
-        saveIntoPageFilepath();
-        return lastTuple;
-    }
-    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException{
-        // true: page is empty and deleted so delete from table
-        //false: page is not empty so don't delete from table
-        int indexDeleted = getIndexBinarySearch(htblColNameValue);
-        if(indexDeleted == -1){
-            throw new DBAppException("The tuple you specified is not present");
-        }
-        Tuple tupleToBeDeleted = new Tuple(htblColNameValue,this.getClusteringKey());
-        pageTuples.remove(indexDeleted);
-        if(isPageEmpty()){
-            this.deletePage();
+        if(isPageEmpty()) {
+            FileManipulation.deleteEntireFile(this.filepath);
             return true;
         }
-//        if(tupleToBeDeleted.compareTo(minVal)==0) {
-        minVal = pageTuples.get(0);
-//        }
-//        else if (tupleToBeDeleted.compareTo(maxVal)==0){
-        maxVal = pageTuples.get(this.getSizeOfPage()-1);
-//        }
+        updateMinMax();
+        saveIntoPageFilepath();
         return false;
     }
-    public void deletePage()
-    {
-        try
-        {
-            File f= new File(this.getFilepath());           //file to be delete
-            if(f.delete())                      //returns Boolean value
-            {
-                System.out.println(f.getName() + " deleted");   //getting and printing the file name
-            }
-            else
-            {
-                System.out.println("failed");
+
+
+
+    public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
+        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
+        for (Map.Entry<String, Object> entry : entrySet) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            Object currentColValue = currentTuple.getTupleAttributes().get(key);
+            if(!currentColValue.equals(value)) {
+                return false;
             }
         }
-        catch(Exception e)
-        {
-            System.out.println(e.getMessage());
+        return true;
+    }
+
+    public Tuple updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
+//        boolean clusteringKeyExist=false;
+        Hashtable tupleHashtable = new Hashtable<String,Object>();
+        Object valueCorrectDataType= Column.adjustDataType(strClusteringKeyValue,dataType);
+        tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
+        int indexToBeUpdated = getIndexBinarySearch(tupleHashtable);
+        if(indexToBeUpdated == -1) {
+            throw new DBAppException("The tuple you specified is not present");
         }
+//        if(htblColNameValue.containsKey(this.getClusteringKey())){
+//            clusteringKeyExist=true;
+//        }
+        Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
+        Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
+        for (Map.Entry<String, Object> entry : entrySet) {
+            String keyToBeUpdated = entry.getKey();
+            Object newValue = entry.getValue();
+            tupleToBeUpdated.getTupleAttributes().put(keyToBeUpdated,newValue);
+        }
+
+        //print page info -----------
+        this.printPageInfo();
+//        if(clusteringKeyExist) {
+//            this.getPageTuples().remove(indexToBeUpdated);
+//            saveIntoPageFilepath();
+//            return tupleToBeUpdated;
+//        }
+        saveIntoPageFilepath();
+        return null;
     }
 
     public int getMaxSizePerPage() {
@@ -273,7 +278,7 @@ public class Page implements Serializable{
             int mid = (start + end) / 2 ;
             if(tuple.compareTo(this.pageTuples.get(mid)) == 0){
                 // we should not return immediately need to check if whole tuples are equal
-                // made a method called isEqual in Tuple class
+                // made a method called isEqual in Tuple class (indices maybe?)
                 return mid;
             }
             else if (tuple.compareTo(this.pageTuples.get(mid)) < 0){
@@ -284,5 +289,24 @@ public class Page implements Serializable{
             }
         }
         return -1;
+    }
+
+
+    @Override
+    public String toString() {
+        String pageInfo = "";
+        pageInfo+= "page id: "+this.getPageID()+"\n";
+        pageInfo+= "max page size: "+this.getMaxSizePerPage()+"\n";
+        pageInfo+= "filepath: "+this.getFilepath()+"\n";
+        pageInfo+= "min: "+this.getMinVal().toString()+"\n";
+        pageInfo+= "max: "+this.getMaxVal().toString()+"\n";
+        pageInfo+= "cluster key: "+this.getClusteringKey()+"\n";
+        pageInfo+= "table name: "+this.getTableName()+"\n";
+        pageInfo+= "tuples:\n";
+        for(int i=0;i<this.getSizeOfPage();i++){
+            pageInfo+=this.getPageTuples().get(i).toString()+"\n";
+        }
+        pageInfo+= this.getFilepath()+"done ...................... \n\n";
+        return pageInfo;
     }
 }

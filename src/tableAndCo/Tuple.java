@@ -1,5 +1,7 @@
 package tableAndCo;
 
+import helpers.Comparison;
+
 import java.io.*;
 import java.util.Date;
 import java.util.Hashtable;
@@ -28,31 +30,7 @@ public class Tuple implements Serializable {
         Object t1 = this.getTupleAttributes().get(this.getClusteringKey());
         Object t2 = o.getTupleAttributes().get(o.getClusteringKey());
         String type = t1.getClass().getName();
-        if (type.equals("java.lang.Integer")) {
-            return ((Integer) t1).compareTo((Integer) t2);
-        } else if (type.equals("java.lang.String")) {
-            return ((String) t1).compareTo((String) t2);
-        } else if (type.equals("java.lang.Double")) {
-            return ((Double) t1).compareTo((Double) t2);
-        } else if (type.equals("java.util.Date")) {
-            return ((Date) t1).compareTo((Date) t2);
-        } else {
-            return 0;
-        }
-    }
-
-    public boolean isEqual(Tuple t) {
-        Set<Map.Entry<String, Object>> entrySet = this.getTupleAttributes().entrySet();
-        Hashtable<String ,Object> htbl = t.getTupleAttributes();
-        for (Map.Entry<String, Object> entry : entrySet) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            Object value2 = htbl.get(key);
-            if(!value.equals(value2)){
-                return false;
-            }
-        }
-        return true;
+        return Comparison.compareTo(t1,t2,type);
     }
     @Override
     public String toString() {
