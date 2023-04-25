@@ -1,12 +1,14 @@
 import exceptions.DBAppException;
 import helpers.Comparison;
 import helpers.FileManipulation;
+import index.Octree;
 import metadata.Column;
 import metadata.Metadata;
 import tableAndCo.Page;
 import tableAndCo.Table;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DBApp implements Serializable {
@@ -66,9 +68,50 @@ public class DBApp implements Serializable {
         Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
         tables.add(newTable.getFilepath());
     }
-//    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException{
-//
-//    }
+    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException {
+        if(strarrColName.length<3){
+            throw new DBAppException("Array missing index attributes ");
+        } else if (strarrColName.length>3) {
+            throw new DBAppException("index attributes should be only 3 ");
+        }
+        int tableIndex = checkTablePresent(strTableName);
+        if(tableIndex==-1){
+            throw new DBAppException("table not found");
+        }
+        Vector<String> columnNames = metaData.getColumnNames(strTableName);
+        for (int i=0;i<3;i++){
+            if (!columnNames.contains(strarrColName[i])){
+                throw new DBAppException("columns specified are not in the table");
+            }
+        }
+        Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        if(!toBeInsertedInTable.isTableEmpty()){
+
+            Octree octree=new Octree();
+
+        }
+
+    }
+    public void getMinMax(Vector<String> columns,String columnNeeded,String strTableName) {
+        String type="";
+        Object[] minMax=null;
+        for (int i = 0; i < columns.size(); i++) {
+            if (columns.get(i) == columnNeeded) {
+                type = metaData.getColumnType(strTableName, columnNeeded);
+                break;
+            }
+        }
+        if (type.equals("java.lang.Integer")) {
+
+        } else if (type.equals("java.lang.String")) {
+
+        } else if (type.equals("java.lang.Double")) {
+
+        } else if (type.equals("java.util.Date")) {
+
+        }
+
+    }
     public int checkTablePresent(String strTableName) throws DBAppException, IOException, ClassNotFoundException {
         int tableIndex = -1;
         for(int i = 0; i< tables.size(); i++){
