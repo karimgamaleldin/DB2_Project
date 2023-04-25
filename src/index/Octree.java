@@ -94,6 +94,18 @@ public class Octree {
             return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
         }
     }
+    public boolean deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException {
+        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
+        Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
+        Octree octreeToBeDeletedFrom = searchForOctree(tobeDeletedPoint);
+        int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
+        if(indexOfPoint==-1){
+            throw new DBAppException("point to be deleted is not in the Octree");
+        }
+        else{
+
+        }
+    }
     public void divide() throws DBAppException, ParseException {
         // calculate boundaries of each octant
         this.isDivided = true;

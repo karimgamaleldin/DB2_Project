@@ -37,6 +37,7 @@ public class Table implements Serializable {
         FileManipulation.saveIntoFilepath(this,this.filepath);
 //        this.setPageTuples(null);//may give error
     }
+
     public Vector<String> getTablePages() {
         return tablePages;
     }
