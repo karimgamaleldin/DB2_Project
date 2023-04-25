@@ -8,6 +8,7 @@ import tableAndCo.Page;
 import tableAndCo.Table;
 
 import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -68,7 +69,7 @@ public class DBApp implements Serializable {
         Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
         tables.add(newTable.getFilepath());
     }
-    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException {
+    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException, ParseException {
         if(strarrColName.length<3){
             throw new DBAppException("Array missing index attributes ");
         } else if (strarrColName.length>3) {
@@ -84,32 +85,39 @@ public class DBApp implements Serializable {
                 throw new DBAppException("columns specified are not in the table");
             }
         }
+        Object[] firstAttribute= null;
+        Object[] secondAttribute= null;
+        Object[] thirdAttribute= null;
         Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
         if(!toBeInsertedInTable.isTableEmpty()){
-
-            Octree octree=new Octree();
-
+            firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
+            secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
+            thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
+            Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
+           // insert all the existing values in octree
+            //ezay b2a el 3elm 3end allah
         }
 
     }
-    public void getMinMax(Vector<String> columns,String columnNeeded,String strTableName) {
-        String type="";
-        Object[] minMax=null;
+    public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
+        String[] minMax=null;
+        Column columnNeeded=null;
+//        for (int i = 0; i < columnNames.size(); i++) {
+//            if (columnNames.get(i) == columnNeededString) {
+//                type = metaData.getColumnType(strTableName, columnNeededString);
+//                break;
+//            }
+//        }
+        Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
         for (int i = 0; i < columns.size(); i++) {
-            if (columns.get(i) == columnNeeded) {
-                type = metaData.getColumnType(strTableName, columnNeeded);
+            if (columns.get(i).getColumnName() == columnNeededString) {
+                columnNeeded=columns.get(i);
                 break;
             }
         }
-        if (type.equals("java.lang.Integer")) {
-
-        } else if (type.equals("java.lang.String")) {
-
-        } else if (type.equals("java.lang.Double")) {
-
-        } else if (type.equals("java.util.Date")) {
-
-        }
+        minMax[0]=columnNeeded.getMin();
+        minMax[1]=columnNeeded.getMax();
+        return minMax;
 
     }
     public int checkTablePresent(String strTableName) throws DBAppException, IOException, ClassNotFoundException {
