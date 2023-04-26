@@ -6,6 +6,8 @@ import helpers.FileManipulation;
 import tableAndCo.Page;
 import tableAndCo.Tuple;
 
+import java.io.IOException;
+import java.util.Hashtable;
 import java.util.Vector;
 
 public class Point {

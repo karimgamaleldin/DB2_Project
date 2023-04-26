@@ -105,9 +105,9 @@ public class Table implements Serializable {
         }
         else{
             while(start <= end){
-                int mid = (start + end) / 2 ;
-                 min=minValues.get(mid);
-                 max=maxValues.get(mid);
+                int mid = start + (end-start) / 2 ;
+                min=minValues.get(mid);
+                max=maxValues.get(mid);
                 if(wanted.compareTo(min) >0){
                     if(wanted.compareTo(max)<=0){
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
@@ -136,15 +136,22 @@ public class Table implements Serializable {
                 }
                 else {
                     //tuple = the min value
-                    loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
-                    Tuple shifted=  loadedPage.insertIntoPage(htblColNameValue);
-                    updateMinMax(loadedPage,mid);
-                    shift(mid+1,shifted);
+                      throw new DBAppException("the key already exists");
+                }
+            }
+            if(start>end){
+                if(start>=this.tablePages.size()){
+                    insertIntoCreatedPage(htblColNameValue);
+                }else {
+                    loadedPage = FileManipulation.loadPage(this.tablePages.get(start));
+                    Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+                    updateMinMax(loadedPage,start);
+                    shift(start+1,shifted);
                     saveIntoTableFilepath();
-                    return;
                 }
             }
         }
+
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
 
     }
