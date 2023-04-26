@@ -94,7 +94,7 @@ public class Octree {
             return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
         }
     }
-    public boolean deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException {
+    public void deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
         Octree octreeToBeDeletedFrom = searchForOctree(tobeDeletedPoint);
@@ -103,6 +103,7 @@ public class Octree {
             throw new DBAppException("point to be deleted is not in the Octree");
         }
         else{
+            octreeToBeDeletedFrom.points.remove(indexOfPoint);
 
         }
     }
