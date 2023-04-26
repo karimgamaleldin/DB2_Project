@@ -1,0 +1,4 @@
+Table Name,metadata.Column Name,metadata.Column Type,ClusteringKey,IndexName,IndexType,min,max,
+Students,gpa,java.lang.Integer,False,null,null,7,1000,
+Students,age,java.lang.Integer,True,null,null,1,40,
+Students,name,java.lang.String,False,null,null,A,zzzzzzz,
