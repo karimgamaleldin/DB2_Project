@@ -331,12 +331,12 @@ public class DBApp implements Serializable {
         Hashtable<String, Object> tuple1 = new Hashtable<>();
         tuple1.put("age", 1);
         tuple1.put("name", "Kord");
-        tuple1.put("gpa", 1.6);
+        tuple1.put("gpa", 1000);
 
         Hashtable<String, Object> tuple2 = new Hashtable<>();
         tuple2.put("age", 2);
         tuple2.put("name", "Omar");
-        tuple2.put("gpa", 4.0);
+        tuple2.put("gpa", 1000);
 
         Hashtable<String, Object> tuple3 = new Hashtable<>();
         tuple3.put("age", 3);
@@ -346,7 +346,7 @@ public class DBApp implements Serializable {
         Hashtable<String, Object> tuple4 = new Hashtable<>();
         tuple4.put("age", 4);
         tuple4.put("name", "Malak");
-        tuple4.put("gpa", 2.3);
+        tuple4.put("gpa", 1000);
 
         Hashtable<String, Object> tuple5 = new Hashtable<>();
         tuple5.put("age", 5);
@@ -405,7 +405,6 @@ public class DBApp implements Serializable {
         htblColNameMax.put("gpa", "1000");
         DBApp dbApp = new DBApp();
 //        dbApp.init();
-
          dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //         dbApp.insertIntoTable("Students", tuple0);
          dbApp.insertIntoTable("Students", tuple2);

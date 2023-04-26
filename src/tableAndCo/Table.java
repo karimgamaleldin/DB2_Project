@@ -123,10 +123,10 @@ public class Table implements Serializable {
                 else if (wanted.compareTo(min) < 0){
                     Tuple maxOfPreviousPage = maxValues.get(mid-1);
                     if(wanted.compareTo(maxOfPreviousPage) > 0) {
-                        loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
+                        loadedPage = FileManipulation.loadPage(this.tablePages.get(mid-1));
                         Tuple shifted = loadedPage.insertIntoPage(htblColNameValue);
-                        updateMinMax(loadedPage,mid);
-                        shift(mid+1,shifted);
+                        updateMinMax(loadedPage,mid-1);
+                        shift(mid,shifted);
                         saveIntoTableFilepath();
                         return;
                     }
