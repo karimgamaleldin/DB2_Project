@@ -108,7 +108,7 @@ public class Table implements Serializable {
                 int mid = start + (end-start) / 2 ;
                 min=minValues.get(mid);
                 max=maxValues.get(mid);
-                if(wanted.compareTo(min) >0){
+                if(wanted.compareTo(min) > 0){
                     if(wanted.compareTo(max)<=0){
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
                         Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
@@ -123,10 +123,10 @@ public class Table implements Serializable {
                 else if (wanted.compareTo(min) < 0){
                     Tuple maxOfPreviousPage = maxValues.get(mid-1);
                     if(wanted.compareTo(maxOfPreviousPage) > 0) {
-                        loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
+                        loadedPage = FileManipulation.loadPage(this.tablePages.get(mid-1));
                         Tuple shifted = loadedPage.insertIntoPage(htblColNameValue);
-                        updateMinMax(loadedPage,mid);
-                        shift(mid+1,shifted);
+                        updateMinMax(loadedPage,mid-1);
+                        shift(mid,shifted);
                         saveIntoTableFilepath();
                         return;
                     }
@@ -139,17 +139,17 @@ public class Table implements Serializable {
                       throw new DBAppException("the key already exists");
                 }
             }
-            if(start>end){
-                if(start>=this.tablePages.size()){
-                    insertIntoCreatedPage(htblColNameValue);
-                }else {
-                    loadedPage = FileManipulation.loadPage(this.tablePages.get(start));
-                    Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
-                    updateMinMax(loadedPage,start);
-                    shift(start+1,shifted);
-                    saveIntoTableFilepath();
-                }
-            }
+//            if(start>end){
+//                if(start>=this.tablePages.size()){
+//                    insertIntoCreatedPage(htblColNameValue);
+//                }else {
+//                    loadedPage = FileManipulation.loadPage(this.tablePages.get(start));
+//                    Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+//                    updateMinMax(loadedPage,start);
+//                    shift(start+1,shifted);
+//                    saveIntoTableFilepath();
+//                }
+//            }
         }
 
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);

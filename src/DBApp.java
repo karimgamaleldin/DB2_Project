@@ -331,76 +331,80 @@ public class DBApp implements Serializable {
         Hashtable<String, Object> tuple1 = new Hashtable<>();
         tuple1.put("age", 1);
         tuple1.put("name", "Kord");
-        tuple1.put("gpa", 1.6);
+        tuple1.put("gpa", 1000);
 
         Hashtable<String, Object> tuple2 = new Hashtable<>();
         tuple2.put("age", 2);
         tuple2.put("name", "Omar");
-        tuple2.put("gpa", 4.0);
+        tuple2.put("gpa", 1000);
 
         Hashtable<String, Object> tuple3 = new Hashtable<>();
         tuple3.put("age", 3);
         tuple3.put("name", "Ahmed");
-        tuple3.put("gpa", 0.9);
+        tuple3.put("gpa", 1000);
 
         Hashtable<String, Object> tuple4 = new Hashtable<>();
         tuple4.put("age", 4);
         tuple4.put("name", "Malak");
-        tuple4.put("gpa", 2.3);
+        tuple4.put("gpa", 1000);
 
         Hashtable<String, Object> tuple5 = new Hashtable<>();
         tuple5.put("age", 5);
         tuple5.put("name", "Menna");
-        tuple5.put("gpa", 0.8);
+        tuple5.put("gpa", 1000);
 
         Hashtable<String, Object> tuple6 = new Hashtable<>();
         tuple6.put("age", 6);
         tuple6.put("name", "Lobna");
-        tuple6.put("gpa", 1.4);
+        tuple6.put("gpa", 1000);
 
         Hashtable<String, Object> tuple7 = new Hashtable<>();
         tuple7.put("age", 7);
         tuple7.put("name", "boni");
-        tuple7.put("gpa", 3.2);
+        tuple7.put("gpa", 1000);
 
         Hashtable<String, Object> tuple8 = new Hashtable<>();
         tuple8.put("age", 8);
         tuple8.put("name", "nada");
-        tuple8.put("gpa", 2.5);
+        tuple8.put("gpa", 1000);
 
         Hashtable<String, Object> tuple9 = new Hashtable<>();
         tuple9.put("age", 9);
         tuple9.put("name", "noura");
-        tuple9.put("gpa", 3.4);
+        tuple9.put("gpa", 1000);
 
         Hashtable<String, Object> tuple10 = new Hashtable<>();
         tuple10.put("age", 10);
         tuple10.put("name", "ashry");
-        tuple10.put("gpa", 0.9);
+        tuple10.put("gpa", 1000);
 
         Hashtable<String, Object> tuple11 = new Hashtable<>();
         tuple11.put("age", 11);
         tuple11.put("name", "sara");
-        tuple11.put("gpa", 0.9);
+        tuple11.put("gpa", 1000);
+
+        Hashtable<String, Object> tuple12 = new Hashtable<>();
+        tuple12.put("age", 12);
+        tuple12.put("name", "abbas");
+        tuple12.put("gpa", 1000);
 
 
         Hashtable<String, String> htblColNameType = new Hashtable<>();
         htblColNameType.put("age", "java.lang.Integer");
         htblColNameType.put("name", "java.lang.String");
-        htblColNameType.put("gpa", "java.lang.Double");
+        htblColNameType.put("gpa", "java.lang.Integer");
 
         Hashtable<String, String> htblColNameMin = new Hashtable<>();
         htblColNameMin.put("age", "1");
         htblColNameMin.put("name", "A");
-        htblColNameMin.put("gpa", "0.7");
+        htblColNameMin.put("gpa", "7");
 
         Hashtable<String, String> htblColNameMax = new Hashtable<>();
         htblColNameMax.put("age", "40");
         htblColNameMax.put("name", "zzzzzzz");
-        htblColNameMax.put("gpa", "4.0");
+        htblColNameMax.put("gpa", "1000");
         DBApp dbApp = new DBApp();
 //        dbApp.init();
-
          dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //         dbApp.insertIntoTable("Students", tuple0);
          dbApp.insertIntoTable("Students", tuple2);
@@ -414,6 +418,7 @@ public class DBApp implements Serializable {
          dbApp.insertIntoTable("Students", tuple9);
          dbApp.insertIntoTable("Students", tuple10);
          dbApp.insertIntoTable("Students", tuple11);
+         dbApp.insertIntoTable("Students", tuple12);
 
 
 //         Hashtable<String, Object> updateHtbl = new Hashtable<>();
@@ -435,12 +440,12 @@ public class DBApp implements Serializable {
 //    System.out.println(dbApp.tables);
         Table table = FileManipulation.loadTable(dbApp.tables.get(0));
 
-        for (String pageName : table.getTablePages()) {
-            Page p = FileManipulation.loadPage(pageName);
-            System.out.println("PAGE " + p.getPageID());
-            System.out.println(p.getPageTuples());
-            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-//            p.serialize();
-        }
+//        for (String pageName : table.getTablePages()) {
+//            Page p = FileManipulation.loadPage(pageName);
+//            System.out.println("PAGE " + p.getPageID());
+//            System.out.println(p.getPageTuples());
+//            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+////            p.serialize();
+//        }
     }
 }
