@@ -452,12 +452,12 @@ public class DBApp implements Serializable {
 //    System.out.println(dbApp.tables);
         Table table = FileManipulation.loadTable(dbApp.tables.get(0));
 
-//        for (String pageName : table.getTablePages()) {
-//            Page p = FileManipulation.loadPage(pageName);
-//            System.out.println("PAGE " + p.getPageID());
-//            System.out.println(p.getPageTuples());
-//            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-////            p.serialize();
-//        }
+        for (String pageName : table.getTablePages()) {
+            Page p = FileManipulation.loadPage(pageName);
+            System.out.println("PAGE " + p.getPageID());
+            System.out.println(p.getPageTuples());
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+//            p.serialize();
+        }
     }
 }

@@ -96,10 +96,15 @@ public class Table implements Serializable {
         }
         else if (wanted.compareTo(max) > 0) {//if tuple greater than biggest tuple in table
             loadedPage = FileManipulation.loadPage(this.tablePages.get(end));
+//            if(loadedPage.isPageFull()){
+//                insertIntoCreatedPage(htblColNameValue);
+//            }else{
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+//            System.out.println(shifted);
             updateMinMax(loadedPage,end);
             shift(end+1,shifted);
             saveIntoTableFilepath();
+//            }
         }
         else{
             while(start <= end){

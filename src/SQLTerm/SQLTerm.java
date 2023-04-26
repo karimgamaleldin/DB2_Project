@@ -7,4 +7,5 @@ public class SQLTerm {
     String _strColumnName;
     String _strOperator;
     Object  _objValue;
+
 }
