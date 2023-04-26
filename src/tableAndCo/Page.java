@@ -99,8 +99,8 @@ public class Page implements Serializable{
         if(this.isPageEmpty()){
             this.pageTuples.add(insertedTuple);
             updateMinMax();
-            //print page -------------------
-            printPageInfo();
+//            //print page -------------------
+//            printPageInfo();
             saveIntoPageFilepath();
             return null;
         }
@@ -156,7 +156,7 @@ public class Page implements Serializable{
         updateMinMax();;
         saveIntoPageFilepath();
         //print page -------------------
-        printPageInfo();
+//        printPageInfo();
 
         return lastTuple;
     }
@@ -179,8 +179,8 @@ public class Page implements Serializable{
                 }
             }
         }
-        //print page -------------------
-        printPageInfo();
+//        //print page -------------------
+//        printPageInfo();
 
         if(isPageEmpty()) {
             FileManipulation.deleteEntireFile(this.filepath);
@@ -227,7 +227,7 @@ public class Page implements Serializable{
         }
 
         //print page info -----------
-        this.printPageInfo();
+//        this.printPageInfo();
 //        if(clusteringKeyExist) {
 //            this.getPageTuples().remove(indexToBeUpdated);
 //            saveIntoPageFilepath();
