@@ -1,6 +1,10 @@
 package index;
 
+import exceptions.DBAppException;
 import helpers.Comparison;
+import helpers.FileManipulation;
+import tableAndCo.Page;
+import tableAndCo.Tuple;
 
 import java.util.Vector;
 
@@ -67,5 +71,13 @@ public class Point {
         boolean yEqual = Comparison.compareTo(this.height,p.getLength(),null)==0;
         boolean zEqual = Comparison.compareTo(this.height,p.getHeight(),null)==0;
         return xEqual && yEqual && zEqual;
+    }
+
+    public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue) throws IOException, ClassNotFoundException , DBAppException {
+        for(int i = 0 ; i < references.size() ; i++){
+            Page p = FileManipulation.loadPage(references.get(i));
+            boolean deleted = p.deleteFromPage(htblColNameValue);
+            // todo serilize
+        }
     }
 }
