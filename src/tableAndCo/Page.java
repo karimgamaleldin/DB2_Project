@@ -100,7 +100,7 @@ public class Page implements Serializable{
             this.pageTuples.add(insertedTuple);
             updateMinMax();
 //            //print page -------------------
-//            printPageInfo();
+            printPageInfo();
             saveIntoPageFilepath();
             return null;
         }
@@ -156,7 +156,7 @@ public class Page implements Serializable{
         updateMinMax();;
         saveIntoPageFilepath();
         //print page -------------------
-//        printPageInfo();
+        printPageInfo();
 
         return lastTuple;
     }

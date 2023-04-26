@@ -139,17 +139,17 @@ public class Table implements Serializable {
                       throw new DBAppException("the key already exists");
                 }
             }
-            if(start>end){
-                if(start>=this.tablePages.size()){
-                    insertIntoCreatedPage(htblColNameValue);
-                }else {
-                    loadedPage = FileManipulation.loadPage(this.tablePages.get(start));
-                    Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
-                    updateMinMax(loadedPage,start);
-                    shift(start+1,shifted);
-                    saveIntoTableFilepath();
-                }
-            }
+//            if(start>end){
+//                if(start>=this.tablePages.size()){
+//                    insertIntoCreatedPage(htblColNameValue);
+//                }else {
+//                    loadedPage = FileManipulation.loadPage(this.tablePages.get(start));
+//                    Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+//                    updateMinMax(loadedPage,start);
+//                    shift(start+1,shifted);
+//                    saveIntoTableFilepath();
+//                }
+//            }
         }
 
 //        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
