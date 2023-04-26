@@ -108,7 +108,7 @@ public class Table implements Serializable {
                 int mid = start + (end-start) / 2 ;
                 min=minValues.get(mid);
                 max=maxValues.get(mid);
-                if(wanted.compareTo(min) >0){
+                if(wanted.compareTo(min) > 0){
                     if(wanted.compareTo(max)<=0){
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
                         Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);

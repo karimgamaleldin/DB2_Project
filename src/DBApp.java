@@ -392,12 +392,12 @@ public class DBApp implements Serializable {
         Hashtable<String, String> htblColNameMin = new Hashtable<>();
         htblColNameMin.put("age", "1");
         htblColNameMin.put("name", "A");
-        htblColNameMin.put("gpa", "0.7");
+        htblColNameMin.put("gpa", "7");
 
         Hashtable<String, String> htblColNameMax = new Hashtable<>();
         htblColNameMax.put("age", "40");
         htblColNameMax.put("name", "zzzzzzz");
-        htblColNameMax.put("gpa", "4.0");
+        htblColNameMax.put("gpa", "1000");
         DBApp dbApp = new DBApp();
 //        dbApp.init();
 
