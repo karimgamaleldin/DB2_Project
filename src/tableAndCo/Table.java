@@ -78,9 +78,7 @@ public class Table implements Serializable {
 //            System.out.println(minValues.get(0));
 //            minValues.add(page.getMinVal());
 //            maxValues.add(page.getMaxVal());
-
             saveIntoTableFilepath();
-
             return;
         }
 
@@ -306,7 +304,7 @@ public class Table implements Serializable {
         }
         Hashtable<String, Object> shift=null;
         //if nextPage == table size before entering loop
-        if(nextPage==this.tablePages.size()){
+        if(nextPage>=this.tablePages.size()){
             shift=shifted.getTupleAttributes();
             insertIntoCreatedPage(shift);
             return;
