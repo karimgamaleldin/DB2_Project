@@ -153,7 +153,7 @@ public class Page implements Serializable{
         }
 //        System.out.println("min of page "+pageID+": "+minVal.getTupleAttributes());
 //        System.out.println("max of page "+pageID+": "+maxVal.getTupleAttributes());
-        updateMinMax();;
+        updateMinMax();
         saveIntoPageFilepath();
         //print page -------------------
         printPageInfo();
