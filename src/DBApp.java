@@ -89,12 +89,13 @@ public class DBApp implements Serializable {
         Object[] secondAttribute= null;
         Object[] thirdAttribute= null;
         Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
+        secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
+        thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
+        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
         if(!toBeInsertedInTable.isTableEmpty()){
-            firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
-            secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
-            thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
-            Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
-           // insert all the existing values in octree
+
+             // insert all the existing values in octree
             //ezay b2a el 3elm 3end allah
         }
 
