@@ -103,7 +103,7 @@ public class Octree {
             throw new DBAppException("point to be deleted is not in the Octree");
         }
         else{
-
+            octreeToBeDeletedFrom.points.remove(indexOfPoint);
         }
     }
     public void divide() throws DBAppException, ParseException {
