@@ -1,6 +1,7 @@
 import exceptions.DBAppException;
 import helpers.Comparison;
 import helpers.FileManipulation;
+import helpers.SimulatingNull;
 import index.Octree;
 import metadata.Column;
 import metadata.Metadata;
@@ -136,12 +137,31 @@ public class DBApp implements Serializable {
         }
         return tableIndex;
     }
+    public void insertingNulls(Vector<String> missingColumnNames,Hashtable<String,Object> htblColNameValue){
+        for(int i=0;i<missingColumnNames.size();i++){
+            htblColNameValue.put(missingColumnNames.get(i), new SimulatingNull());
+        }
+    }
     public void checkHtblValid(String strTableName, Hashtable<String,Object> htblColNameValue, boolean insert) throws Exception {
         Vector<String> columnNames = metaData.getColumnNames(strTableName);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         if (insert) {
-            if(entrySet.size() != columnNames.size()){
-                throw new DBAppException("There are missing or extra column(s)");
+            if(entrySet.size() > columnNames.size()){
+                throw new DBAppException("There are extra column(s)");
+            }else {
+                for (Map.Entry<String, Object> entry : entrySet) {
+                    String key = entry.getKey();
+                    if(!columnNames.contains(key)){
+                        throw new DBAppException(key+" is an extra column");
+                    }
+                }
+                Vector<String> missingColumnNames = new Vector<String>();
+                for(int i=0;i<columnNames.size();i++) {
+                    if(!htblColNameValue.containsKey(columnNames.get(i))) {
+                        missingColumnNames.add(columnNames.get(i));
+                    }
+                }
+                insertingNulls(missingColumnNames,htblColNameValue);
             }
         }
         for (Map.Entry<String, Object> entry : entrySet) {

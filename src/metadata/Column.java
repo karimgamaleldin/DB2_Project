@@ -50,7 +50,7 @@ public class Column {
         if (type.equals("java.lang.Integer")) {
             return Integer.parseInt(key);
         } else if (type.equals("java.lang.String")) {
-            return key;
+            return key.toLowerCase();
         } else if (type.equals("java.lang.Double")) {
             return Double.parseDouble(key);
         } else if (type.equals("java.util.Date")) {
