@@ -92,26 +92,29 @@ public class Page implements Serializable{
     }
     public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException, DBAppException {
         boolean wasFull = this.isPageFull();
-        Tuple lastTuple = wasFull ? this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
         Tuple insertedTuple = new Tuple(tuple, clusteringKey);
+        if(this.maxVal!=null&&insertedTuple.compareTo(this.maxVal) > 0&&wasFull){
+            return insertedTuple;
+        }
+        Tuple lastTuple = wasFull ?  this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
 //        System.out.println(lastTuple!=null?"removed tuple: "+lastTuple.getTupleAttributes().toString():"no tuple");
 //        System.out.println("insert tuple: "+insertedTuple.getTupleAttributes().toString());
         if(this.isPageEmpty()){
             this.pageTuples.add(insertedTuple);
             updateMinMax();
 //            //print page -------------------
-            printPageInfo();
+//            printPageInfo();
             saveIntoPageFilepath();
             return null;
         }
         int start = 0 ;
         int end = this.getSizeOfPage() - 1;
-        if(insertedTuple.compareTo(this.pageTuples.get(0)) < 0){
+        if(insertedTuple.compareTo(this.pageTuples.get(0)) <= 0){
             this.pageTuples.add(0, insertedTuple);
         }
         else {
            while (start <= end) {
-               int mid = (start + end) / 2;
+               int mid = start + (end-start) / 2;
                Tuple currentTuple = this.pageTuples.get(mid);
                if (insertedTuple.compareTo(currentTuple) > 0) {
 //                   int temp = mid+1;
@@ -156,7 +159,7 @@ public class Page implements Serializable{
         updateMinMax();
         saveIntoPageFilepath();
         //print page -------------------
-        printPageInfo();
+//        printPageInfo();
 
         return lastTuple;
     }
@@ -166,7 +169,8 @@ public class Page implements Serializable{
         if(htblColNameValue.containsKey(this.getClusteringKey())){
             int indexDeleted = getIndexBinarySearch(htblColNameValue);
             if(indexDeleted == -1){
-                throw new DBAppException("The tuple you specified is not present");
+                return false;
+//                throw new DBAppException("The tuple you specified is not present");
             }
             pageTuples.remove(indexDeleted);
         } else {
@@ -275,7 +279,7 @@ public class Page implements Serializable{
         int start = 0;
         int end = this.pageTuples.size() - 1;
         while(start <= end){
-            int mid = (start + end) / 2 ;
+            int mid = start + (end-start) / 2 ;
             if(tuple.compareTo(this.pageTuples.get(mid)) == 0){
                 // we should not return immediately need to check if whole tuples are equal
                 // made a method called isEqual in Tuple class (indices maybe?)

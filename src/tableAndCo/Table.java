@@ -78,9 +78,7 @@ public class Table implements Serializable {
 //            System.out.println(minValues.get(0));
 //            minValues.add(page.getMinVal());
 //            maxValues.add(page.getMaxVal());
-
             saveIntoTableFilepath();
-
             return;
         }
 
@@ -98,10 +96,15 @@ public class Table implements Serializable {
         }
         else if (wanted.compareTo(max) > 0) {//if tuple greater than biggest tuple in table
             loadedPage = FileManipulation.loadPage(this.tablePages.get(end));
+//            if(loadedPage.isPageFull()){
+//                insertIntoCreatedPage(htblColNameValue);
+//            }else{
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+//            System.out.println(shifted);
             updateMinMax(loadedPage,end);
             shift(end+1,shifted);
             saveIntoTableFilepath();
+//            }
         }
         else{
             while(start <= end){
@@ -306,7 +309,7 @@ public class Table implements Serializable {
         }
         Hashtable<String, Object> shift=null;
         //if nextPage == table size before entering loop
-        if(nextPage==this.tablePages.size()){
+        if(nextPage>=this.tablePages.size()){
             shift=shifted.getTupleAttributes();
             insertIntoCreatedPage(shift);
             return;
