@@ -27,9 +27,11 @@ public class Table implements Serializable {
         this.nextPageID = 0;
         this.minValues=new Vector<Tuple>();
         this.maxValues=new Vector<Tuple>();
-        this.filepath = "data/tables/"+tableName+".class";
+        //"resources/data/tables/"+tableName+".class"
+        this.filepath = "src/resources/data/tables/"+tableName+".class";
         this.saveIntoTableFilepath();
-        FileManipulation.createDirectory("data/pages/"+tableName);
+        //"resources/data/pages/"
+        FileManipulation.createDirectory("src/resources/data/pages/"+tableName);
     }
 
     public void saveIntoTableFilepath() throws IOException {
@@ -144,7 +146,7 @@ public class Table implements Serializable {
 //        boolean clusteringKeyExist=false;
         if(isTableEmpty()){
             return;
-//            throw new DBAppException("The table is empty");
+//            throw new exceptions.DBAppException("The table is empty");
         }
 //        if(htblColNameValue.containsKey(this.getClusteringKey())){
 //            clusteringKeyExist=true;
@@ -166,7 +168,7 @@ public class Table implements Serializable {
         Tuple max=maxValues.get(end);
         if(toBeUpdated.compareTo(min) <0 || toBeUpdated.compareTo(max) >0){//if tuple less than first tuple in table
             return;
-//            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
         } else {
             while(start <= end){
                 int mid = (start + end) / 2 ;
@@ -196,7 +198,7 @@ public class Table implements Serializable {
                     return;
                 }
             }
-//            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
         }
     }
 
@@ -229,7 +231,7 @@ public class Table implements Serializable {
     }
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
-//            throw new DBAppException("The table is empty");
+//            throw new exceptions.DBAppException("The table is empty");
             return;
         }
         if(htblColNameValue.size()==0){
@@ -242,9 +244,9 @@ public class Table implements Serializable {
 //        Tuple min=minValues.get(start);
 //        Tuple max=maxValues.get(end);
 //        if(toBeDeleted.compareTo(min) <0){//if tuple less than first tuple in table
-//            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
 //        } else if (toBeDeleted.compareTo(max) >0) {//if tuple more than biggest tuple in table
-//            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
 //        } else{
         for(int i=0;i<this.getTablePages().size();i++){
             Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));

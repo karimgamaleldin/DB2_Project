@@ -2,7 +2,6 @@ package index;
 
 
 import exceptions.DBAppException;
-import tableAndCo.Tuple;
 
 import java.io.IOException;
 import java.text.ParseException;

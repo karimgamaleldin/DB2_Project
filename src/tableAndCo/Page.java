@@ -1,12 +1,11 @@
 package tableAndCo;
+
 import exceptions.DBAppException;
-
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import helpers.FileManipulation;
 import metadata.Column;
+
+import java.io.*;
+import java.util.*;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
@@ -24,7 +23,8 @@ public class Page implements Serializable{
         this.pageID = pageID;
         this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        this.filepath = "data/pages/"+tableName+"/"+filepath+".class" ;
+        //"resources/data/pages/"+tableName+"/"+filepath+".class"
+        this.filepath = "src/resources/data/pages/"+tableName+"/"+filepath+".class" ;
         this.minVal = null;
         this.maxVal = null;
         this.clusteringKey = clusteringKey;
@@ -167,7 +167,10 @@ public class Page implements Serializable{
             if(indexDeleted == -1){
                 return false;
             }
-            pageTuples.remove(indexDeleted);
+            Tuple tupleToBeDeleted = this.pageTuples.get(indexDeleted);
+            if(shouldBeDeleted(tupleToBeDeleted,htblColNameValue)){
+                pageTuples.remove(indexDeleted);
+            }
         } else {
             for(int i = 0 ; i<pageTuples.size();i++){
                 Tuple currentTuple = pageTuples.get(i);

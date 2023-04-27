@@ -1,7 +1,5 @@
 package helpers;
 
-import tableAndCo.Tuple;
-
 import java.util.Date;
 
 public abstract class Comparison {

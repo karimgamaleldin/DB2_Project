@@ -1,6 +1,8 @@
 package helpers;
 
-public class SimulatingNull {
+import java.io.Serializable;
+
+public class SimulatingNull implements Serializable {
     @Override
     public String toString(){
         return "null";
