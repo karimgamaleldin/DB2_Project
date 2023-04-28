@@ -47,10 +47,10 @@ public abstract class FileManipulation {
         try {
             File f= new File(filepath);           //file to be delete
             if(f.delete()) { //returns boolean value
-                System.out.println(f.getName() + " deleted");   //getting and printing the file name
+//                System.out.println(f.getName() + " deleted");   //getting and printing the file name
             }
             else {
-                System.out.println("failed");
+//                System.out.println("failed");
             }
         }
         catch(Exception e) {

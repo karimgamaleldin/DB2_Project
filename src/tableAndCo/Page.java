@@ -96,9 +96,6 @@ public class Page implements Serializable{
         if(this.maxVal!=null&&insertedTuple.compareTo(this.maxVal) > 0&&wasFull){
             return insertedTuple;
         }
-        Tuple lastTuple = wasFull ?  this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
-//        System.out.println(lastTuple!=null?"removed tuple: "+lastTuple.getTupleAttributes().toString():"no tuple");
-//        System.out.println("insert tuple: "+insertedTuple.getTupleAttributes().toString());
         if(this.isPageEmpty()){
             this.pageTuples.add(insertedTuple);
             updateMinMax();
@@ -117,34 +114,16 @@ public class Page implements Serializable{
                int mid = start + (end-start) / 2;
                Tuple currentTuple = this.pageTuples.get(mid);
                if (insertedTuple.compareTo(currentTuple) > 0) {
-//                   int temp = mid+1;
-//                   if(temp>=this.getSizeOfPage()){
-//                       this.pageTuples.add(insertedTuple);
-//                       break;
-//                   }
-//                   Tuple nextTuple = this.pageTuples.get(temp);
-//                   if(insertedTuple.compareTo(nextTuple)<=0){
-//                       this.pageTuples.add(temp, insertedTuple);
-//                       break;
-//                   }
                    start = mid + 1;
                } else if (insertedTuple.compareTo(currentTuple) < 0) {
-//                   int temp = mid-1;
-//                   if(temp<0){
-//                       this.pageTuples.add(0,insertedTuple);
-//                       break;
-//                   }
-//                   Tuple nextTuple = this.pageTuples.get(temp);
-//                   if(insertedTuple.compareTo(nextTuple)>=0){
-//                       this.pageTuples.add(temp, insertedTuple);
-//                       break;
-//                   }
                    end = mid - 1;
                } else {
-                   throw new DBAppException("the key: "+insertedTuple.getClusteringKey()+" already exists.");
+                   Object clusterKey = insertedTuple.getTupleAttributes().get(insertedTuple.getClusteringKey());
+                   throw new DBAppException("the key: "+insertedTuple.getClusteringKey()+" "+clusterKey.toString()+" already exists.");
                }
            }
         }
+        Tuple lastTuple = wasFull ?  this.pageTuples.remove(this.getSizeOfPage() - 1) : null ;
         if(start>end) {
             if(start==this.getSizeOfPage()){
                 this.pageTuples.add(insertedTuple);

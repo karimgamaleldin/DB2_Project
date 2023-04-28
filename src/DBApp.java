@@ -146,6 +146,10 @@ public class DBApp implements Serializable {
         Vector<String> columnNames = metaData.getColumnNames(strTableName);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         if (insert) {
+            String clusteringKey = metaData.getTableClusteringKey(strTableName);
+            if(!htblColNameValue.containsKey(clusteringKey)){
+                throw new DBAppException(clusteringKey+" is not found in the entry");
+            }
             if(entrySet.size() > columnNames.size()){
                 throw new DBAppException("There are extra column(s)");
             }else {
@@ -408,12 +412,12 @@ public class DBApp implements Serializable {
 
         Hashtable<String, Object> tuple10 = new Hashtable<>();
         tuple10.put("age", 10);
-        tuple10.put("name", "ashry");
+        tuple10.put("name", "nada");
         tuple10.put("gpa", 0.9);
 
         Hashtable<String, Object> tuple11 = new Hashtable<>();
         tuple11.put("age", 11);
-        tuple11.put("name", "sara");
+        tuple11.put("name", "nada");
         tuple11.put("gpa", 0.9);
 
         Hashtable<String, Object> tuple12 = new Hashtable<>();
@@ -501,16 +505,18 @@ public class DBApp implements Serializable {
 
 
          Hashtable<String, Object> updateHtbl = new Hashtable<>();
-         updateHtbl.put("gpa", 2.0);
+         updateHtbl.put("name", "kimo");
+         updateHtbl.put("gpa", 1.0);
 //         updateHtbl.put("name", "boniiiii");
-         dbApp.updateTable("Students", "15", updateHtbl);
+//         dbApp.updateTable("Students", "20", updateHtbl);
 
          Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
          Hashtable<String,Object> deletingCriteria1 = new Hashtable<>();
          Hashtable<String,Object> deletingCriteria2 = new Hashtable<>();
          Hashtable<String,Object> deletingCriteria3 = new Hashtable<>();
-         deletingCriteria0.put( "age", 6);
-         deletingCriteria0.put("name","Lobna");
+         deletingCriteria0.put( "age", 10);
+         deletingCriteria0.put("name","nada");
+         deletingCriteria0.put("gpa",0.9);
          deletingCriteria1.put("gpa", 0.9);
          deletingCriteria2.put( "name", "nada");
 //         deletingCriteria3.put( "age", 5);

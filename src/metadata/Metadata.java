@@ -197,6 +197,19 @@ public class Metadata {
         return columnsNames;
     }
 
+    public String getTableClusteringKey(String strTableName){
+        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+        String clusteringKey = "";
+        for(int i = 0 ; i < columns.size() ; i++){
+            Column currentColumn = columns.get(i);
+            if(currentColumn.getTableName().equals(strTableName)&&currentColumn.isClusteringKey()) {
+                clusteringKey = currentColumn.getColumnName();
+                break;
+            }
+        }
+        return clusteringKey;
+    }
+
     public String getColumnType(String strTableName ,String columnName){
         String type = "";
         Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
