@@ -27,9 +27,11 @@ public class Table implements Serializable {
         this.nextPageID = 0;
         this.minValues=new Vector<Tuple>();
         this.maxValues=new Vector<Tuple>();
-        this.filepath = "data/tables/"+tableName+".class";
+        //"resources/data/tables/"+tableName+".class"
+        this.filepath = "src/resources/data/tables/"+tableName+".class";
         this.saveIntoTableFilepath();
-        FileManipulation.createDirectory("data/pages/"+tableName);
+        //"resources/data/pages/"
+        FileManipulation.createDirectory("src/resources/data/pages/"+tableName);
     }
 
     public void saveIntoTableFilepath() throws IOException {
@@ -96,15 +98,10 @@ public class Table implements Serializable {
         }
         else if (wanted.compareTo(max) > 0) {//if tuple greater than biggest tuple in table
             loadedPage = FileManipulation.loadPage(this.tablePages.get(end));
-//            if(loadedPage.isPageFull()){
-//                insertIntoCreatedPage(htblColNameValue);
-//            }else{
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
-//            System.out.println(shifted);
             updateMinMax(loadedPage,end);
             shift(end+1,shifted);
             saveIntoTableFilepath();
-//            }
         }
         else{
             while(start <= end){
@@ -142,31 +139,18 @@ public class Table implements Serializable {
                       throw new DBAppException("the key already exists");
                 }
             }
-//            if(start>end){
-//                if(start>=this.tablePages.size()){
-//                    insertIntoCreatedPage(htblColNameValue);
-//                }else {
-//                    loadedPage = FileManipulation.loadPage(this.tablePages.get(start));
-//                    Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
-//                    updateMinMax(loadedPage,start);
-//                    shift(start+1,shifted);
-//                    saveIntoTableFilepath();
-//                }
-//            }
         }
-
-//        this.getTablePages().get(0).insertIntoPage(htblColNameValue);
-
+        loadedPage = null;
     }
     public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception {
 //        boolean clusteringKeyExist=false;
         if(isTableEmpty()){
-            throw new DBAppException("The table is empty");
+            return;
+//            throw new exceptions.DBAppException("The table is empty");
         }
 //        if(htblColNameValue.containsKey(this.getClusteringKey())){
 //            clusteringKeyExist=true;
-//        }
-
+//
         String clusterKeyDataType = "";
         for(int i=0;i<columns.size();i++){
             Column currentColumn = columns.get(i);
@@ -182,10 +166,9 @@ public class Table implements Serializable {
         int end = this.getTablePages().size()-1;
         Tuple min=minValues.get(start);
         Tuple max=maxValues.get(end);
-        if(toBeUpdated.compareTo(min) <0){//if tuple less than first tuple in table
-            throw new DBAppException("tuple is not in the table");
-        } else if (toBeUpdated.compareTo(max) >0) {//if tuple equal than biggest tuple in table
-            throw new DBAppException("tuple is not in the table");
+        if(toBeUpdated.compareTo(min) <0 || toBeUpdated.compareTo(max) >0){//if tuple less than first tuple in table
+            return;
+//            throw new exceptions.DBAppException("tuple is not in the table");
         } else {
             while(start <= end){
                 int mid = (start + end) / 2 ;
@@ -215,13 +198,13 @@ public class Table implements Serializable {
                     return;
                 }
             }
-            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
         }
     }
 
 
     private void updateHelper(int mid, String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue, String clusterKeyDataType) throws Exception {
-        Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(mid));
+        Page loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
 //        Tuple updatedTuple =
         loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
         if(loadedPage.isPageEmpty()){
@@ -230,6 +213,7 @@ public class Table implements Serializable {
             minValues.remove(mid);
             maxValues.remove(mid);
         }
+        loadedPage = null;
 //        if(updatedTuple!=null){
 //            insert(updatedTuple.getTupleAttributes());
 //        }
@@ -247,7 +231,7 @@ public class Table implements Serializable {
     }
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
-//            throw new DBAppException("The table is empty");
+//            throw new exceptions.DBAppException("The table is empty");
             return;
         }
         if(htblColNameValue.size()==0){
@@ -260,9 +244,9 @@ public class Table implements Serializable {
 //        Tuple min=minValues.get(start);
 //        Tuple max=maxValues.get(end);
 //        if(toBeDeleted.compareTo(min) <0){//if tuple less than first tuple in table
-//            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
 //        } else if (toBeDeleted.compareTo(max) >0) {//if tuple more than biggest tuple in table
-//            throw new DBAppException("tuple is not in the table");
+//            throw new exceptions.DBAppException("tuple is not in the table");
 //        } else{
         for(int i=0;i<this.getTablePages().size();i++){
             Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
@@ -275,6 +259,7 @@ public class Table implements Serializable {
             }else {
                 updateMinMax(loadedPage,i);
             }
+            loadedPage = null;
         }
         saveIntoTableFilepath();
     }
@@ -302,6 +287,7 @@ public class Table implements Serializable {
         page.insertIntoPage(shift);
         int lastIndex = this.tablePages.size()-1;
         updateMinMax(page,lastIndex);
+        page = null;
     }
     public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException, DBAppException {
         if(shifted==null) {
@@ -322,6 +308,7 @@ public class Table implements Serializable {
             shifted=currentPage.insertIntoPage(shift);
             updateMinMax(currentPage,nextPage);
             nextPage++;
+            currentPage = null;
             if(nextPage==this.tablePages.size()){
                 if(shifted!=null){
                     shift=shifted.getTupleAttributes();

@@ -1,14 +1,11 @@
 package metadata;
 
-import helpers.FileManipulation;
-
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 
 public class Metadata {
@@ -43,6 +40,7 @@ public class Metadata {
             sc.next();
 //            System.out.print(sc.next()+":"+i+",");
         }
+        columnsOfMetaData.clear();
         while (sc.hasNext())  //returns a boolean value
         {
             Vector<String> temp = new Vector<String>();
@@ -109,12 +107,12 @@ public class Metadata {
 
     public void writeHeaders() throws IOException {
         StringBuilder sb= new StringBuilder();
-        //Table Name, metadata.Column Name, metadata.Column Type, ClusteringKey, IndexName,IndexType, min, max
+        //Table Name, main.java.java.Column Name, main.java.java.Column Type, ClusteringKey, IndexName,IndexType, min, max
         sb.append("Table Name");
         sb.append(",");
-        sb.append("metadata.Column Name");
+        sb.append("main.java.java.Column Name");
         sb.append(",");
-        sb.append("metadata.Column Type");
+        sb.append("main.java.java.Column Type");
         sb.append(",");
         sb.append("ClusteringKey");
         sb.append(",");

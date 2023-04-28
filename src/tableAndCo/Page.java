@@ -1,12 +1,11 @@
 package tableAndCo;
+
 import exceptions.DBAppException;
-
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import helpers.FileManipulation;
 import metadata.Column;
+
+import java.io.*;
+import java.util.*;
 
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
@@ -24,7 +23,8 @@ public class Page implements Serializable{
         this.pageID = pageID;
         this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        this.filepath = "data/pages/"+tableName+"/"+filepath+".class" ;
+        //"resources/data/pages/"+tableName+"/"+filepath+".class"
+        this.filepath = "src/resources/data/pages/"+tableName+"/"+filepath+".class" ;
         this.minVal = null;
         this.maxVal = null;
         this.clusteringKey = clusteringKey;
@@ -142,8 +142,6 @@ public class Page implements Serializable{
                    end = mid - 1;
                } else {
                    throw new DBAppException("the key: "+insertedTuple.getClusteringKey()+" already exists.");
-//                   this.pageTuples.add(mid, insertedTuple);
-//                   break;
                }
            }
         }
@@ -154,8 +152,6 @@ public class Page implements Serializable{
                 this.pageTuples.add(start,insertedTuple);
             }
         }
-//        System.out.println("min of page "+pageID+": "+minVal.getTupleAttributes());
-//        System.out.println("max of page "+pageID+": "+maxVal.getTupleAttributes());
         updateMinMax();
         saveIntoPageFilepath();
         //print page -------------------
@@ -170,9 +166,11 @@ public class Page implements Serializable{
             int indexDeleted = getIndexBinarySearch(htblColNameValue);
             if(indexDeleted == -1){
                 return false;
-//                throw new DBAppException("The tuple you specified is not present");
             }
-            pageTuples.remove(indexDeleted);
+            Tuple tupleToBeDeleted = this.pageTuples.get(indexDeleted);
+            if(shouldBeDeleted(tupleToBeDeleted,htblColNameValue)){
+                pageTuples.remove(indexDeleted);
+            }
         } else {
             for(int i = 0 ; i<pageTuples.size();i++){
                 Tuple currentTuple = pageTuples.get(i);
@@ -210,14 +208,14 @@ public class Page implements Serializable{
         return true;
     }
 
-    public Tuple updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
+    public void updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
 //        boolean clusteringKeyExist=false;
         Hashtable tupleHashtable = new Hashtable<String,Object>();
         Object valueCorrectDataType= Column.adjustDataType(strClusteringKeyValue,dataType);
         tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
         int indexToBeUpdated = getIndexBinarySearch(tupleHashtable);
         if(indexToBeUpdated == -1) {
-            throw new DBAppException("The tuple you specified is not present");
+            return;
         }
 //        if(htblColNameValue.containsKey(this.getClusteringKey())){
 //            clusteringKeyExist=true;
@@ -238,7 +236,6 @@ public class Page implements Serializable{
 //            return tupleToBeUpdated;
 //        }
         saveIntoPageFilepath();
-        return null;
     }
 
     public int getMaxSizePerPage() {

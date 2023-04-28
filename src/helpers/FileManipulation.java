@@ -5,7 +5,6 @@ import tableAndCo.Table;
 
 import java.io.*;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.Vector;
 
 public abstract class FileManipulation {
@@ -110,6 +109,7 @@ public abstract class FileManipulation {
 
     public static int readFromConfig(String cfgPath){
         Properties prop = new Properties();
+        // "src/resources/DBApp.config"
         String fileName = "src/resources/DBApp.config";
         try{
             FileInputStream fis = new FileInputStream(fileName);

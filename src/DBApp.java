@@ -2,14 +2,14 @@ import exceptions.DBAppException;
 import helpers.Comparison;
 import helpers.FileManipulation;
 import index.Octree;
+import tableAndCo.Page;
+import helpers.SimulatingNull;
+import tableAndCo.Table;
 import metadata.Column;
 import metadata.Metadata;
-import tableAndCo.Page;
-import tableAndCo.Table;
 
 import java.io.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DBApp implements Serializable {
@@ -20,16 +20,17 @@ public class DBApp implements Serializable {
     private String tablesFilepath;
     public DBApp(){
         this.tables = new Vector<String>();
-        this.pagesFilepath = "data/pages/";
-        this.tablesFilepath = "data/tables/";
-        init();
+        //resources/data/pages
+        this.pagesFilepath = "src/resources/data/pages/";
+        //resources/data/tables
+        this.tablesFilepath = "src/resources/data/tables/";
     }
     public void init(){
         try {
-            FileManipulation.createDirectory("data");
+            FileManipulation.createDirectory("src/resources/data");
             FileManipulation.createDirectory(this.pagesFilepath);
             FileManipulation.createDirectory(this.tablesFilepath);
-            metaData = new Metadata("data/metadata.csv");
+            metaData = new Metadata("src/resources/data/metadata.csv");
             FileManipulation.loadFilesFromDirectory(this.tablesFilepath,this.tables);
         }catch(Exception e){
             System.out.println(e);
@@ -136,24 +137,49 @@ public class DBApp implements Serializable {
         }
         return tableIndex;
     }
+    public void insertingNulls(Vector<String> missingColumnNames,Hashtable<String,Object> htblColNameValue){
+        for(int i=0;i<missingColumnNames.size();i++){
+            htblColNameValue.put(missingColumnNames.get(i), new SimulatingNull());
+        }
+    }
     public void checkHtblValid(String strTableName, Hashtable<String,Object> htblColNameValue, boolean insert) throws Exception {
         Vector<String> columnNames = metaData.getColumnNames(strTableName);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         if (insert) {
-            if(entrySet.size() != columnNames.size()){
-                throw new DBAppException("There are missing or extra column(s)");
+            if(entrySet.size() > columnNames.size()){
+                throw new DBAppException("There are extra column(s)");
+            }else {
+                for (Map.Entry<String, Object> entry : entrySet) {
+                    String key = entry.getKey();
+                    if(!columnNames.contains(key)){
+                        throw new DBAppException(key+" is an extra column");
+                    }
+                }
+                Vector<String> missingColumnNames = new Vector<String>();
+//                System.out.println(columnNames);
+//                System.out.println(htblColNameValue);
+                for(int i=0;i<columnNames.size();i++) {
+                    if(!htblColNameValue.containsKey(columnNames.get(i))) {
+                        missingColumnNames.add(columnNames.get(i));
+                    }
+                }
+                insertingNulls(missingColumnNames,htblColNameValue);
             }
         }
         for (Map.Entry<String, Object> entry : entrySet) {
             String key = entry.getKey();
             Object value = entry.getValue();
             if(!columnNames.contains(key)){
-                throw new DBAppException("The metadata.Column names aren't correct");
+                throw new DBAppException("The Column names aren't correct");
             }
             String columnType = metaData.getColumnType(strTableName,key);
             String valClass = ((""+value.getClass()).replaceAll("class","")).replaceAll(" ","");
 //            System.out.println(key+": "+valClass+","+columnType);
+            if(valClass.compareTo("helpers.SimulatingNull")==0){
+                continue;
+            }
             if(valClass.compareTo(columnType)!=0){
+                System.out.println(valClass+"-"+columnType);
                 throw new DBAppException("wrong entry datatype");
             }
 //            System.out.println(key+": "+value);
@@ -170,15 +196,17 @@ public class DBApp implements Serializable {
         }
     }
     public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception {
-        if (!tables.contains(this.tablesFilepath+strTableName+".class")){
-            throw new DBAppException("This Table is not present");
-        }
+        metaData.loadMetaData();
+//        if (!tables.contains(this.tablesFilepath+strTableName+".class")){
+//            throw new exceptions.DBAppException("This Table is not present");
+//        }
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, true);
         Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
         toBeInsertedInTable.insert(htblColNameValue);
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws Exception {
+        metaData.loadMetaData();
         Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);
@@ -186,13 +214,13 @@ public class DBApp implements Serializable {
         currTable.update(strClusteringKeyValue, htblColNameValue, columns);
     }
     public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception{
+        metaData.loadMetaData();
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);
         Table currTable = FileManipulation.loadTable(this.tables.get(tableIndex));
         currTable.delete(htblColNameValue);
-
     }
-//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws exceptions.DBAppException {
 //
 //  }
     public boolean isSupported(String dt){
@@ -210,7 +238,7 @@ public class DBApp implements Serializable {
 //        String strTableName2="CityShop2";
 //        String strTableName3="CityShop3";
 //        String strTableName4="CityShop4";
-//        DBApp dbApp = new DBApp( );
+//        main.java.java.DBApp dbApp = new main.java.java.DBApp( );
 //        Hashtable htblColNameType = new Hashtable( );
 //        htblColNameType.put("ID", "java.lang.Integer");
 //        htblColNameType.put("Name", "java.lang.String");
@@ -323,15 +351,15 @@ public class DBApp implements Serializable {
 
 
         // leba tests
-//        Hashtable<String, Object> tuple0 = new Hashtable<>();
-//        tuple0.put("age", 0);
-//        tuple0.put("name", "Soubra");
-//        tuple0.put("gpa", 1.6);
-
         Hashtable<String, Object> tuple0 = new Hashtable<>();
         tuple0.put("age", 0);
         tuple0.put("name", "Soubra");
         tuple0.put("gpa", 1.6);
+
+//        Hashtable<String, Object> tuple0 = new Hashtable<>();
+//        tuple0.put("age", 0);
+//        tuple0.put("name", "Soubra");
+//        tuple0.put("gpa", 1.6);
 
         Hashtable<String, Object> tuple1 = new Hashtable<>();
         tuple1.put("age", 1);
@@ -388,24 +416,42 @@ public class DBApp implements Serializable {
         tuple11.put("name", "sara");
         tuple11.put("gpa", 0.9);
 
+        Hashtable<String, Object> tuple12 = new Hashtable<>();
+        tuple12.put("age", 12);
+        tuple12.put("name", "sara");
+        tuple12.put("gpa", 0.9);
 
-        Hashtable<String, String> htblColNameType = new Hashtable<>();
-        htblColNameType.put("age", "java.lang.Integer");
-        htblColNameType.put("name", "java.lang.String");
-        htblColNameType.put("gpa", "java.lang.Double");
+        Hashtable<String, Object> tuple13 = new Hashtable<>();
+        tuple13.put("age", 13);
+        tuple13.put("name", "sara");
+        tuple13.put("gpa", 0.9);
 
-        Hashtable<String, String> htblColNameMin = new Hashtable<>();
-        htblColNameMin.put("age", "1");
-        htblColNameMin.put("name", "A");
-        htblColNameMin.put("gpa", "0.7");
+        Hashtable<String, Object> tuple14 = new Hashtable<>();
+        tuple14.put("age", 14);
 
-        Hashtable<String, String> htblColNameMax = new Hashtable<>();
-        htblColNameMax.put("age", "40");
-        htblColNameMax.put("name", "zzzzzzz");
-        htblColNameMax.put("gpa", "4.0");
+        Hashtable<String, Object> tuple15 = new Hashtable<>();
+        tuple15.put("age", 15);
+        tuple15.put("name", "sara");
 
+
+
+//        Hashtable<String, String> htblColNameType = new Hashtable<>();
+//        htblColNameType.put("age", "java.lang.Integer");
+//        htblColNameType.put("name", "java.lang.String");
+//        htblColNameType.put("gpa", "java.lang.Double");
+//
+//        Hashtable<String, String> htblColNameMin = new Hashtable<>();
+//        htblColNameMin.put("age", "1");
+//        htblColNameMin.put("name", "A");
+//        htblColNameMin.put("gpa", "0.7");
+//
+//        Hashtable<String, String> htblColNameMax = new Hashtable<>();
+//        htblColNameMax.put("age", "40");
+//        htblColNameMax.put("name", "zzzzzzz");
+//        htblColNameMax.put("gpa", "4.0");
+//
         DBApp dbApp = new DBApp();
-//        dbApp.init();
+        dbApp.init();
 //         dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //         dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple2);
@@ -417,8 +463,12 @@ public class DBApp implements Serializable {
 //         dbApp.insertIntoTable("Students", tuple5);
 //         dbApp.insertIntoTable("Students", tuple4);
 //         dbApp.insertIntoTable("Students", tuple9);
-//         dbApp.insertIntoTable("Students", tuple10);
-//         dbApp.insertIntoTable("Students", tuple11);
+         dbApp.insertIntoTable("Students", tuple11);
+         dbApp.insertIntoTable("Students", tuple10);
+//         dbApp.insertIntoTable("Students", tuple12);
+//         dbApp.insertIntoTable("Students", tuple13);
+//         dbApp.insertIntoTable("Students", tuple14);
+//         dbApp.insertIntoTable("Students", tuple15);
 
 //        dbApp.insertIntoTable("Students", tuple1);
 //        dbApp.insertIntoTable("Students", tuple2);
@@ -430,10 +480,10 @@ public class DBApp implements Serializable {
 
 
 
-//         Hashtable<String, Object> updateHtbl = new Hashtable<>();
-//         updateHtbl.put("gpa", 10);
+         Hashtable<String, Object> updateHtbl = new Hashtable<>();
+         updateHtbl.put("gpa", 2.0);
 //         updateHtbl.put("name", "boniiiii");
-//         dbApp.updateTable("Students", "7", updateHtbl);
+         dbApp.updateTable("Students", "15", updateHtbl);
 
          Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
          Hashtable<String,Object> deletingCriteria1 = new Hashtable<>();
@@ -441,14 +491,27 @@ public class DBApp implements Serializable {
          Hashtable<String,Object> deletingCriteria3 = new Hashtable<>();
          deletingCriteria0.put( "age", 6);
          deletingCriteria0.put("name","Lobna");
-         deletingCriteria1.put("gpa", 2.3);
+         deletingCriteria1.put("gpa", 0.9);
          deletingCriteria2.put( "name", "nada");
+//         deletingCriteria3.put( "age", 5);
+//        dbApp.deleteFromTable("Students", deletingCriteria3);
+//        deletingCriteria3.put( "age", 6);
+//        dbApp.deleteFromTable("Students", deletingCriteria3);
+//        deletingCriteria3.put( "age", 7);
+//        dbApp.deleteFromTable("Students", deletingCriteria3);
+//        deletingCriteria3.put( "age", 8);
+//        dbApp.deleteFromTable("Students", deletingCriteria3);
+
 
 
 //        dbApp.deleteFromTable("Students", deletingCriteria0);
 //        dbApp.deleteFromTable("Students", deletingCriteria1);
+//        dbApp.insertIntoTable("Students", tuple12);
+//        dbApp.insertIntoTable("Students", tuple13);
+//        dbApp.insertIntoTable("Students", tuple13);
+
 //        dbApp.deleteFromTable("Students", deletingCriteria2);
-        dbApp.deleteFromTable("Students", deletingCriteria3);
+//        dbApp.deleteFromTable("Students", deletingCriteria3);
 //    System.out.println(dbApp.tables);
         Table table = FileManipulation.loadTable(dbApp.tables.get(0));
 

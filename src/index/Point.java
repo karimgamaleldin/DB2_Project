@@ -4,7 +4,6 @@ import exceptions.DBAppException;
 import helpers.Comparison;
 import helpers.FileManipulation;
 import tableAndCo.Page;
-import tableAndCo.Tuple;
 
 import java.io.IOException;
 import java.util.Hashtable;
