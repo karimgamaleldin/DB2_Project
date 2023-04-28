@@ -180,7 +180,7 @@ public class DBApp implements Serializable {
             }
             if(valClass.compareTo(columnType)!=0){
                 System.out.println(valClass+"-"+columnType);
-                throw new DBAppException("wrong entry datatype");
+                throw new DBAppException("Please check " + key + " as it has a wrong data type");
             }
 //            System.out.println(key+": "+value);
             Vector<Object> columnMinAndMax = metaData.getColumnMinAndMax(strTableName,key,columnType);
@@ -191,7 +191,7 @@ public class DBApp implements Serializable {
             boolean greaterThanMax = Comparison.compareTo(value,max,columnType)>0;
 //            System.out.println(lessThanMin+" ,"+ greaterThanMax);
             if(lessThanMin || greaterThanMax){
-                throw new DBAppException("entry is less than min or greater than max");
+                throw new DBAppException("Please Check " + key + " as " + value + " is out of range.");
             }
         }
     }
@@ -351,10 +351,10 @@ public class DBApp implements Serializable {
 
 
         // leba tests
-        Hashtable<String, Object> tuple0 = new Hashtable<>();
-        tuple0.put("age", 0);
-        tuple0.put("name", "Soubra");
-        tuple0.put("gpa", 1.6);
+//tests/*        Hashtable<String, Object> tuple0 = new Hashtable<>();
+//        tuple0.put("age", 0);
+//        tuple0.put("name", "Soubra");
+//        tuple0.put("gpa", 1.6);*/
 
 //        Hashtable<String, Object> tuple0 = new Hashtable<>();
 //        tuple0.put("age", 0);
@@ -433,27 +433,44 @@ public class DBApp implements Serializable {
         tuple15.put("age", 15);
         tuple15.put("name", "sara");
 
+        Hashtable<String, Object> tuple16 = new Hashtable<>();
+        tuple16.put("age", 20);
+        tuple16.put("name", "kimo");
+        tuple16.put("gpa", 3.0);
+
+        Hashtable<String, Object> tuple17 = new Hashtable<>();
+        tuple17.put("age", 19);
+//        tuple17.put("name", "kimo");
+        tuple17.put("gpa", 3.0);
+
+        Hashtable<String, Object> tuple18 = new Hashtable<>();
+        tuple18.put("age", 19);
+        tuple18.put("name", "kimo");
+//        tuple18.put("gpa", 3.0);
+        tuple18.put("gpa", 3.0);
 
 
-//        Hashtable<String, String> htblColNameType = new Hashtable<>();
-//        htblColNameType.put("age", "java.lang.Integer");
-//        htblColNameType.put("name", "java.lang.String");
-//        htblColNameType.put("gpa", "java.lang.Double");
-//
-//        Hashtable<String, String> htblColNameMin = new Hashtable<>();
-//        htblColNameMin.put("age", "1");
-//        htblColNameMin.put("name", "A");
-//        htblColNameMin.put("gpa", "0.7");
-//
-//        Hashtable<String, String> htblColNameMax = new Hashtable<>();
-//        htblColNameMax.put("age", "40");
-//        htblColNameMax.put("name", "zzzzzzz");
-//        htblColNameMax.put("gpa", "4.0");
-//
+
+
+        Hashtable<String, String> htblColNameType = new Hashtable<>();
+        htblColNameType.put("age", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.Double");
+
+        Hashtable<String, String> htblColNameMin = new Hashtable<>();
+        htblColNameMin.put("age", "1");
+        htblColNameMin.put("name", "A");
+        htblColNameMin.put("gpa", "0.7");
+
+        Hashtable<String, String> htblColNameMax = new Hashtable<>();
+        htblColNameMax.put("age", "40");
+        htblColNameMax.put("name", "zzzzzzz");
+        htblColNameMax.put("gpa", "4.0");
+
         DBApp dbApp = new DBApp();
         dbApp.init();
 //         dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
-//         dbApp.insertIntoTable("Students", tuple0);
+//     //    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple2);
 //         dbApp.insertIntoTable("Students", tuple6);
 //         dbApp.insertIntoTable("Students", tuple7);
@@ -463,12 +480,15 @@ public class DBApp implements Serializable {
 //         dbApp.insertIntoTable("Students", tuple5);
 //         dbApp.insertIntoTable("Students", tuple4);
 //         dbApp.insertIntoTable("Students", tuple9);
-         dbApp.insertIntoTable("Students", tuple11);
-         dbApp.insertIntoTable("Students", tuple10);
+//         dbApp.insertIntoTable("Students", tuple11);
+//         dbApp.insertIntoTable("Students", tuple10);
 //         dbApp.insertIntoTable("Students", tuple12);
 //         dbApp.insertIntoTable("Students", tuple13);
 //         dbApp.insertIntoTable("Students", tuple14);
 //         dbApp.insertIntoTable("Students", tuple15);
+//         dbApp.insertIntoTable("Students", tuple16);
+//         dbApp.insertIntoTable("Students", tuple17);
+//         dbApp.insertIntoTable("Students", tuple18);
 
 //        dbApp.insertIntoTable("Students", tuple1);
 //        dbApp.insertIntoTable("Students", tuple2);
@@ -504,7 +524,7 @@ public class DBApp implements Serializable {
 
 
 
-//        dbApp.deleteFromTable("Students", deletingCriteria0);
+//       dbApp.deleteFromTable("Students", deletingCriteria0);
 //        dbApp.deleteFromTable("Students", deletingCriteria1);
 //        dbApp.insertIntoTable("Students", tuple12);
 //        dbApp.insertIntoTable("Students", tuple13);
