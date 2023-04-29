@@ -1,6 +1,4 @@
-package tableAndCo;
-
-import helpers.Comparison;
+package main.java;
 
 import java.io.*;
 import java.util.Hashtable;

@@ -1,7 +1,4 @@
-package helpers;
-
-import tableAndCo.Page;
-import tableAndCo.Table;
+package main.java;
 
 import java.io.*;
 import java.util.Properties;
@@ -17,7 +14,7 @@ public abstract class FileManipulation {
 //                System.out.println("File already exists.");
             }
         }catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("createSer:"+e.getMessage());
         }
     }
 
@@ -54,7 +51,7 @@ public abstract class FileManipulation {
             }
         }
         catch(Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("deleteFile:"+e.getMessage());
         }
     }
 
@@ -80,8 +77,9 @@ public abstract class FileManipulation {
         return null;
     }
 
-    public static Table loadTable(String filepath) throws IOException, ClassNotFoundException {
-        FileInputStream file = new FileInputStream(filepath);
+    public static Table loadTable(String dirPath,String fileName) throws IOException, ClassNotFoundException {
+//        System.out.println(dirPath + fileName + ".class");
+        FileInputStream file = new FileInputStream(dirPath + fileName + ".class");
         if(file.available()!=0){
             ObjectInputStream on = new ObjectInputStream(file);
             //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
@@ -96,32 +94,38 @@ public abstract class FileManipulation {
         return null;
     }
 
-    public static void loadFilesFromDirectory(String dirpath, Vector<String> names) {
+    public static Vector<String> loadFilesFromDirectory(String dirpath) {
+        Vector<String> names = new Vector<String>();
         File dir = new File(dirpath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
             for (File child : directoryListing) {
-                names.add(dirpath+child.getName());
-//                System.out.println(child.getName());
+                String name = child.getName().replaceAll(".class","");
+//                System.out.println(name);
+                names.add(name);
             }
         }
+        return names;
     }
 
     public static int readFromConfig(String cfgPath){
         Properties prop = new Properties();
-        // "src/resources/DBApp.config"
-        String fileName = "src/resources/DBApp.config";
+        // "src/resources/main.java.DBApp.config"
+        String fileName = "src/main/resources/DBApp.config";
         try{
             FileInputStream fis = new FileInputStream(fileName);
             prop.load(fis);
-
+            fis.close();
         }
         catch(FileNotFoundException ex){
-            System.out.println(ex);
+            System.out.println("ex:"+ex);
         }
         catch(IOException io){
-            System.out.println(io);
+            System.out.println("io: "+io);
         }
+//        int value = Integer.parseInt(prop.getProperty(cfgPath));
+
+//        System.out.println("value"+Integer.parseInt(prop.getProperty(cfgPath)));
         return Integer.parseInt(prop.getProperty(cfgPath));
     }
 

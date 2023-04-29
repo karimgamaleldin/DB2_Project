@@ -1,4 +1,4 @@
-package helpers;
+package main.java;
 
 import java.util.Date;
 
@@ -7,9 +7,10 @@ public abstract class Comparison {
         // return 0 if equal , returns -ve if o1 object is less than o2 else +ve
 //        String type = o1.getClass().toString();
         if(type==null){
-            type = ((""+o1.getClass())
-                    .replaceAll("class",""))
-                    .replaceAll(" ","");
+//            type = ((""+o1.getClass())
+//                    .replaceAll("class",""))
+//                    .replaceAll(" ","");
+            type = o1.getClass().getName();
         }
         if (type.equals("java.lang.Integer")) {
             return ((Integer) o1).compareTo((Integer) o2);

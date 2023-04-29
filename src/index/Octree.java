@@ -1,7 +1,7 @@
 package index;
 
 
-import exceptions.DBAppException;
+import main.java.DBAppException;
 
 import java.io.IOException;
 import java.text.ParseException;

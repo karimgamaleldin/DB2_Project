@@ -1,9 +1,9 @@
 package index;
 
-import exceptions.DBAppException;
-import helpers.Comparison;
-import helpers.FileManipulation;
-import tableAndCo.Page;
+import main.java.DBAppException;
+import main.java.Comparison;
+import main.java.FileManipulation;
+import main.java.Page;
 
 import java.io.IOException;
 import java.util.Hashtable;

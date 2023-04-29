@@ -1,4 +1,4 @@
-package metadata;
+package main.java;
 
 import java.io.*;
 import java.util.Hashtable;
@@ -169,9 +169,9 @@ public class Metadata {
             }
             fw.append(sb.toString()).flush();
 //            System.out.println("finished");
-            System.out.println(metafile.length());
+//            System.out.println(sb);
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("create metadata:"+e);
         }
     }
     public int getTupleSize(String strTableName){

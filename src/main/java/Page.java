@@ -1,8 +1,4 @@
-package tableAndCo;
-
-import exceptions.DBAppException;
-import helpers.FileManipulation;
-import metadata.Column;
+package main.java;
 
 import java.io.*;
 import java.util.*;
@@ -23,8 +19,8 @@ public class Page implements Serializable{
         this.pageID = pageID;
         this.pageTuples = new Vector<Tuple>();
         this.maxSizePerPage = maxSizePerPage;
-        //"resources/data/pages/"+tableName+"/"+filepath+".class"
-        this.filepath = "src/resources/data/pages/"+tableName+"/"+filepath+".class" ;
+        //"src/resources/data/pages/"+tableName+"/"+filepath+".class"
+        this.filepath = "src/main/resources/data/"+filepath+".class" ;
         this.minVal = null;
         this.maxVal = null;
         this.clusteringKey = clusteringKey;
@@ -179,6 +175,8 @@ public class Page implements Serializable{
         for (Map.Entry<String, Object> entry : entrySet) {
             String key = entry.getKey();
             Object value = entry.getValue();
+            System.out.println("should be deleted htbl"+currentTuple.getTupleAttributes());
+            System.out.println("key"+key);
             Object currentColValue = currentTuple.getTupleAttributes().get(key);
             if(!currentColValue.equals(value)) {
                 return false;

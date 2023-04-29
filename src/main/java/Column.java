@@ -1,4 +1,4 @@
-package metadata;
+package main.java;
 
 import java.text.SimpleDateFormat;
 
@@ -50,7 +50,7 @@ public class Column {
         if (type.equals("java.lang.Integer")) {
             return Integer.parseInt(key);
         } else if (type.equals("java.lang.String")) {
-            return key.toLowerCase();
+            return key;
         } else if (type.equals("java.lang.Double")) {
             return Double.parseDouble(key);
         } else if (type.equals("java.util.Date")) {

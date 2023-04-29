@@ -1,12 +1,6 @@
-import exceptions.DBAppException;
-import helpers.Comparison;
-import helpers.FileManipulation;
+package main.java;
+
 import index.Octree;
-import tableAndCo.Page;
-import helpers.SimulatingNull;
-import tableAndCo.Table;
-import metadata.Column;
-import metadata.Metadata;
 
 import java.io.*;
 import java.text.ParseException;
@@ -18,22 +12,31 @@ public class DBApp implements Serializable {
     private Metadata metaData;
     private String pagesFilepath;
     private String tablesFilepath;
+    private int maxPageSize;
     public DBApp(){
         this.tables = new Vector<String>();
-        //resources/data/pages
-        this.pagesFilepath = "src/resources/data/pages/";
+        //src/resources/data/pages
+        this.pagesFilepath = "src/main/resources/data/";
         //resources/data/tables
-        this.tablesFilepath = "src/resources/data/tables/";
+        this.tablesFilepath = "src/main/resources/data/tables/";
+//        FileManipulation.loadFilesFromDirectory(this.tablesFilepath,this.tables);
+
     }
     public void init(){
         try {
-            FileManipulation.createDirectory("src/resources/data");
+            FileManipulation.createDirectory("src/main/resources/data");
+//            System.out.println(1);
             FileManipulation.createDirectory(this.pagesFilepath);
+//            System.out.println(2);
             FileManipulation.createDirectory(this.tablesFilepath);
-            metaData = new Metadata("src/resources/data/metadata.csv");
-            FileManipulation.loadFilesFromDirectory(this.tablesFilepath,this.tables);
+//            System.out.println(3);
+            metaData = new Metadata("src/main/resources/metadata.csv");
+//            System.out.println(4);
+            this.maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinPage");
+//            System.out.println(5);
+            this.tables = FileManipulation.loadFilesFromDirectory(this.tablesFilepath);
         }catch(Exception e){
-            System.out.println(e);
+            System.out.println("init: "+e);
         }
     }
 
@@ -44,7 +47,7 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException, ClassNotFoundException {
 
         for(int i = 0; i< tables.size(); i++){
-            Table currTable = FileManipulation.loadTable(tables.get(i));
+            Table currTable = FileManipulation.loadTable(this.tablesFilepath,tables.get(i));
             String currentTableName = currTable.getTableName();
             if (currentTableName.equals(strTableName)){
                 throw new DBAppException("This table already exists");
@@ -65,10 +68,8 @@ public class DBApp implements Serializable {
                 htblColNameMin,
                 htblColNameMax
         );
-
-        int maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
-        Table newTable = new Table(strTableName , htblColNameType.size() , maxPageSize, strClusteringKeyColumn);
-        tables.add(newTable.getFilepath());
+        Table newTable = new Table(strTableName , htblColNameType.size() , this.maxPageSize, strClusteringKeyColumn);
+        tables.add(newTable.getTableName());
     }
     public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException, ParseException {
         if(strarrColName.length<3){
@@ -89,7 +90,7 @@ public class DBApp implements Serializable {
         Object[] firstAttribute= null;
         Object[] secondAttribute= null;
         Object[] thirdAttribute= null;
-        Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
         firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
         secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
         thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
@@ -124,8 +125,8 @@ public class DBApp implements Serializable {
     }
     public int checkTablePresent(String strTableName) throws DBAppException, IOException, ClassNotFoundException {
         int tableIndex = -1;
-        for(int i = 0; i< tables.size(); i++){
-            Table currTable = FileManipulation.loadTable(this.tables.get(i));
+        for(int i = 0; i < tables.size(); i++){
+            Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(i));
             String currentTableName = currTable.getTableName();
             if (currentTableName.equals(strTableName)){
                 tableIndex = i;
@@ -179,7 +180,7 @@ public class DBApp implements Serializable {
             String columnType = metaData.getColumnType(strTableName,key);
             String valClass = ((""+value.getClass()).replaceAll("class","")).replaceAll(" ","");
 //            System.out.println(key+": "+valClass+","+columnType);
-            if(valClass.compareTo("helpers.SimulatingNull")==0){
+            if(valClass.compareTo("main.java.SimulatingNull")==0){
                 continue;
             }
             if(valClass.compareTo(columnType)!=0){
@@ -202,11 +203,11 @@ public class DBApp implements Serializable {
     public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception {
         metaData.loadMetaData();
 //        if (!tables.contains(this.tablesFilepath+strTableName+".class")){
-//            throw new exceptions.DBAppException("This Table is not present");
+//            throw new main.java.DBAppException("This Table is not present");
 //        }
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, true);
-        Table toBeInsertedInTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
         toBeInsertedInTable.insert(htblColNameValue);
     }
     public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws Exception {
@@ -214,17 +215,17 @@ public class DBApp implements Serializable {
         Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);
-        Table currTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
         currTable.update(strClusteringKeyValue, htblColNameValue, columns);
     }
     public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception{
         metaData.loadMetaData();
         int tableIndex = checkTablePresent(strTableName);
         checkHtblValid(strTableName, htblColNameValue, false);
-        Table currTable = FileManipulation.loadTable(this.tables.get(tableIndex));
+        Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
         currTable.delete(htblColNameValue);
     }
-//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws exceptions.DBAppException {
+//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws main.java.DBAppException {
 //
 //  }
     public boolean isSupported(String dt){
@@ -242,7 +243,7 @@ public class DBApp implements Serializable {
 //        String strTableName2="CityShop2";
 //        String strTableName3="CityShop3";
 //        String strTableName4="CityShop4";
-//        main.java.java.DBApp dbApp = new main.java.java.DBApp( );
+//        main.java.java.main.java.DBApp dbApp = new main.java.java.main.java.DBApp( );
 //        Hashtable htblColNameType = new Hashtable( );
 //        htblColNameType.put("ID", "java.lang.Integer");
 //        htblColNameType.put("Name", "java.lang.String");
@@ -473,7 +474,8 @@ public class DBApp implements Serializable {
 
         DBApp dbApp = new DBApp();
         dbApp.init();
-//         dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
+         dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
+         dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //     //    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple2);
 //         dbApp.insertIntoTable("Students", tuple6);
@@ -539,7 +541,7 @@ public class DBApp implements Serializable {
 //        dbApp.deleteFromTable("Students", deletingCriteria2);
 //        dbApp.deleteFromTable("Students", deletingCriteria3);
 //    System.out.println(dbApp.tables);
-        Table table = FileManipulation.loadTable(dbApp.tables.get(0));
+        Table table = FileManipulation.loadTable(dbApp.tablesFilepath,dbApp.tables.get(0));
 
         for (String pageName : table.getTablePages()) {
             Page p = FileManipulation.loadPage(pageName);

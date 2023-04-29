@@ -1,6 +1,6 @@
 package index;
 
-import helpers.Comparison;
+import main.java.Comparison;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

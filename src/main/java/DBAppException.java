@@ -1,4 +1,4 @@
-package exceptions;
+package main.java;
 
 public class DBAppException extends Exception {
 
