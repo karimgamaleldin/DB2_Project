@@ -55,7 +55,7 @@ public class Column {
             return Double.parseDouble(key);
         } else if (type.equals("java.util.Date")) {
             //YYYY-MM-DD
-            SimpleDateFormat formatter=new SimpleDateFormat("YYYY-MM-DD");
+            SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
             return formatter.parse(key);
         }
         return null;

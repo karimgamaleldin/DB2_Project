@@ -234,7 +234,6 @@ public class Table implements Serializable {
             emptyTable();
             return;
         }
-        Tuple toBeDeleted=new Tuple(htblColNameValue,clusteringKey);
 //        int start =0;
 //        int end = this.getTablePages().size()-1;
 //        Tuple min=minValues.get(start);
@@ -244,6 +243,7 @@ public class Table implements Serializable {
 //        } else if (toBeDeleted.compareTo(max) >0) {//if tuple more than biggest tuple in table
 //            throw new main.java.DBAppException("tuple is not in the table");
 //        } else{
+
         for(int i=0;i<this.getTablePages().size();i++){
             Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
             boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);

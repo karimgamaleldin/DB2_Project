@@ -98,6 +98,7 @@ public abstract class FileManipulation {
         Vector<String> names = new Vector<String>();
         File dir = new File(dirpath);
         File[] directoryListing = dir.listFiles();
+
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 String name = child.getName().replaceAll(".class","");

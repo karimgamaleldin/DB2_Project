@@ -45,7 +45,7 @@ public class DBApp implements Serializable {
                             Hashtable<String,String> htblColNameType,
                             Hashtable<String,String> htblColNameMin,
                             Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException, ClassNotFoundException {
-
+        System.out.println("---" + tables.size());
         for(int i = 0; i< tables.size(); i++){
             Table currTable = FileManipulation.loadTable(this.tablesFilepath,tables.get(i));
             String currentTableName = currTable.getTableName();
@@ -53,6 +53,7 @@ public class DBApp implements Serializable {
                 throw new DBAppException("This table already exists");
             }
         }
+        System.out.println("end of loop");
 
         Set<Map.Entry<String, String>> entrySet = htblColNameType.entrySet();
         for (Map.Entry<String, String> entry : entrySet) {
