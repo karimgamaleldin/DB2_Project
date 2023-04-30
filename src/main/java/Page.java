@@ -13,6 +13,7 @@ public class Page implements Serializable{
     private Tuple maxVal;
     private String clusteringKey;
     private String tableName;
+    private String clusterKeyDataType;
 
 
     public Page(int pageID, String filepath , int maxSizePerPage,String clusteringKey, String tableName) {
@@ -25,6 +26,7 @@ public class Page implements Serializable{
         this.maxVal = null;
         this.clusteringKey = clusteringKey;
         this.tableName = tableName;
+        this.clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
         FileManipulation.createSerFile(this.filepath);
     }
 
@@ -86,9 +88,9 @@ public class Page implements Serializable{
         }
         System.out.println("-------------------");
     }
-    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, ClassNotFoundException, DBAppException {
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, DBAppException {
         boolean wasFull = this.isPageFull();
-        Tuple insertedTuple = new Tuple(tuple, clusteringKey);
+        Tuple insertedTuple = new Tuple(tuple, clusteringKey,this.clusterKeyDataType);
         if(this.maxVal!=null&&insertedTuple.compareTo(this.maxVal) > 0&&wasFull){
             return insertedTuple;
         }
@@ -247,7 +249,7 @@ public class Page implements Serializable{
 
     public int getIndexBinarySearch(Hashtable<String,Object> htblColNameValue){
         // we need to adjust the case of duplicates
-        Tuple tuple = new Tuple(htblColNameValue , this.clusteringKey);
+        Tuple tuple = new Tuple(htblColNameValue , this.clusteringKey, this.clusterKeyDataType);
         int start = 0;
         int end = this.pageTuples.size() - 1;
         while(start <= end){

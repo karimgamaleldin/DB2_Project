@@ -10,7 +10,7 @@ import java.util.Vector;
 
 public class Metadata {
     private String filePath;
-    private Hashtable<String,Vector<Column>> columnsOfMetaData;
+    private static Hashtable<String,Vector<Column>> columnsOfMetaData;
     private File metafile;
     private FileWriter fw;
 
@@ -25,6 +25,18 @@ public class Metadata {
             writeHeaders();
         }
 
+    }
+    public static String getClusterKeyDataType(String strTableName){
+        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        String clusterKeyDataType = "";
+        for(int i=0;i<columns.size();i++){
+            Column currentColumn = columns.get(i);
+            if(currentColumn.isClusteringKey()){
+                clusterKeyDataType = currentColumn.getColumnType();
+                break;
+            }
+        }
+        return clusterKeyDataType;
     }
     public void loadMetaData() throws FileNotFoundException {
         // true: file empty

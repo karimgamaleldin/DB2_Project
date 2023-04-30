@@ -64,18 +64,17 @@ public class Table implements Serializable {
     public boolean isTableEmpty() {
         return this.getTablePages().isEmpty();
     }
+
     public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException {
         if(!htblColNameValue.containsKey(clusteringKey)){
             throw new DBAppException("clustering key not found");
         }
-        Tuple wanted= new Tuple(htblColNameValue,clusteringKey);
+        String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
+        Tuple wanted= new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
         if(isTableEmpty()){
             Page page = createNewPage();
             page.insertIntoPage(htblColNameValue);
             updateMinMax(page,0);
-//            System.out.println(minValues.get(0));
-//            minValues.add(page.getMinVal());
-//            maxValues.add(page.getMaxVal());
             saveIntoTableFilepath();
             return;
         }
@@ -139,33 +138,20 @@ public class Table implements Serializable {
         loadedPage = null;
         System.gc();
     }
-    public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception {
-//        boolean clusteringKeyExist=false;
+    public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue) throws Exception {
         if(isTableEmpty()){
             return;
-//            throw new main.java.DBAppException("The table is empty");
         }
-//        if(htblColNameValue.containsKey(this.getClusteringKey())){
-//            clusteringKeyExist=true;
-//
-        String clusterKeyDataType = "";
-        for(int i=0;i<columns.size();i++){
-            Column currentColumn = columns.get(i);
-            if(currentColumn.isClusteringKey()){
-                clusterKeyDataType = currentColumn.getColumnType();
-                break;
-            }
-        }
+        String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
         Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
         htblColNameValue.put(clusteringKey,correctValType);
-        Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey);
+        Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
         int start =0;
         int end = this.getTablePages().size()-1;
         Tuple min=minValues.get(start);
         Tuple max=maxValues.get(end);
         if(toBeUpdated.compareTo(min) <0 || toBeUpdated.compareTo(max) >0){//if tuple less than first tuple in table
             return;
-//            throw new main.java.DBAppException("tuple is not in the table");
         } else {
             while(start <= end){
                 int mid = (start + end) / 2 ;
@@ -174,9 +160,6 @@ public class Table implements Serializable {
                 if(toBeUpdated.compareTo(min) >0){
                     if(toBeUpdated.compareTo(max)<=0){
                         updateHelper(mid,strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
-//                        if(clusteringKeyExist){
-//                            updateMinMax(loadedPage,mid);
-//                        }
                         saveIntoTableFilepath();
                         return;
                     }else{
@@ -188,21 +171,16 @@ public class Table implements Serializable {
                 }
                 else {//if tuple == min
                     updateHelper(mid,strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
-//                    if(clusteringKeyExist){
-//                        updateMinMax(loadedPage,mid);
-//                    }
                     saveIntoTableFilepath();
                     return;
                 }
             }
-//            throw new main.java.DBAppException("tuple is not in the table");
         }
     }
 
 
     private void updateHelper(int mid, String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue, String clusterKeyDataType) throws Exception {
         Page loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
-//        Tuple updatedTuple =
         loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
         if(loadedPage.isPageEmpty()){
             FileManipulation.deleteEntireFile(loadedPage.getFilepath());
