@@ -33,7 +33,6 @@ public class Table implements Serializable {
     public void saveIntoTableFilepath() throws IOException {
         //save the newly inserted tuple in the file itself
         FileManipulation.saveIntoFilepath(this,this.filepath);
-//        this.setPageTuples(null);//may give error
     }
 
     public Vector<String> getTablePages() {
@@ -190,9 +189,6 @@ public class Table implements Serializable {
         }
         loadedPage = null;
         System.gc();
-//        if(updatedTuple!=null){
-//            insert(updatedTuple.getTupleAttributes());
-//        }
     }
     public void emptyTable() throws IOException {
         for(int i=0;i<this.tablePages.size();i++){

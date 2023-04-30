@@ -75,7 +75,6 @@ public class Page implements Serializable{
     public void saveIntoPageFilepath() throws IOException {
         //save the newly inserted tuple in the file itself
         FileManipulation.saveIntoFilepath(this,this.filepath);
-//        this.setPageTuples(null);//may give error
     }
     public void updateMinMax(){
         minVal = this.pageTuples.get(0);
@@ -186,7 +185,6 @@ public class Page implements Serializable{
     }
 
     public void updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
-//        boolean clusteringKeyExist=false;
         Hashtable tupleHashtable = new Hashtable<String,Object>();
         Object valueCorrectDataType= Column.adjustDataType(strClusteringKeyValue,dataType);
         tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
@@ -194,9 +192,7 @@ public class Page implements Serializable{
         if(indexToBeUpdated == -1) {
             return;
         }
-//        if(htblColNameValue.containsKey(this.getClusteringKey())){
-//            clusteringKeyExist=true;
-//        }
+
         Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
@@ -206,12 +202,7 @@ public class Page implements Serializable{
         }
 
         //print page info -----------
-//        this.printPageInfo();
-//        if(clusteringKeyExist) {
-//            this.getPageTuples().remove(indexToBeUpdated);
-//            saveIntoPageFilepath();
-//            return tupleToBeUpdated;
-//        }
+//        this.printPageInfo();l
         saveIntoPageFilepath();
     }
 
