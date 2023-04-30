@@ -1,5 +1,0 @@
-Table Name,main.java.java.Column Name,main.java.java.Column Type,ClusteringKey,IndexName,IndexType,min,max,
-Students,gpa,java.lang.Double,False,null,null,0,5,
-Students,age,java.lang.Integer,False,null,null,0,40,
-Students,name,java.lang.String,False,null,null,A,ZZZZZZZZZZ,
-Students,dob,java.util.Date,True,null,null,1950-12-31,2023-12-31,

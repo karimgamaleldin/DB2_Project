@@ -177,14 +177,6 @@ public class Metadata {
         }
     }
     public int getTupleSize(String strTableName){
-//        int size = 0;
-//        for (int i = 0 ; i < columnsOfMetaData.size() ; i++){
-//            String currentTablename = columnsOfMetaData.get(i).getTableName();
-//            if(currentTablename.equals(strTableName)){
-//                size++;
-//            }
-//        }
-//        return size;
         return this.columnsOfMetaData.get(strTableName).size();
     }
     public Vector<String> getColumnNames(String strTableName){
