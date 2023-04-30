@@ -20,9 +20,7 @@ public class Metadata {
         this.columnsOfMetaData = new Hashtable<String,Vector<Column>>();
         this.filePath = filePath;
         this.fw=new FileWriter(metafile,true);
-//        System.out.println(metafile.length());
         this.loadMetaData();
-//        System.out.println(metafile.length());
         if(metafile.length()==0){
             writeHeaders();
         }
@@ -38,7 +36,6 @@ public class Metadata {
         int i=1;
         for(;i<=8;i++){
             sc.next();
-//            System.out.print(sc.next()+":"+i+",");
         }
         columnsOfMetaData.clear();
         while (sc.hasNext())  //returns a boolean value
@@ -51,7 +48,6 @@ public class Metadata {
             if(!sc.hasNext()){
                 break;
             }
-//            System.out.println();
             String strTableName = temp.get(0);
             String columnName = temp.get(1);
             String dataType = temp.get(2);
@@ -63,13 +59,9 @@ public class Metadata {
             String maxColValue = temp.get(7);
             Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
             Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
-//            System.out.print(strTableName.contains("\r\n"));
             columns.add(col);
             columnsOfMetaData.put(strTableName,columns);
-//            System.out.println(columnsOfMetaData.get(strTableName));
         }
-//        System.out.println(columnsOfMetaData);
-
         sc.close();  //closes the scanner
     }
 
@@ -132,8 +124,7 @@ public class Metadata {
                               String strClusteringKeyColumn,
                               Hashtable<String,String> htblColNameType,
                               Hashtable<String,String> htblColNameMin,
-                              Hashtable<String,String> htblColNameMax)
-    {
+                              Hashtable<String,String> htblColNameMax) throws DBAppException {
         try {
 
 //            fw= new FileWriter(metafile,true);
@@ -168,10 +159,9 @@ public class Metadata {
                 sb.append(",\r\n");
             }
             fw.append(sb.toString()).flush();
-//            System.out.println("finished");
-//            System.out.println(sb);
         } catch (Exception e) {
-            System.out.println("create metadata:"+e);
+            throw new DBAppException(e.getMessage());
+//            System.out.println("create metadata:"+e);
         }
     }
     public int getTupleSize(String strTableName){

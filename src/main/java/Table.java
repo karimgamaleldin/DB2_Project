@@ -137,6 +137,7 @@ public class Table implements Serializable {
             }
         }
         loadedPage = null;
+        System.gc();
     }
     public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,Vector<Column> columns) throws Exception {
 //        boolean clusteringKeyExist=false;
@@ -210,6 +211,7 @@ public class Table implements Serializable {
             maxValues.remove(mid);
         }
         loadedPage = null;
+        System.gc();
 //        if(updatedTuple!=null){
 //            insert(updatedTuple.getTupleAttributes());
 //        }
@@ -256,6 +258,7 @@ public class Table implements Serializable {
                 updateMinMax(loadedPage,i);
             }
             loadedPage = null;
+            System.gc();
         }
         saveIntoTableFilepath();
     }
@@ -305,6 +308,7 @@ public class Table implements Serializable {
             updateMinMax(currentPage,nextPage);
             nextPage++;
             currentPage = null;
+            System.gc();
             if(nextPage==this.tablePages.size()){
                 if(shifted!=null){
                     shift=shifted.getTupleAttributes();

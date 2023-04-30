@@ -49,6 +49,8 @@ public abstract class FileManipulation {
             else {
 //                System.out.println("failed");
             }
+            f = null;
+            System.gc();
         }
         catch(Exception e) {
             System.out.println("deleteFile:"+e.getMessage());

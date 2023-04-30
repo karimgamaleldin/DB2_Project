@@ -1,6 +1,7 @@
 package main.java;
 
 import index.Octree;
+import org.junit.platform.commons.function.Try;
 
 import java.io.*;
 import java.text.ParseException;
@@ -19,7 +20,6 @@ public class DBApp implements Serializable {
         this.pagesFilepath = "src/main/resources/data/";
         //resources/data/tables
         this.tablesFilepath = "src/main/resources/data/tables/";
-//        FileManipulation.loadFilesFromDirectory(this.tablesFilepath,this.tables);
 
     }
     public void init(){
@@ -44,31 +44,84 @@ public class DBApp implements Serializable {
                             String strClusteringKeyColumn,
                             Hashtable<String,String> htblColNameType,
                             Hashtable<String,String> htblColNameMin,
-                            Hashtable<String,String> htblColNameMax ) throws DBAppException, IOException, ClassNotFoundException {
-        for(int i = 0; i< tables.size(); i++){
-            Table currTable = FileManipulation.loadTable(this.tablesFilepath,tables.get(i));
-            String currentTableName = currTable.getTableName();
-            if (currentTableName.equals(strTableName)){
-                throw new DBAppException("This table already exists");
+                            Hashtable<String,String> htblColNameMax ) throws DBAppException {
+
+        try{
+            for(int i = 0; i< tables.size(); i++){
+                Table currTable = FileManipulation.loadTable(this.tablesFilepath,tables.get(i));
+                String currentTableName = currTable.getTableName();
+                if (currentTableName.equals(strTableName)){
+                    throw new DBAppException("This table already exists");
+                }
+            }
+
+            Set<Map.Entry<String, String>> entrySet = htblColNameType.entrySet();
+            for (Map.Entry<String, String> entry : entrySet) {
+                if (!isSupported(entry.getValue())){
+                    throw new DBAppException("data type: "+entry.getValue()+" is not supported");
+                }
+            }
+            checkMinAndMaxHtbl(htblColNameType, htblColNameMin, htblColNameMax);
+            metaData.writeMetaData(
+                    strTableName,
+                    strClusteringKeyColumn,
+                    htblColNameType,
+                    htblColNameMin,
+                    htblColNameMax
+            );
+            Table newTable = new Table(strTableName , htblColNameType.size() , this.maxPageSize, strClusteringKeyColumn);
+            tables.add(newTable.getTableName());
+        }catch (Exception e){
+            throw new DBAppException(e.getMessage());
+        }
+    }
+    public void checkMinAndMaxHtbl(Hashtable<String,String> htblColNameType,
+                                   Hashtable<String,String> htblColNameMin,
+                                   Hashtable<String,String> htblColNameMax) throws DBAppException {
+        if(htblColNameType.size()!=htblColNameMax.size()){
+            throw new DBAppException("the size of htblColNameType is not equal to size of htblColNameMax");
+        }
+        if(htblColNameType.size()!=htblColNameMin.size()){
+            throw new DBAppException("the size of htblColNameType is not equal to size of htblColNameMin");
+        }
+        HashSet<String> maxColumnNames = new HashSet<String>();
+        for(String key: htblColNameMax.keySet()){
+            maxColumnNames.add(key);
+        }
+        HashSet<String> minColumnNames = new HashSet<String>();
+        for(String key: htblColNameMin.keySet()){
+            minColumnNames.add(key);
+        }
+        //check same keys in htbl type and htbl max and min
+        for(String key: htblColNameType.keySet()){
+            if(!maxColumnNames.contains(key)){
+                throw new DBAppException("htblColNameMax does not contain the key: "+key);
+            }
+            if(!minColumnNames.contains(key)){
+                throw new DBAppException("htblColNameMin does not contain the key: "+key);
+            }
+        }
+        // check values of max and min are of correct corresponding types
+        for(String key: htblColNameMax.keySet()){
+            String value = htblColNameMax.get(key);
+            String type = htblColNameType.get(key);
+            try{
+                Column.adjustDataType(value,type);
+            } catch (Exception e){
+                throw new DBAppException(value+" is not of type "+ type);
             }
         }
 
-        Set<Map.Entry<String, String>> entrySet = htblColNameType.entrySet();
-        for (Map.Entry<String, String> entry : entrySet) {
-            if (!isSupported(entry.getValue())){
-                throw new DBAppException("This data type is not supported");
+        for(String key: htblColNameMin.keySet()){
+            String value = htblColNameMin.get(key);
+            String type = htblColNameType.get(key);
+            try{
+                Column.adjustDataType(value,type);
+            } catch (Exception e){
+                throw new DBAppException(value+" is not of type "+ type);
             }
         }
 
-        metaData.writeMetaData(
-                strTableName,
-                strClusteringKeyColumn,
-                htblColNameType,
-                htblColNameMin,
-                htblColNameMax
-        );
-        Table newTable = new Table(strTableName , htblColNameType.size() , this.maxPageSize, strClusteringKeyColumn);
-        tables.add(newTable.getTableName());
     }
     public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException, ParseException {
         if(strarrColName.length<3){
@@ -160,8 +213,6 @@ public class DBApp implements Serializable {
                     }
                 }
                 Vector<String> missingColumnNames = new Vector<String>();
-//                System.out.println(columnNames);
-//                System.out.println(htblColNameValue);
                 for(int i=0;i<columnNames.size();i++) {
                     if(!htblColNameValue.containsKey(columnNames.get(i))) {
                         missingColumnNames.add(columnNames.get(i));
@@ -199,30 +250,39 @@ public class DBApp implements Serializable {
             }
         }
     }
-    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception {
-        metaData.loadMetaData();
-//        if (!tables.contains(this.tablesFilepath+strTableName+".class")){
-//            throw new main.java.DBAppException("This Table is not present");
-//        }
-        int tableIndex = checkTablePresent(strTableName);
-        checkHtblValid(strTableName, htblColNameValue, true);
-        Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
-        toBeInsertedInTable.insert(htblColNameValue);
+    public void insertIntoTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException {
+        try{
+            metaData.loadMetaData();
+            int tableIndex = checkTablePresent(strTableName);
+            checkHtblValid(strTableName, htblColNameValue, true);
+            Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
+            toBeInsertedInTable.insert(htblColNameValue);
+        }catch (Exception e){
+            throw new DBAppException(e.getMessage());
+        }
     }
-    public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws Exception {
-        metaData.loadMetaData();
-        Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
-        int tableIndex = checkTablePresent(strTableName);
-        checkHtblValid(strTableName, htblColNameValue, false);
-        Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
-        currTable.update(strClusteringKeyValue, htblColNameValue, columns);
+    public void updateTable(String strTableName, String strClusteringKeyValue, Hashtable<String,Object> htblColNameValue ) throws DBAppException {
+        try{
+            metaData.loadMetaData();
+            Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
+            int tableIndex = checkTablePresent(strTableName);
+            checkHtblValid(strTableName, htblColNameValue, false);
+            Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
+            currTable.update(strClusteringKeyValue, htblColNameValue, columns);
+        } catch (Exception e){
+            throw new DBAppException(e.getMessage());
+        }
     }
-    public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws Exception{
-        metaData.loadMetaData();
-        int tableIndex = checkTablePresent(strTableName);
-        checkHtblValid(strTableName, htblColNameValue, false);
-        Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
-        currTable.delete(htblColNameValue);
+    public void deleteFromTable(String strTableName, Hashtable<String,Object> htblColNameValue) throws DBAppException{
+        try {
+            metaData.loadMetaData();
+            int tableIndex = checkTablePresent(strTableName);
+            checkHtblValid(strTableName, htblColNameValue, false);
+            Table currTable = FileManipulation.loadTable(this.tablesFilepath, this.tables.get(tableIndex));
+            currTable.delete(htblColNameValue);
+        } catch (Exception e){
+            throw new DBAppException(e.getMessage());
+        }
     }
 //  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws main.java.DBAppException {
 //
@@ -456,20 +516,26 @@ public class DBApp implements Serializable {
 //
 //
 //
-//        Hashtable<String, String> htblColNameType = new Hashtable<>();
-//        htblColNameType.put("age", "java.lang.Integer");
-//        htblColNameType.put("name", "java.lang.String");
-//        htblColNameType.put("gpa", "java.lang.Double");
-//
-//        Hashtable<String, String> htblColNameMin = new Hashtable<>();
-//        htblColNameMin.put("age", "1");
-//        htblColNameMin.put("name", "A");
-//        htblColNameMin.put("gpa", "0.7");
-//
-//        Hashtable<String, String> htblColNameMax = new Hashtable<>();
-//        htblColNameMax.put("age", "40");
-//        htblColNameMax.put("name", "zzzzzzz");
-//        htblColNameMax.put("gpa", "4.0");
+        Hashtable<String, String> htblColNameType = new Hashtable<>();
+        htblColNameType.put("age", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.Long");
+//        htblColNameType.put("dob", "java.util.Date");
+//        htblColNameType.put("job", "java.lang.String");
+
+        Hashtable<String, String> htblColNameMin = new Hashtable<>();
+        htblColNameMin.put("age", "1");
+        htblColNameMin.put("name", "A");
+        htblColNameMin.put("gpa", "0.7");
+//        htblColNameMin.put("dob", "1900-012-31");
+//        htblColNameMin.put("job", "1900-012-31");
+
+        Hashtable<String, String> htblColNameMax = new Hashtable<>();
+        htblColNameMax.put("age", "40");
+        htblColNameMax.put("name", "ZZZZZZZZZZ");
+        htblColNameMax.put("gpa", "5");
+//        htblColNameMax.put("dob", "2023-012-31");
+//        htblColNameMax.put("job", "e");
 //
 //        DBApp dbApp = new DBApp();
 //        dbApp.init();
