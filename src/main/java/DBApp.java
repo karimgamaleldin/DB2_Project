@@ -329,7 +329,8 @@ public class DBApp implements Serializable {
         Hashtable<String, Object> tuple2 = new Hashtable<>();
         tuple2.put("age", 2);
         tuple2.put("name", "Omar");
-        tuple2.put("gpa", 4.0);
+        tuple2.put("gpa", 4);
+        tuple2.put("dob",new SimpleDateFormat("dd-MM-yyyy").parse("31-12-1956"));
 
         Hashtable<String, Object> tuple3 = new Hashtable<>();
         tuple3.put("age", 3);
