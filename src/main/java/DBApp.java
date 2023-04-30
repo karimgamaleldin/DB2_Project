@@ -17,8 +17,7 @@ public class DBApp implements Serializable {
     private String tablesFilepath;
     private int maxPageSize;
     public DBApp(){
-        this.tables = new Vector<String>();
-        //src/resources/data/pages
+        this.tables = new Vector<String>();        //src/resources/data/pages
         this.pagesFilepath = "src/main/resources/data/";
         //resources/data/tables
         this.tablesFilepath = "src/main/resources/data/tables/";
