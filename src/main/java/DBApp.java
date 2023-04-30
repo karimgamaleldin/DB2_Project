@@ -4,7 +4,9 @@ import index.Octree;
 import org.junit.platform.commons.function.Try;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DBApp implements Serializable {
@@ -237,6 +239,9 @@ public class DBApp implements Serializable {
                 if(!(valClass.equals("java.lang.Integer")&&columnType.equals("java.lang.Double"))){
                     throw new DBAppException("Please check " + key + " as it has a wrong data type");
                 }
+                else {
+                    htblColNameValue.put(key,Double.parseDouble("" + value));
+                }
 //                System.out.println(valClass+"-"+columnType);
             }
 //            System.out.println(key+": "+value);
@@ -304,123 +309,7 @@ public class DBApp implements Serializable {
 
 
     public static void main(String[] args) throws Exception {
-//        String strTableName = "CityShop";
-//        String strTableName2="CityShop2";
-//        String strTableName3="CityShop3";
-//        String strTableName4="CityShop4";
-//        main.java.java.main.java.DBApp dbApp = new main.java.java.main.java.DBApp( );
-//        Hashtable htblColNameType = new Hashtable( );
-//        htblColNameType.put("ID", "java.lang.Integer");
-//        htblColNameType.put("Name", "java.lang.String");
-////        htblColNameType.put("X", "java.lang.Double");
-////        htblColNameType.put("Y", "java.lang.Double");
-////        htblColNameType.put("Z", "java.lang.Double");
-////        htblColNameType.put("Specialization", "java.lang.String");
-////        htblColNameType.put("Address", "java.lang.String");
-////
-////        Hashtable htblColNameMin = new Hashtable();
-////        htblColNameMin.put("ID", "0");
-////        htblColNameMin.put("Name", "A");
-////        htblColNameMin.put("X", "0");
-////        htblColNameMin.put("Y", "0");
-////        htblColNameMin.put("Z", "0");
-////        htblColNameMin.put("Specialization", "A");
-////        htblColNameMin.put("Address", "A");
-////        Hashtable htblColNameMax = new Hashtable();
-////        htblColNameMax.put("ID", "10000");
-////        htblColNameMax.put("Name", "ZZZZZZZZZZZ");
-////        htblColNameMax.put("X", "10000");
-////        htblColNameMax.put("Y", "10000");
-////        htblColNameMax.put("Z", "10000");
-////        htblColNameMax.put("Specialization", "ZZZZZZZZZZZ");
-////        htblColNameMax.put("Address","ZZZZZZZZZZZ" );
-//
-////        dbApp.createTable( strTableName, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-////        dbApp.createTable( strTableName2, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-////        dbApp.createTable( strTableName3, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-////        dbApp.createTable( strTableName4, "ID", htblColNameType, htblColNameMin, htblColNameMax );
-//
-////        Hashtable htblColNameValue = new Hashtable( );
-////        Hashtable htblColNameValue2 = new Hashtable( );
-////        Hashtable htblColNameValue3 = new Hashtable( );
-////        Hashtable htblColNameValue4 = new Hashtable( );
-////        Hashtable htblColNameValue5 = new Hashtable( );
-////
-////        htblColNameValue.put("ID", new Integer( 1 ));
-////        htblColNameValue.put("Name", "hgfhg");
-////        htblColNameValue.put("X", new Double(1000));
-////        htblColNameValue.put("Y", new Double(1000));
-////        htblColNameValue.put("Z", new Double(1000));
-////        htblColNameValue.put("Specialization", "b");
-////        htblColNameValue.put("Address","c" );
-////
-////        htblColNameValue2.put("ID", new Integer( 5 ));
-////        htblColNameValue2.put("Name", "dgdf");
-////        htblColNameValue2.put("X", new Double(1000));
-////        htblColNameValue2.put("Y", new Double(1000));
-////        htblColNameValue2.put("Z", new Double(1000));
-////        htblColNameValue2.put("Specialization", "b");
-////        htblColNameValue2.put("Address","c" );
-////
-////        htblColNameValue3.put("ID", new Integer( 3 ));
-////        htblColNameValue3.put("Name", "dfgfd");
-////        htblColNameValue3.put("X", new Double(2000));
-////        htblColNameValue3.put("Y", new Double(1000));
-////        htblColNameValue3.put("Z", new Double(1000));
-////        htblColNameValue3.put("Specialization", "b");
-////        htblColNameValue3.put("Address","c" );
-////
-////        htblColNameValue4.put("ID", new Integer( 2 ));
-////        htblColNameValue4.put("Name", "dfgdf");
-////        htblColNameValue4.put("X", new Double(1000));
-////        htblColNameValue4.put("Y", new Double(1000));
-////        htblColNameValue4.put("Z", new Double(1000));
-////        htblColNameValue4.put("Specialization", "b");
-////        htblColNameValue4.put("Address","c" );
-////
-////        htblColNameValue5.put("ID", new Integer( 4 ));
-////        htblColNameValue5.put("Name", "sefdsd");
-////        htblColNameValue5.put("X", new Double(2000));
-////        htblColNameValue5.put("Y", new Double(1000));
-////        htblColNameValue5.put("Z", new Double(1000));
-////        htblColNameValue5.put("Specialization", "b");
-////        htblColNameValue5.put("Address","c" );
-//
-////        System.out.println("insert 1");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue );
-////        System.out.println("insert 5");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue2 );
-////        System.out.println("insert 3");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue3 );
-////        System.out.println("insert 2");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue4 );
-////        System.out.println("insert 4");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue5 );
-//
-//
-////        Hashtable htblColNameValueDelete = new Hashtable( );
-////        htblColNameValueDelete.put("X", new Double(1000));
-////        System.out.println("delete all");
-////        dbApp.deleteFromTable( strTableName , htblColNameValueDelete );
-//
-////        Hashtable htblColNameValueDelete2 = new Hashtable( );
-////        htblColNameValueDelete2.put("X", new Double(2000));
-////        System.out.println("delete page 1");
-////        dbApp.deleteFromTable( strTableName , htblColNameValueDelete2 );
-//
-////        System.out.println("insert 3");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue3 );
-////        System.out.println("insert 4");
-////        dbApp.insertIntoTable( strTableName , htblColNameValue5 );
-//
-////        Hashtable htblColNameValueUpdate = new Hashtable( );
-////        htblColNameValueUpdate.put("X", new Double(500));
-////        htblColNameValueUpdate.put("Y", new Double(4000));
-////        System.out.println("update 4");
-////        dbApp.updateTable( strTableName ,"4", htblColNameValueUpdate );
-//
-//
-//        // leba tests
+        // leba tests
 ////tests/*        Hashtable<String, Object> tuple0 = new Hashtable<>();
 ////        tuple0.put("age", 0);
 ////        tuple0.put("name", "Soubra");
@@ -433,8 +322,9 @@ public class DBApp implements Serializable {
 
         Hashtable<String, Object> tuple1 = new Hashtable<>();
         tuple1.put("age", 1);
-        tuple1.put("name", "Kord");
-        tuple1.put("gpa", 1.0);
+        tuple1.put("name", "Kimo2");
+        tuple1.put("gpa", 5.0);
+        tuple1.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("05-07-2002"));
 
         Hashtable<String, Object> tuple2 = new Hashtable<>();
         tuple2.put("age", 2);
@@ -448,7 +338,7 @@ public class DBApp implements Serializable {
 
         Hashtable<String, Object> tuple4 = new Hashtable<>();
         tuple4.put("age", 4);
-        tuple4.put("name", "Malak");
+        tuple4.put("name", "biso");
         tuple4.put("gpa", 2.3);
 
         Hashtable<String, Object> tuple5 = new Hashtable<>();
@@ -500,11 +390,11 @@ public class DBApp implements Serializable {
         tuple14.put("age", 14);
 
         Hashtable<String, Object> tuple15 = new Hashtable<>();
-        tuple15.put("age", 15);
-        tuple15.put("name", "sara");
+        tuple15.put("age", 29);
+        tuple15.put("name", "afterMod");
 
         Hashtable<String, Object> tuple16 = new Hashtable<>();
-        tuple16.put("age", 20);
+        tuple16.put("age", 18);
         tuple16.put("name", "kimo");
         tuple16.put("gpa", 3.0);
 
@@ -529,7 +419,7 @@ public class DBApp implements Serializable {
 //
 //
         Hashtable<String, String> htblColNameType = new Hashtable<>();
-        htblColNameType.put("age", "java.lang.Double");
+        htblColNameType.put("age", "java.lang.Integer");
         htblColNameType.put("name", "java.lang.String");
         htblColNameType.put("gpa", "java.lang.Double");
 //        htblColNameType.put("dob", "java.util.Date");
@@ -546,16 +436,16 @@ public class DBApp implements Serializable {
         htblColNameMax.put("age", "40");
         htblColNameMax.put("name", "ZZZZZZZZZZ");
         htblColNameMax.put("gpa", "5");
-//        htblColNameMax.put("dob", "2023-012-31");
+        htblColNameMax.put("dob", "2023-12-31");
 //        htblColNameMax.put("job", "e");
 //
         DBApp dbApp = new DBApp();
         dbApp.init();
-//         dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
-////         dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
-////     //    dbApp.insertIntoTable("Students", tuple0);
-//         dbApp.insertIntoTable("Students", tuple1);
-//         dbApp.insertIntoTable("Students", tuple2);
+         dbApp.createTable("Students", "dob", htblColNameType, htblColNameMin, htblColNameMax);
+//////        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//////     //    dbApp.insertIntoTable("Students", tuple0);
+         dbApp.insertIntoTable("Students", tuple1);
+         dbApp.insertIntoTable("Students", tuple2);
 //         dbApp.insertIntoTable("Students", tuple6);
 //         dbApp.insertIntoTable("Students", tuple7);
 //         dbApp.insertIntoTable("Students", tuple8);
@@ -594,9 +484,9 @@ public class DBApp implements Serializable {
 //         Hashtable<String,Object> deletingCriteria1 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria2 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria3 = new Hashtable<>();
-//         deletingCriteria0.put( "age", 10);
-//         deletingCriteria0.put("name","nada");
-//         deletingCriteria0.put("gpa",0.9);
+//         deletingCriteria0.put( "dob",new SimpleDateFormat("dd-MM-yyyy").parse("05-12-1999"));
+         deletingCriteria0.put("gpa",2);
+         deletingCriteria0.put("name","a");
 //         deletingCriteria1.put("gpa", 0.9);
 //         deletingCriteria2.put( "name", "nada");
 //         deletingCriteria3.put( "age", 5);
@@ -610,7 +500,7 @@ public class DBApp implements Serializable {
 
 
 
-//       dbApp.deleteFromTable("Students", deletingCriteria0);
+       dbApp.deleteFromTable("Students", deletingCriteria0);
 //        dbApp.deleteFromTable("Students", deletingCriteria1);
 //        dbApp.insertIntoTable("Students", tuple12);
 //        dbApp.insertIntoTable("Students", tuple13);
