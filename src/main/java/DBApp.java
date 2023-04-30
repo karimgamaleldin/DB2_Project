@@ -152,7 +152,7 @@ public class DBApp implements Serializable {
         if(!toBeInsertedInTable.isTableEmpty()){
 
              // insert all the existing values in octree
-            //ezay b2a el 3elm 3end allah
+
         }
 
     }
