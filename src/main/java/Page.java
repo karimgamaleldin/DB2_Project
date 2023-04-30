@@ -178,7 +178,7 @@ public class Page implements Serializable{
             String key = entry.getKey();
             Object value = entry.getValue();
             Object currentColValue = currentTuple.getTupleAttributes().get(key);
-            if(!currentColValue.equals(value)) {
+            if(Comparison.compareTo(currentColValue,value,null)!=0) {
                 return false;
             }
         }

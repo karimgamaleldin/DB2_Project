@@ -335,11 +335,13 @@ public class DBApp implements Serializable {
         tuple3.put("age", 3);
         tuple3.put("name", "Ahmed");
         tuple3.put("gpa", 0.9);
+        tuple3.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("05-12-1999"));
 
         Hashtable<String, Object> tuple4 = new Hashtable<>();
         tuple4.put("age", 4);
         tuple4.put("name", "biso");
         tuple4.put("gpa", 2.3);
+        tuple4.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2024"));
 
         Hashtable<String, Object> tuple5 = new Hashtable<>();
         tuple5.put("age", 5);
@@ -396,7 +398,7 @@ public class DBApp implements Serializable {
         Hashtable<String, Object> tuple16 = new Hashtable<>();
         tuple16.put("age", 18);
         tuple16.put("name", "kimo");
-        tuple16.put("gpa", 3.0);
+        tuple15.put("gpa", 4);
 
         Hashtable<String, Object> tuple17 = new Hashtable<>();
         tuple17.put("age", 19);
@@ -404,32 +406,29 @@ public class DBApp implements Serializable {
         tuple17.put("gpa", 3.0);
 
         Hashtable<String, Object> tuple18 = new Hashtable<>();
-        tuple18.put("age", 19.1);
+        tuple18.put("age", 17);
         tuple18.put("name", "kimo");
 //        tuple18.put("gpa", 3.0);
         tuple18.put("gpa", 3.0);
 
         Hashtable<String, Object> tuple19 = new Hashtable<>();
-        tuple19.put("age", 19.11);
+        tuple19.put("age", 16);
         tuple19.put("name", "kimo");
 //        tuple19.put("gpa", 3.0);
         tuple19.put("gpa", 3.0);
-//
-//
-//
-//
+
         Hashtable<String, String> htblColNameType = new Hashtable<>();
         htblColNameType.put("age", "java.lang.Integer");
         htblColNameType.put("name", "java.lang.String");
         htblColNameType.put("gpa", "java.lang.Double");
-//        htblColNameType.put("dob", "java.util.Date");
+        htblColNameType.put("dob", "java.util.Date");
 //        htblColNameType.put("job", "java.lang.String");
 
         Hashtable<String, String> htblColNameMin = new Hashtable<>();
-        htblColNameMin.put("age", "1");
+        htblColNameMin.put("age", "0");
         htblColNameMin.put("name", "A");
-        htblColNameMin.put("gpa", "0.7");
-//        htblColNameMin.put("dob", "1900-012-31");
+        htblColNameMin.put("gpa", "0");
+        htblColNameMin.put("dob", "1950-12-31");
 //        htblColNameMin.put("job", "1900-012-31");
 
         Hashtable<String, String> htblColNameMax = new Hashtable<>();
@@ -464,23 +463,16 @@ public class DBApp implements Serializable {
 //         dbApp.insertIntoTable("Students", tuple18);
 //         dbApp.insertIntoTable("Students", tuple19);
 
-//        dbApp.insertIntoTable("Students", tuple1);
-//        dbApp.insertIntoTable("Students", tuple2);
-//        dbApp.insertIntoTable("Students", tuple3);
-//        dbApp.insertIntoTable("Students", tuple5);
-//        dbApp.insertIntoTable("Students", tuple6);
-//        dbApp.insertIntoTable("Students", tuple7);
-//        dbApp.insertIntoTable("Students", tuple4);
-
-
+// https://forms.gle/8LdxcCXyybNyxNtv7
 
          Hashtable<String, Object> updateHtbl = new Hashtable<>();
          updateHtbl.put("name", "a");
-         updateHtbl.put("gpa", 4.6);
-//         updateHtbl.put("name", "boniiiii");
-         dbApp.updateTable("Students", "19", updateHtbl);
+         updateHtbl.put("gpa", 2);
+         dbApp.updateTable("Students", "2002-07-05", updateHtbl);
 
-//         Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
+//         updateHtbl.put("name", "boniiiii");
+
+         Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria1 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria2 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria3 = new Hashtable<>();
@@ -490,7 +482,7 @@ public class DBApp implements Serializable {
 //         deletingCriteria1.put("gpa", 0.9);
 //         deletingCriteria2.put( "name", "nada");
 //         deletingCriteria3.put( "age", 5);
-//        dbApp.deleteFromTable("Students", deletingCriteria3);
+//        dbApp.deleteFromTable("Students", deletingCriteria0);
 //        deletingCriteria3.put( "age", 6);
 //        dbApp.deleteFromTable("Students", deletingCriteria3);
 //        deletingCriteria3.put( "age", 7);
