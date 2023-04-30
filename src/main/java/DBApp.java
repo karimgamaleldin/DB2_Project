@@ -30,7 +30,7 @@ public class DBApp implements Serializable {
             FileManipulation.createDirectory(this.pagesFilepath);
             FileManipulation.createDirectory(this.tablesFilepath);
             metaData = new Metadata("src/main/resources/metadata.csv");
-            this.maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinPage");
+            this.maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
             this.tables = FileManipulation.loadFilesFromDirectory(this.tablesFilepath);
         }catch(Exception e){
             System.out.println("init: "+e);
