@@ -69,9 +69,19 @@ public class Point {
     }
     public boolean isEqual(Point p){
         boolean xEqual = Comparison.compareTo(this.width,p.getWidth(),null)==0;
-        boolean yEqual = Comparison.compareTo(this.height,p.getLength(),null)==0;
+        boolean yEqual = Comparison.compareTo(this.length,p.getLength(),null)==0;
         boolean zEqual = Comparison.compareTo(this.height,p.getHeight(),null)==0;
         return xEqual && yEqual && zEqual;
+    }
+
+    @Override
+    public String toString() {
+        return "(" +
+                "width=" + width +
+                ", length=" + length +
+                ", height=" + height +
+                ", ref="+references+
+                ')';
     }
 
     public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue) throws IOException, ClassNotFoundException , DBAppException {

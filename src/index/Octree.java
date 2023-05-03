@@ -6,6 +6,8 @@ import main.java.DBAppException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Vector;
 
 public class Octree {
@@ -38,7 +40,11 @@ public class Octree {
     }
     public Octree searchForOctree(Point p){
         if(!isDivided){
-            return this;
+            if(this.cube.pointInRange(p)){
+                return this;
+            }else {
+                return null;
+            }
         }
         if(firstOctant.cube.pointInRange(p)){
             return firstOctant.searchForOctree(p);
@@ -67,7 +73,10 @@ public class Octree {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
         Octree octreeToBeInsertedIn = searchForOctree(insertedPoint);
+        if(octreeToBeInsertedIn==null) return false;
+//        System.out.println(octreeToBeInsertedIn.cube);
         int indexOfPoint = octreeToBeInsertedIn.containsPoint(insertedPoint);
+//        System.out.println(indexOfPoint);
         if(indexOfPoint!=-1){
             Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
             currPoint.insertDups(insertedPoint);
@@ -96,13 +105,16 @@ public class Octree {
             return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
         }
     }
+
     public void deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws DBAppException , IOException, ClassNotFoundException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
         Octree octreeToBeDeletedFrom = searchForOctree(tobeDeletedPoint);
         int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
         if(indexOfPoint==-1){
-            throw new DBAppException("point to be deleted is not in the Octree");
+            // I think no need for exception just do nothing
+            return;
+//            throw new DBAppException("point to be deleted is not in the Octree");
         }
         else{
             octreeToBeDeletedFrom.points.get(indexOfPoint).removeDataWithOctree(htblColNameValue);
@@ -230,5 +242,59 @@ public class Octree {
 
     public void setCube(Cube root) {
         this.cube = root;
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        Queue<Octree> q = new LinkedList<>();
+        q.add(this);
+        while(!q.isEmpty()){
+            int currSize = q.size();
+            for(int i=0;i<currSize;i++){
+                Octree currOctree = q.remove();
+                Object minWidth = currOctree.cube.getMinWidth();
+                Object maxWidth = currOctree.cube.getMaxWidth();
+                Object minHeight = currOctree.cube.getMinHeight();
+                Object maxHeight = currOctree.cube.getMaxHeight();
+                Object minLength = currOctree.cube.getMinLength();
+                Object maxLength = currOctree.cube.getMaxLength();
+                s+= "{mw:"+minWidth+",xw:"+maxWidth+",ml:"+minLength+",xl:"+maxLength+",mh:"+minHeight+",xh:"+maxHeight;
+                if(currOctree.isDivided){
+                    s+=",Node}-----";
+                    q.add(currOctree.firstOctant);
+                    q.add(currOctree.secondOctant);
+                    q.add(currOctree.thirdOctant);
+                    q.add(currOctree.fourthOctant);
+                    q.add(currOctree.fifthOctant);
+                    q.add(currOctree.sixthOctant);
+                    q.add(currOctree.seventhOctant);
+                    q.add(currOctree.eighthOctant);
+                }else {
+                    if(currOctree.points.size()==0){
+                        s+="}-----";
+                    }else{
+                        s+=",";
+                        for(int j=0;j<currOctree.points.size();j++){
+                            s+=currOctree.points.get(j)+",";
+                        }
+                        s+="}";
+                    }
+
+                }
+            }
+            s+="\n";
+        }
+        return s;
+    }
+
+    public static void main(String[] args) throws ParseException, DBAppException {
+        Octree octree = new Octree(0,100,0,100,0,100,3);
+        octree.insertIntoOctree(10,20,20,null);
+        octree.insertIntoOctree(12,20,30,null);
+        octree.insertIntoOctree(5,10,20,null);
+        octree.insertIntoOctree(6,8,20,"1");
+        octree.insertIntoOctree(6,8,20,"2");
+        System.out.println(octree);
     }
 }
