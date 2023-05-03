@@ -15,12 +15,14 @@ public class DBApp implements Serializable {
     private Metadata metaData;
     private String pagesFilepath;
     private String tablesFilepath;
+    private String indicesFilepath;
     private int maxPageSize;
     public DBApp(){
         this.tables = new Vector<String>();        //src/resources/data/pages
         this.pagesFilepath = "src/main/resources/data/";
         //resources/data/tables
         this.tablesFilepath = "src/main/resources/data/tables/";
+        this.indicesFilepath = "src/main/resources/data/indices/";
 
     }
     public void init(){
@@ -28,6 +30,7 @@ public class DBApp implements Serializable {
             FileManipulation.createDirectory("src/main/resources/data");
             FileManipulation.createDirectory(this.pagesFilepath);
             FileManipulation.createDirectory(this.tablesFilepath);
+            FileManipulation.createDirectory(this.indicesFilepath);
             metaData = new Metadata("src/main/resources/metadata.csv");
             this.maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
             this.tables = FileManipulation.loadFilesFromDirectory(this.tablesFilepath);

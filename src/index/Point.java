@@ -1,9 +1,6 @@
 package index;
 
-import main.java.DBAppException;
-import main.java.Comparison;
-import main.java.FileManipulation;
-import main.java.Page;
+import main.java.*;
 
 import java.io.IOException;
 import java.util.Hashtable;
@@ -67,7 +64,7 @@ public class Point {
     public void insertDups(Point p) {
         this.references.add(p.getPageName());
     }
-    public boolean isEqual(Point p){
+    public boolean isEqual(Point p) {
         boolean xEqual = Comparison.compareTo(this.width,p.getWidth(),null)==0;
         boolean yEqual = Comparison.compareTo(this.length,p.getLength(),null)==0;
         boolean zEqual = Comparison.compareTo(this.height,p.getHeight(),null)==0;
@@ -85,10 +82,22 @@ public class Point {
     }
 
     public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue) throws IOException, ClassNotFoundException , DBAppException {
+        Page p = FileManipulation.loadPage(pageName);
+        String strTableName = p.getTableName();
+        Table currTable = FileManipulation.loadTable("src/main/resources/data/tables/",strTableName);
         for(int i = 0 ; i < references.size() ; i++){
-            Page p = FileManipulation.loadPage(references.get(i));
-            boolean deleted = p.deleteFromPage(htblColNameValue);
-            // todo serilize
+            String currPage = references.get(i);
+            p = FileManipulation.loadPage(currPage);
+            boolean isDeleted = p.deleteFromPage(htblColNameValue);
+            int indexOfPage = currTable.getTablePages().indexOf(currPage);
+            if(isDeleted){
+                currTable.getTablePages().remove(indexOfPage);
+                currTable.getMaxValues().remove(indexOfPage);
+                currTable.getMinValues().remove(indexOfPage);
+            }else {
+                currTable.updateMinMax(p,indexOfPage);
+            }
         }
+        currTable.saveIntoTableFilepath();
     }
 }

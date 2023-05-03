@@ -1,7 +1,9 @@
 package index;
 
 
+import main.java.DBApp;
 import main.java.DBAppException;
+import main.java.FileManipulation;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -12,17 +14,26 @@ import java.util.Vector;
 
 public class Octree {
     private Cube cube;
-//    private String col1, col2, col3;
+    private String strColWidth, strColLength, strColHeight;
     private int maxEntriesPerCube;
     private boolean isDivided;
     private Vector<Point> points;
     private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eighthOctant;
+    private String filepath;
+    private String name;
+
     public Octree(Object minWidth, Object maxWidth,
-                  Object minLength, Object maxLength, Object minHeight, Object maxHeight, int maxEntriesPerCube) throws ParseException {
+                  Object minLength, Object maxLength, Object minHeight, Object maxHeight,
+                  int maxEntriesPerCube, String strColWidth, String strColLength,
+                  String strColHeight, String name) throws ParseException {
         this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
         this.points = new Vector<Point>();
+        this.strColWidth = strColWidth;
+        this.strColLength = strColLength;
+        this.strColHeight = strColHeight;
+        this.filepath = "src/main/resources/data/indices/"+name+"_octree.class";
     }
     public int containsPoint(Point p){
         for(int i=0;i<points.size();i++){
@@ -106,9 +117,9 @@ public class Octree {
         }
     }
 
-    public void deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws DBAppException , IOException, ClassNotFoundException {
+    public void deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue) throws DBAppException , IOException, ClassNotFoundException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
-        Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
+        Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, null);
         Octree octreeToBeDeletedFrom = searchForOctree(tobeDeletedPoint);
         int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
         if(indexOfPoint==-1){
@@ -118,20 +129,44 @@ public class Octree {
         }
         else{
             octreeToBeDeletedFrom.points.get(indexOfPoint).removeDataWithOctree(htblColNameValue);
+            octreeToBeDeletedFrom.points.remove(indexOfPoint);
+        }
+    }
+
+    public void updateInOctree(String ref, Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException, ParseException {
+        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
+        Point tobeUpdatedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, null);
+        Octree octreeToBeUpdated = searchForOctree(tobeUpdatedPoint);
+        int indexOfPoint = octreeToBeUpdated.containsPoint(tobeUpdatedPoint);
+        if(indexOfPoint==-1){
+            // I think no need for exception just do nothing
+            return;
+//            throw new DBAppException("point to be deleted is not in the Octree");
+        }
+        else{
+            Point updatePoint = octreeToBeUpdated.points.get(indexOfPoint);
+            updatePoint.getReferences().remove(ref);
+            if(updatePoint.getReferences().size()==0){
+                octreeToBeUpdated.points.remove(indexOfPoint);
+            }
+            Object newWidth = htblColNameValue.get(this.strColWidth);
+            Object newLength = htblColNameValue.get(this.strColLength);
+            Object newHeight = htblColNameValue.get(this.strColHeight);
+            this.insertIntoOctree(newWidth,newLength,newHeight,ref);
         }
     }
     public void divide() throws DBAppException, ParseException {
         // calculate boundaries of each octant
         this.isDivided = true;
         Point center = this.cube.getCenter();
-        this.firstOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
-        this.secondOctant = new Octree(center.getWidth(), this.cube.getMaxWidth() ,this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
-        this.thirdOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
-        this.fourthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube);
-        this.fifthOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() ,this.maxEntriesPerCube);
-        this.sixthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube);
-        this.seventhOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube);
-        this.eighthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube);
+        this.firstOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.secondOctant = new Octree(center.getWidth(), this.cube.getMaxWidth() ,this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.thirdOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.fourthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.fifthOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() ,this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.sixthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.seventhOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.eighthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
         for(int i=0;i<points.size();i++){
             Object valOfCol1 = points.get(i).getWidth();
             Object valOfCol2 = points.get(i).getLength();
@@ -147,6 +182,25 @@ public class Octree {
             || eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
         }
         this.points.clear();
+    }
+
+    public String getFilepath() {
+        return filepath;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public String getStrColWidth() {
+        return strColWidth;
+    }
+
+    public String getStrColLength() {
+        return strColLength;
+    }
+
+    public String getStrColHeight() {
+        return strColHeight;
     }
     public int getMaxEntriesPerCube() {
         return maxEntriesPerCube;
@@ -289,12 +343,16 @@ public class Octree {
     }
 
     public static void main(String[] args) throws ParseException, DBAppException {
-        Octree octree = new Octree(0,100,0,100,0,100,3);
+        Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
         octree.insertIntoOctree(10,20,20,null);
         octree.insertIntoOctree(12,20,30,null);
         octree.insertIntoOctree(5,10,20,null);
         octree.insertIntoOctree(6,8,20,"1");
         octree.insertIntoOctree(6,8,20,"2");
         System.out.println(octree);
+        DBApp dbApp = new DBApp();
+        dbApp.init();
+//        octree.deleteFromOctree(6,8,20);
+//        System.out.println(octree);
     }
 }
