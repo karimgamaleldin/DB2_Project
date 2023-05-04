@@ -1,4 +1,4 @@
-package main.java;
+package mainClasses;
 
 import index.Octree;
 import sqlterm.SQLTerm;
@@ -6,7 +6,6 @@ import sqlterm.SQLTerm;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -72,6 +71,7 @@ public class DBApp implements Serializable {
             Table newTable = new Table(strTableName , htblColNameType.size() , this.maxPageSize, strClusteringKeyColumn);
             tables.add(newTable.getTableName());
         }catch (Exception e){
+            e.printStackTrace();
             throw new DBAppException(e.getMessage());
         }
     }
@@ -123,7 +123,8 @@ public class DBApp implements Serializable {
         }
 
     }
-    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException, ParseException {
+    public void createIndex(String strTableName , String[] strarrColName) throws Exception {
+        metaData.loadMetaData();
         if(strarrColName.length<3){
             throw new DBAppException("Array missing index attributes ");
         } else if (strarrColName.length>3) {
@@ -139,20 +140,33 @@ public class DBApp implements Serializable {
                 throw new DBAppException("columns specified are not in the table");
             }
         }
-        Object[] firstAttribute= null;
-        Object[] secondAttribute= null;
-        Object[] thirdAttribute= null;
+        Vector<Object> firstAttribute= null;
+        Vector<Object> secondAttribute= null;
+        Vector<Object> thirdAttribute= null;
         Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
-        firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
-        secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
-        thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
-//        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1,strarrColName[0],strarrColName[1],strarrColName[2],);
+        firstAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[0]);//getMinMax(columnNames,strarrColName[0],strTableName);
+        secondAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[1]);
+        thirdAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[2]);
+        String indexName = strarrColName[0]+strarrColName[1]+strarrColName[2]+"Index";
+        Octree octree=new Octree(firstAttribute.get(0),firstAttribute.get(1),secondAttribute.get(0),secondAttribute.get(1),
+                thirdAttribute.get(0),thirdAttribute.get(1),3,
+                strarrColName[0],strarrColName[1],strarrColName[2],indexName);
         if(!toBeInsertedInTable.isTableEmpty()){
-
-             // insert all the existing values in octree
-
+            // insert all the existing values in octree
+            for(int i=0;i<toBeInsertedInTable.getTablePages().size();i++){
+                String currPagePath = toBeInsertedInTable.getTablePages().get(i);
+                Page currPage = FileManipulation.loadPage(currPagePath);
+                for(int j=0;j<currPage.getPageTuples().size();j++){
+                    Object valOfCol1 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[0]);
+                    Object valOfCol2 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[1]);
+                    Object valOfCol3 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[2]);
+                    octree.insertIntoOctree(valOfCol1,valOfCol2,valOfCol3,currPagePath);
+                }
+            }
         }
-
+        Metadata.updateCSV(strTableName,strarrColName,indexName,"Octree");
+        metaData.loadMetaData();
+        FileManipulation.createSerFile(octree.getFilepath());
     }
     public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
         String[] minMax=null;
@@ -228,9 +242,10 @@ public class DBApp implements Serializable {
                 throw new DBAppException("The Column names aren't correct");
             }
             String columnType = metaData.getColumnType(strTableName,key);
-            String valClass = ((""+value.getClass()).replaceAll("class","")).replaceAll(" ","");
+            //((""+value.getClass()).replaceAll("class","")).replaceAll(" ","")
+            String valClass = value.getClass().getName();
 //            System.out.println(key+": "+valClass+","+columnType);
-            if(valClass.compareTo("main.java.SimulatingNull")==0){
+            if(valClass.compareTo("java.SimulatingNull")==0){
                 continue;
             }
             if(valClass.compareTo(columnType)!=0){
@@ -243,7 +258,7 @@ public class DBApp implements Serializable {
 //                System.out.println(valClass+"-"+columnType);
             }
 //            System.out.println(key+": "+value);
-            Vector<Object> columnMinAndMax = metaData.getColumnMinAndMax(strTableName,key,columnType);
+            Vector<Object> columnMinAndMax = Metadata.getColumnMinAndMax(strTableName,key);
             Object min = columnMinAndMax.get(0);
             Object max = columnMinAndMax.get(1);
 //            System.out.println(max.toString());
@@ -298,7 +313,7 @@ public class DBApp implements Serializable {
             throw new DBAppException(e.getMessage());
         }
     }
-//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws main.java.DBAppException {
+//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws java.DBAppException {
 //
 //  }
     public boolean isSupported(String dt){
@@ -461,31 +476,33 @@ public class DBApp implements Serializable {
 ////        tuple19.put("gpa", 3.0);
 //        tuple19.put("gpa", 3.0);
 //
-//        Hashtable<String, String> htblColNameType = new Hashtable<>();
-//        htblColNameType.put("age", "java.lang.Integer");
-//        htblColNameType.put("name", "java.lang.String");
-//        htblColNameType.put("gpa", "java.lang.Double");
-//        htblColNameType.put("dob", "java.util.Date");
-////        htblColNameType.put("job", "java.lang.String");
-//
-//        Hashtable<String, String> htblColNameMin = new Hashtable<>();
-//        htblColNameMin.put("age", "0");
-//        htblColNameMin.put("name", "A");
-//        htblColNameMin.put("gpa", "0");
-//        htblColNameMin.put("dob", "1950-12-31");
-////        htblColNameMin.put("job", "1900-012-31");
-//
-//        Hashtable<String, String> htblColNameMax = new Hashtable<>();
-//        htblColNameMax.put("age", "40");
-//        htblColNameMax.put("name", "ZZZZZZZZZZ");
-//        htblColNameMax.put("gpa", "5");
-//        htblColNameMax.put("dob", "2023-12-31");
+        Hashtable<String, String> htblColNameType = new Hashtable<>();
+        htblColNameType.put("age", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.Double");
+        htblColNameType.put("dob", "java.util.Date");
+//        htblColNameType.put("job", "java.lang.String");
+
+        Hashtable<String, String> htblColNameMin = new Hashtable<>();
+        htblColNameMin.put("age", "0");
+        htblColNameMin.put("name", "A");
+        htblColNameMin.put("gpa", "0");
+        htblColNameMin.put("dob", "1950-12-31");
+//        htblColNameMin.put("job", "1900-012-31");
+
+        Hashtable<String, String> htblColNameMax = new Hashtable<>();
+        htblColNameMax.put("age", "40");
+        htblColNameMax.put("name", "ZZZZZZZZZZ");
+        htblColNameMax.put("gpa", "5");
+        htblColNameMax.put("dob", "2023-12-31");
 //        htblColNameMax.put("job", "e");
-//
-//        DBApp dbApp = new DBApp();
-//        dbApp.init();
-//         dbApp.createTable("Students", "dob", htblColNameType, htblColNameMin, htblColNameMax);
-//////        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
+
+        DBApp dbApp = new DBApp();
+        dbApp.init();
+//        dbApp.createTable("Students", "dob", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
+        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
 //////     //    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple1);
 //         dbApp.insertIntoTable("Students", tuple2);

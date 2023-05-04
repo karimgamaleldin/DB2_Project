@@ -1,9 +1,10 @@
 package index;
 
-import main.java.Comparison;
+import mainClasses.Comparison;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Cube {
@@ -53,9 +54,24 @@ public class Cube {
         return (a1+a2)/2.0;
     }
     public Date getMiddleDate(Date d1, Date d2) throws ParseException {
-        Long diff = Math.abs(d1.getTime() - d2.getTime()) / 2;
-        Date median = new SimpleDateFormat("yyyy-MM-dd").parse(diff.toString());
-        return median;
+//        Long diff = Math.abs(d1.getTime() - d2.getTime()) / 2;
+//        Date median = new SimpleDateFormat("yyyy-MM-dd").parse(diff+"");
+//        return median;
+        // create Calendar instances for the two dates
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(d1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(d2);
+
+        // calculate the middle date
+        Calendar middleCal = Calendar.getInstance();
+        middleCal.setTimeInMillis((cal1.getTimeInMillis() + cal2.getTimeInMillis()) / 2);
+
+        // get the middle date as a Date object
+        Date middleDate = middleCal.getTime();
+
+//        System.out.println("The middle date between " + d1 + " and " + d2 + " is " + middleDate);
+        return middleDate;
     }
 
     @Override

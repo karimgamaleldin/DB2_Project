@@ -1,4 +1,8 @@
-package main.java;
+package mainClasses;
+
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvException;
 
 import java.io.*;
 import java.util.*;
@@ -6,10 +10,10 @@ import java.util.Map.Entry;
 
 
 public class Metadata {
-    private String filePath;
+    private static String filePath;
     private static Hashtable<String,Vector<Column>> columnsOfMetaData;
-    private File metafile;
-    private FileWriter fw;
+    private static File metafile;
+    private static FileWriter fw;
 
 
     public Metadata(String filePath) throws IOException {
@@ -34,44 +38,6 @@ public class Metadata {
             }
         }
         return clusterKeyDataType;
-    }
-    public void loadMetaData() throws FileNotFoundException {
-        // true: file empty
-        if(this.metafile.length()==0){
-            return;
-        }
-        Scanner sc = new Scanner(this.metafile);
-        sc.useDelimiter(",");
-        int i=1;
-        for(;i<=8;i++){
-            sc.next();
-        }
-        columnsOfMetaData.clear();
-        while (sc.hasNext())  //returns a boolean value
-        {
-            Vector<String> temp = new Vector<String>();
-            for(int j=1;j<=8&&sc.hasNext();j++){
-                String curr = sc.next();
-                temp.add(curr.replace("\r\n",""));
-            }
-            if(!sc.hasNext()){
-                break;
-            }
-            String strTableName = temp.get(0);
-            String columnName = temp.get(1);
-            String dataType = temp.get(2);
-            String isClusteringKeyStr = temp.get(3);
-            Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
-            String indexName = temp.get(4);
-            String indexType = temp.get(5);
-            String minColValue = temp.get(6);
-            String maxColValue = temp.get(7);
-            Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
-            Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
-            columns.add(col);
-            columnsOfMetaData.put(strTableName,columns);
-        }
-        sc.close();  //closes the scanner
     }
 
     public String getFilePath() {
@@ -106,14 +72,53 @@ public class Metadata {
         this.fw = fw;
     }
 
+    public void loadMetaData() throws FileNotFoundException {
+        // true: file empty
+        if(this.metafile.length()==0){
+            return;
+        }
+        Scanner sc = new Scanner(this.metafile);
+        sc.useDelimiter(",");
+        int i=1;
+        for(;i<=8;i++){
+            sc.next();
+        }
+        columnsOfMetaData.clear();
+        while (sc.hasNext())  //returns a boolean value
+        {
+            Vector<String> temp = new Vector<String>();
+            for(int j=1;j<=8&&sc.hasNext();j++){
+                String curr = sc.next();
+                temp.add(curr.replace("\r\n",""));
+            }
+            if(!sc.hasNext()){
+                break;
+            }
+            String strTableName = temp.get(0);
+//            System.out.println(strTableName);
+            String columnName = temp.get(1);
+            String dataType = temp.get(2);
+            String isClusteringKeyStr = temp.get(3);
+            Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
+            String indexName = temp.get(4);
+            String indexType = temp.get(5);
+            String minColValue = temp.get(6);
+            String maxColValue = temp.get(7);
+            Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
+            Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
+            columns.add(col);
+            columnsOfMetaData.put(strTableName,columns);
+        }
+        sc.close();
+    }
     public void writeHeaders() throws IOException {
         StringBuilder sb= new StringBuilder();
         //Table Name, main.java.java.Column Name, main.java.java.Column Type, ClusteringKey, IndexName,IndexType, min, max
         sb.append("Table Name");
         sb.append(",");
-        sb.append("main.java.java.Column Name");
+        sb.append("Column Name");
         sb.append(",");
-        sb.append("main.java.java.Column Type");
+        sb.append("Column Type");
         sb.append(",");
         sb.append("ClusteringKey");
         sb.append(",");
@@ -187,7 +192,9 @@ public class Metadata {
     }
     public Vector<String> getColumnNames(String strTableName){
         Vector<String> columnsNames = new Vector<String>();
-        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+//        System.out.println(columnsOfMetaData);
+//        System.out.println(strTableName+"-"+columnsOfMetaData.keySet()+": ");
+        Vector<Column> columns = columnsOfMetaData.get(strTableName);
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
             if(currentColumn.getTableName().equals(strTableName)) {
@@ -223,22 +230,76 @@ public class Metadata {
         return type;
     }
 
-    public Vector<Object> getColumnMinAndMax(String strTableName, String columnName, String columnType) throws Exception {
+    public static Vector<Object> getColumnMinAndMax(String strTableName, String columnName) throws Exception {
         Vector<Object> columnsMinAndMax = new Vector<Object>();
-        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+        Vector<Column> columns = columnsOfMetaData.get(strTableName);
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
             String currentColumnTableName = currentColumn.getTableName();
             String currentColumnName = currentColumn.getColumnName();
+            String currentColumnType = currentColumn.getColumnType();
             if(currentColumnTableName.equals(strTableName) && columnName.equals(currentColumnName)) {
-                Object min = Column.adjustDataType(currentColumn.getMin(),columnType);
-                Object max = Column.adjustDataType(currentColumn.getMax(),columnType);
+                Object min = Column.adjustDataType(currentColumn.getMin(),currentColumnType);
+                Object max = Column.adjustDataType(currentColumn.getMax(),currentColumnType);
                 columnsMinAndMax.add(min);
                 columnsMinAndMax.add(max);
                 break;
             }
         }
         return columnsMinAndMax;
+    }
+    public static void updateCSV( String strTableName , String[] strarrColName,
+                                 String indexName,String indexType) throws IOException, CsvException {
+
+
+
+        // Read existing file
+        CSVReader reader = new CSVReader(new FileReader(metafile));
+        List<String[]> csvBody = reader.readAll();
+        StringBuilder sb= new StringBuilder();
+
+        for(int i=0; i<csvBody.size(); i++){
+            String[] strArray = csvBody.get(i);
+            List<String> list = new ArrayList<String>(Arrays.asList(strArray));
+            list.remove(strArray.length-1);
+//            System.out.println(list);
+            strArray = list.toArray(new String[0]);
+            csvBody.remove(i);
+            csvBody.add(i,strArray);
+//            if(!strArray[0].equals(strTableName)){
+//                continue;
+//            }
+            boolean isTableName = strArray[0].equals(strTableName);
+            String currColName = strArray[1];
+            boolean isCurrCol = currColName.equals(strarrColName[0])
+                    || currColName.equals(strarrColName[1])
+                    || currColName.equals(strarrColName[2]);
+//            String print = "";
+            for(int j=0; j<strArray.length; j++){
+//                print+= strArray[j]+",";
+                if(isTableName && isCurrCol && j==4 && strArray[j].equalsIgnoreCase("null")){ //String to be replaced
+                    strArray[j] = indexName; //Target replacement
+                }else if(isTableName && isCurrCol && j==5 && strArray[j].equalsIgnoreCase("null")){ //String to be replaced
+                    strArray[j] = indexType; //Target replacement
+                }
+                sb.append(strArray[j]+",");
+            }
+            sb.append("\r\n");
+//            System.out.println(print);
+        }
+        reader.close();
+        metafile.delete();
+//        metafile=new File(filePath);
+        fw=new FileWriter(metafile,false);
+        fw.append(sb.toString()).flush();
+        fw=new FileWriter(metafile,true);
+
+
+        // Write to CSV file which is open
+//        CSVWriter writer = new CSVWriter(new FileWriter(inputFile));
+//        writer.writeAll(csvBody);
+//        writer.flush();
+//        writer.close();
     }
 
 }

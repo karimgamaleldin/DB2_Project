@@ -1,12 +1,8 @@
 package index;
 
 
-import main.java.DBApp;
-import main.java.DBAppException;
-import main.java.FileManipulation;
-import main.java.*;
-
-
+import mainClasses.DBApp;
+import mainClasses.DBAppException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Hashtable;
@@ -172,11 +168,6 @@ public class Octree {
 //            htblColNameValue.put(clusteringKey,correctValType);
 //            octreeToBeDeletedFrom.points.get(indexOfPoint).updateDataWithOctree(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
 //        }
-//
-//
-//
-//
-//
 //    }
     public void divide() throws DBAppException, ParseException {
         // calculate boundaries of each octant
@@ -372,6 +363,7 @@ public class Octree {
         octree.insertIntoOctree(5,10,20,null);
         octree.insertIntoOctree(6,8,20,"1");
         octree.insertIntoOctree(6,8,20,"2");
+        octree.insertIntoOctree(60,8,20,"3");
         System.out.println(octree);
         DBApp dbApp = new DBApp();
         dbApp.init();

@@ -1,6 +1,7 @@
 package index;
 
-import main.java.*;
+
+import mainClasses.*;
 
 import java.io.IOException;
 import java.util.Hashtable;

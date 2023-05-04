@@ -1,4 +1,4 @@
-package main.java;
+package mainClasses;
 
 import java.io.*;
 import java.util.*;
@@ -215,7 +215,7 @@ public class Table implements Serializable {
 
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
-//            throw new main.java.DBAppException("The table is empty");
+//            throw new java.DBAppException("The table is empty");
             return;
         }
         if(htblColNameValue.size()==0){

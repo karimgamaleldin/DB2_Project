@@ -1,4 +1,4 @@
-package main.java;
+package mainClasses;
 
 import java.io.*;
 import java.util.Properties;
@@ -44,10 +44,10 @@ public abstract class FileManipulation {
         try {
             File f= new File(filepath);           //file to be delete
             if(f.delete()) { //returns boolean value
-//                System.out.println(f.getName() + " deleted");   //getting and printing the file name
+                System.out.println(f.getName() + " deleted");   //getting and printing the file name
             }
             else {
-//                System.out.println("failed");
+                System.out.println("failed");
             }
             f = null;
             System.gc();
@@ -112,7 +112,7 @@ public abstract class FileManipulation {
 
     public static int readFromConfig(String cfgPath){
         Properties prop = new Properties();
-        // "src/resources/main.java.DBApp.config"
+        // "src/resources/java.DBApp.config"
         String fileName = "src/main/resources/DBApp.config";
         try{
             FileInputStream fis = new FileInputStream(fileName);
