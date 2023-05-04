@@ -296,6 +296,15 @@ public class Table implements Serializable {
             }
         }
     }
+    public Vector<Tuple> selectDataFromTable(Hashtable<String,Object> htblColNameValue){
+        if(htblColNameValue.containsKey(clusteringKey)){
+        // binary search
+        }else {
+        // linear search
+        }
+
+        return null;
+    }
 }
 
 

@@ -156,27 +156,27 @@ public class Octree {
             this.insertIntoOctree(newWidth,newLength,newHeight,ref);
         }
     }
-    public void updateFromOctree(String strTableName,String strClusteringKeyValue,Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws Exception {
-        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
-        Point tobeUpdatedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
-        Octree octreeToBeDeletedFrom = searchForOctree(tobeUpdatedPoint);
-        int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeUpdatedPoint);
-        if(indexOfPoint==-1){
-            throw new DBAppException("point to be Updated is not in the Octree");
-        }
-        else {
-            String clusterKeyDataType = Metadata.getClusterKeyDataType(strTableName);
-            Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
-            String clusteringKey=Metadata.getTableClusteringKey(strTableName);
-            htblColNameValue.put(clusteringKey,correctValType);
-            octreeToBeDeletedFrom.points.get(indexOfPoint).updateDataWithOctree(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
-        }
-
-
-
-
-
-    }
+//    public void updateFromOctree(String strTableName,String strClusteringKeyValue,Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws Exception {
+//        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
+//        Point tobeUpdatedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
+//        Octree octreeToBeDeletedFrom = searchForOctree(tobeUpdatedPoint);
+//        int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeUpdatedPoint);
+//        if(indexOfPoint==-1){
+//            throw new DBAppException("point to be Updated is not in the Octree");
+//        }
+//        else {
+//            String clusterKeyDataType = Metadata.getClusterKeyDataType(strTableName);
+//            Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
+//            String clusteringKey= Metadata.getTableClusteringKey(strTableName);
+//            htblColNameValue.put(clusteringKey,correctValType);
+//            octreeToBeDeletedFrom.points.get(indexOfPoint).updateDataWithOctree(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
+//        }
+//
+//
+//
+//
+//
+//    }
     public void divide() throws DBAppException, ParseException {
         // calculate boundaries of each octant
         this.isDivided = true;

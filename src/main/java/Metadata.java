@@ -1,11 +1,8 @@
 package main.java;
 
 import java.io.*;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.Vector;
 
 
 public class Metadata {
@@ -178,6 +175,15 @@ public class Metadata {
     }
     public int getTupleSize(String strTableName){
         return this.columnsOfMetaData.get(strTableName).size();
+    }
+    public Vector<String> getTableNames(){
+        Vector<String> tableNames = new Vector<String>();
+        Set<Entry<String, Vector<Column>>> entrySet = columnsOfMetaData.entrySet();
+        for (Entry<String, Vector<Column>> entry : entrySet) {
+            String key = entry.getKey();
+            tableNames.add(key);
+        }
+        return tableNames;
     }
     public Vector<String> getColumnNames(String strTableName){
         Vector<String> columnsNames = new Vector<String>();
