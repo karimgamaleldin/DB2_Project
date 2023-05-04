@@ -191,8 +191,8 @@ public class Metadata {
         return columnsNames;
     }
 
-    public String getTableClusteringKey(String strTableName){
-        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+    public static String getTableClusteringKey(String strTableName){
+        Vector<Column> columns = columnsOfMetaData.get(strTableName);
         String clusteringKey = "";
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
