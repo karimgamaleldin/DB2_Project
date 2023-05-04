@@ -146,7 +146,7 @@ public class DBApp implements Serializable {
         firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
         secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
         thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
-        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
+//        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1,strarrColName[0],strarrColName[1],strarrColName[2],);
         if(!toBeInsertedInTable.isTableEmpty()){
 
              // insert all the existing values in octree
