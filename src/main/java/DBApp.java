@@ -1,6 +1,7 @@
 package main.java;
 
 import index.Octree;
+import sqlterm.SQLTerm;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -8,19 +9,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
 public class DBApp implements Serializable {
 
     private Vector<String> tables;
     private Metadata metaData;
     private String pagesFilepath;
     private String tablesFilepath;
+    private String indicesFilepath;
     private int maxPageSize;
     public DBApp(){
-        this.tables = new Vector<String>();
-        //src/resources/data/pages
+        this.tables = new Vector<String>();        //src/resources/data/pages
         this.pagesFilepath = "src/main/resources/data/";
         //resources/data/tables
         this.tablesFilepath = "src/main/resources/data/tables/";
+        this.indicesFilepath = "src/main/resources/data/indices/";
 
     }
     public void init(){
@@ -28,6 +31,7 @@ public class DBApp implements Serializable {
             FileManipulation.createDirectory("src/main/resources/data");
             FileManipulation.createDirectory(this.pagesFilepath);
             FileManipulation.createDirectory(this.tablesFilepath);
+            FileManipulation.createDirectory(this.indicesFilepath);
             metaData = new Metadata("src/main/resources/metadata.csv");
             this.maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
             this.tables = FileManipulation.loadFilesFromDirectory(this.tablesFilepath);
@@ -142,7 +146,7 @@ public class DBApp implements Serializable {
         firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
         secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
         thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
-        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
+//        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1,strarrColName[0],strarrColName[1],strarrColName[2],);
         if(!toBeInsertedInTable.isTableEmpty()){
 
              // insert all the existing values in octree
@@ -305,13 +309,54 @@ public class DBApp implements Serializable {
         supportedDataTypes.add("java.util.Date");
         return supportedDataTypes.contains(dt);
     }
+    public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
+        checkSelectQuery(arrSQLTerms , strarrOperators);
+        String tableName = arrSQLTerms[0].get_strTableName();
+        Table T = FileManipulation.loadTable(this.tablesFilepath , tableName);
+        Hashtable<String , Object[]> htbl = new Hashtable<String ,Object[]>();
+        for(int i = 0; i < arrSQLTerms.length ; i++){
+            String columnName = arrSQLTerms[i].get_strColumnName();
+            String operator = arrSQLTerms[i].get_strOperator();
+            Object value = arrSQLTerms[i].get_objValue();
+            Object[] arr = {operator , value};
+            htbl.put(columnName, arr);
+        }
+        Vector<Tuple> results = null;
+        return results.iterator();
+    }
+    public void checkSelectQuery(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
+        String[] operators = {">", ">=", "<", "<=", "!=" , "="};
+        for(int i = 0; i < arrSQLTerms.length ; i++){
+            if(checkTablePresent(arrSQLTerms[i].get_strTableName()) == -1){
+                throw new DBAppException("Table specified in the query isn't present");
+            }
+            else{
+                Vector<String> columns = metaData.getColumnNames(arrSQLTerms[i].get_strTableName());
+                if (!columns.contains(arrSQLTerms[i].get_strColumnName())){
+                    throw new DBAppException("Column Name specified in the query isn't present");
+                }
+                else {
+                    boolean flag = false;
+                    for(int j = 0 ; j < operators.length ; j++){
+                        if(operators[j].equals(arrSQLTerms[i].get_strOperator())){
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if(!flag){
+                        throw new DBAppException("operator specified in the query isn't supported");
+                    }
+                }
+            }
+        }
+    }
 
 
     public static void main(String[] args) throws Exception {
 //      Hashtable<String, Object> tuple0 = new Hashtable<>();
-////        tuple0.put("age", 0);
-////        tuple0.put("name", "Soubra");
-////        tuple0.put("gpa", 1.6);*/
+//        tuple0.put("age", 0);
+//        tuple0.put("name", "Soubra");
+//        tuple0.put("gpa", 1.6);*/
 
 //        Hashtable<String, Object> tuple0 = new Hashtable<>();
 //        tuple0.put("age", 0);

@@ -80,7 +80,6 @@ public abstract class FileManipulation {
     }
 
     public static Table loadTable(String dirPath,String fileName) throws IOException, ClassNotFoundException {
-//        System.out.println(dirPath + fileName + ".class");
         FileInputStream file = new FileInputStream(dirPath + fileName + ".class");
         if(file.available()!=0){
             ObjectInputStream on = new ObjectInputStream(file);

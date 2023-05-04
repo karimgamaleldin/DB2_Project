@@ -35,6 +35,17 @@ public class Table implements Serializable {
         FileManipulation.saveIntoFilepath(this,this.filepath);
     }
 
+    public Vector<Tuple> getMinValues() {
+        return minValues;
+    }
+
+    public Vector<Tuple> getMaxValues() {
+        return maxValues;
+    }
+
+    public int getNextPageID() {
+        return nextPageID;
+    }
     public Vector<String> getTablePages() {
         return tablePages;
     }
@@ -201,6 +212,7 @@ public class Table implements Serializable {
         this.maxValues=new Vector<Tuple>();
         FileManipulation.saveIntoFilepath(this,this.filepath);
     }
+
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
 //            throw new main.java.DBAppException("The table is empty");
@@ -210,16 +222,6 @@ public class Table implements Serializable {
             emptyTable();
             return;
         }
-//        int start =0;
-//        int end = this.getTablePages().size()-1;
-//        Tuple min=minValues.get(start);
-//        Tuple max=maxValues.get(end);
-//        if(toBeDeleted.compareTo(min) <0){//if tuple less than first tuple in table
-//            throw new main.java.DBAppException("tuple is not in the table");
-//        } else if (toBeDeleted.compareTo(max) >0) {//if tuple more than biggest tuple in table
-//            throw new main.java.DBAppException("tuple is not in the table");
-//        } else{
-
         for(int i=0;i<this.getTablePages().size();i++){
             Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
             boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
@@ -293,6 +295,15 @@ public class Table implements Serializable {
 //                this.maxValues.add(page.getMaxVal());
             }
         }
+    }
+    public Vector<Tuple> selectDataFromTable(Hashtable<String,Object> htblColNameValue){
+        if(htblColNameValue.containsKey(clusteringKey)){
+        // binary search
+        }else {
+        // linear search
+        }
+
+        return null;
     }
 }
 
