@@ -8,4 +8,5 @@ public class SQLTerm {
     String _strOperator;
     Object  _objValue;
 
+
 }
