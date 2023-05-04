@@ -119,58 +119,58 @@ public class DBApp implements Serializable {
         }
 
     }
-//    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException, ParseException {
-//        if(strarrColName.length<3){
-//            throw new DBAppException("Array missing index attributes ");
-//        } else if (strarrColName.length>3) {
-//            throw new DBAppException("index attributes should be only 3 ");
-//        }
-//        int tableIndex = checkTablePresent(strTableName);
-//        if(tableIndex==-1){
-//            throw new DBAppException("table not found");
-//        }
-//        Vector<String> columnNames = metaData.getColumnNames(strTableName);
-//        for (int i=0;i<3;i++){
-//            if (!columnNames.contains(strarrColName[i])){
-//                throw new DBAppException("columns specified are not in the table");
-//            }
-//        }
-//        Object[] firstAttribute= null;
-//        Object[] secondAttribute= null;
-//        Object[] thirdAttribute= null;
-//        Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
-//        firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
-//        secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
-//        thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
-//        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
-//        if(!toBeInsertedInTable.isTableEmpty()){
-//
-//             // insert all the existing values in octree
-//
-//        }
-//
-//    }
-//    public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
-//        String[] minMax=null;
-//        Column columnNeeded=null;
-////        for (int i = 0; i < columnNames.size(); i++) {
-////            if (columnNames.get(i) == columnNeededString) {
-////                type = metaData.getColumnType(strTableName, columnNeededString);
-////                break;
-////            }
-////        }
-//        Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
-//        for (int i = 0; i < columns.size(); i++) {
-//            if (columns.get(i).getColumnName() == columnNeededString) {
-//                columnNeeded=columns.get(i);
+    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException, IOException, ClassNotFoundException, ParseException {
+        if(strarrColName.length<3){
+            throw new DBAppException("Array missing index attributes ");
+        } else if (strarrColName.length>3) {
+            throw new DBAppException("index attributes should be only 3 ");
+        }
+        int tableIndex = checkTablePresent(strTableName);
+        if(tableIndex==-1){
+            throw new DBAppException("table not found");
+        }
+        Vector<String> columnNames = metaData.getColumnNames(strTableName);
+        for (int i=0;i<3;i++){
+            if (!columnNames.contains(strarrColName[i])){
+                throw new DBAppException("columns specified are not in the table");
+            }
+        }
+        Object[] firstAttribute= null;
+        Object[] secondAttribute= null;
+        Object[] thirdAttribute= null;
+        Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
+        firstAttribute=getMinMax(columnNames,strarrColName[0],strTableName);
+        secondAttribute=getMinMax(columnNames,strarrColName[1],strTableName);
+        thirdAttribute=getMinMax(columnNames,strarrColName[2],strTableName);
+        Octree octree=new Octree(firstAttribute[0],firstAttribute[1],secondAttribute[0],secondAttribute[1],thirdAttribute[0],thirdAttribute[1],1);
+        if(!toBeInsertedInTable.isTableEmpty()){
+
+             // insert all the existing values in octree
+
+        }
+
+    }
+    public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
+        String[] minMax=null;
+        Column columnNeeded=null;
+//        for (int i = 0; i < columnNames.size(); i++) {
+//            if (columnNames.get(i) == columnNeededString) {
+//                type = metaData.getColumnType(strTableName, columnNeededString);
 //                break;
 //            }
 //        }
-//        minMax[0]=columnNeeded.getMin();
-//        minMax[1]=columnNeeded.getMax();
-//        return minMax;
-//
-//    }
+        Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
+        for (int i = 0; i < columns.size(); i++) {
+            if (columns.get(i).getColumnName() == columnNeededString) {
+                columnNeeded=columns.get(i);
+                break;
+            }
+        }
+        minMax[0]=columnNeeded.getMin();
+        minMax[1]=columnNeeded.getMax();
+        return minMax;
+
+    }
     public int checkTablePresent(String strTableName) throws DBAppException, IOException, ClassNotFoundException {
         int tableIndex = -1;
         for(int i = 0; i < tables.size(); i++){
