@@ -57,6 +57,20 @@ public class Cube {
         Date median = new SimpleDateFormat("yyyy-MM-dd").parse(diff.toString());
         return median;
     }
+
+    @Override
+    public String toString() {
+        return "Cube{" +
+                "center=" + center +
+                ", minWidth=" + minWidth +
+                ", maxWidth=" + maxWidth +
+                ", minLength=" + minLength +
+                ", maxLength=" + maxLength +
+                ", minHeight=" + minHeight +
+                ", maxHeight=" + maxHeight +
+                '}';
+    }
+
     public String getMiddleString(String S, String T)
     {
         int N = Math.max(S.length(),T.length());
