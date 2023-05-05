@@ -336,9 +336,82 @@ public class DBApp implements Serializable {
             Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
             results.add(temp);
         }
-        // to do make the operators between the different queries
+        // to make the operators between the different queries
+        Vector<Tuple> result = results.get(0);
+        for(int i = 1 ; i <= strarrOperators.length ; i++){
+            String op = strarrOperators[i-1];
+            result = op.equals("XOR") ? XORSelect(result , results.get(i)) : op.equals("OR") ? ORSelect(result , results.get(i)) : ANDSelect(result , results.get(i));
+        }
 
-        return results.iterator();
+        return result.iterator();
+    }
+    public Vector<Tuple> XORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
+        Vector<Tuple> result = new Vector<Tuple>();
+        String clusteringKey = vec1.get(0).getClusteringKey();
+        Hashtable<Object , Object> hash1 = new Hashtable<Object , Object>();
+        Hashtable<Object , Object> hash2 = new Hashtable<Object , Object>();
+        for(int i = 0 ; i < vec1.size() ; i++){
+            Tuple tup = vec1.get(i);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            hash1.put(key,tup);
+        }
+        for(int i = 0 ; i < vec2.size() ; i++){
+            Tuple tup = vec2.get(i);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            hash2.put(key,tup);
+        }
+        for(int j = 0 ; j < vec1.size() ; j++) {
+            Tuple tup = vec1.get(j);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            if (!hash2.containsKey(key)) {
+                result.add(tup);
+            }
+        }
+        for(int j = 0 ; j < vec2.size() ; j++) {
+            Tuple tup = vec2.get(j);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            if (!hash1.containsKey(key)) {
+                result.add(tup);
+            }
+        }
+        return result;
+    }
+    public Vector<Tuple> ORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
+        Vector<Tuple> result = new Vector<Tuple>();
+        String clusteringKey = vec1.get(0).getClusteringKey();
+        Hashtable<Object , Tuple> hash1 = new Hashtable<Object , Tuple>();
+        for(int i = 0 ; i < vec1.size() ; i++){
+            Tuple tup = vec1.get(i);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            hash1.put(key,tup);
+            result.add(tup);
+        }
+        for(int j = 0 ; j < vec2.size() ; j++){
+            Tuple tup = vec2.get(j);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            if(!hash1.containsKey(key)){
+                result.add(tup);
+            }
+        }
+        return result;
+    }
+    public Vector<Tuple> ANDSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
+        Vector<Tuple> result = new Vector<Tuple>();
+        String clusteringKey = vec1.get(0).getClusteringKey();
+        Hashtable<Object , Tuple> hash1 = new Hashtable<Object , Tuple>();
+        for(int i = 0 ; i < vec1.size() ; i++){
+            Tuple tup = vec1.get(i);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            hash1.put(key,tup);
+        }
+        for(int j = 0 ; j < vec2.size() ; j++){
+            Tuple tup = vec2.get(j);
+            Object key = tup.getTupleAttributes().get(clusteringKey);
+            if(hash1.containsKey(key)){
+                result.add(tup);
+            }
+        }
+        return result;
     }
     public void checkSelectQuery(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
         String[] operators = {">", ">=", "<", "<=", "!=" , "="};

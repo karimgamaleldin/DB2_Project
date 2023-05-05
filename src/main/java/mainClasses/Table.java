@@ -14,7 +14,7 @@ public class Table implements Serializable {
     private int nextPageID;
     private String filepath;
 
-    public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey) throws IOException {
+    public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey) throws IOException{
         this.tableName = tableName;
         this.tablePages = new Vector<String>();
         this.tuplesSize = tuplesSize;
@@ -298,7 +298,7 @@ public class Table implements Serializable {
     }
     public Vector<Tuple> selectDataFromTable(String columnName , Object value , String operator) throws IOException, ClassNotFoundException, DBAppException {
         Vector<Tuple> ret = new Vector<Tuple>();
-        if(columnName.equals(clusteringKey)){
+        if(false){ //columnName.equals(clusteringKey
             Page loadedPage;
             int start =0;
             int end = this.tablePages.size()-1;
