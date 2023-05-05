@@ -296,14 +296,31 @@ public class Table implements Serializable {
             }
         }
     }
-    public Vector<Tuple> selectDataFromTable(Hashtable<String,Object> htblColNameValue){
-        if(htblColNameValue.containsKey(clusteringKey)){
-        // binary search
+    public Vector<Tuple> selectDataFromTable(String columnName , Object value , String operator) throws IOException, ClassNotFoundException, DBAppException {
+        Vector<Tuple> ret = new Vector<Tuple>();
+        if(columnName.equals(clusteringKey)){
+            Page loadedPage;
+            int start =0;
+            int end = this.tablePages.size()-1;
+            Tuple min=minValues.get(start);
+            Tuple max=maxValues.get(end);
+            while(start <= end){
+                int mid = start + (end-start) / 2 ;
+                min=minValues.get(mid);
+                max=maxValues.get(mid);
+            }
+
         }else {
         // linear search
+            for(int i = 0 ; i < tablePages.size() ; i++){
+                Page p = FileManipulation.loadPage(tablePages.get(i));
+                Vector<Tuple> temp = p.selectLinearDataInPage(columnName , value , operator);
+                for(int j = 0; j < temp.size() ; j++){
+                    ret.add(temp.get(j));
+                }
+            }
         }
-
-        return null;
+        return ret;
     }
 }
 

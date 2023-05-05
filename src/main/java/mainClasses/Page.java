@@ -3,6 +3,8 @@ package mainClasses;
 import java.io.*;
 import java.util.*;
 
+import static mainClasses.Comparison.compareTo;
+
 public class Page implements Serializable{
     // if a field is not serializable it is marked as transient
     private int pageID;
@@ -177,7 +179,7 @@ public class Page implements Serializable{
             String key = entry.getKey();
             Object value = entry.getValue();
             Object currentColValue = currentTuple.getTupleAttributes().get(key);
-            if(Comparison.compareTo(currentColValue,value,null)!=0) {
+            if(compareTo(currentColValue,value,null)!=0) {
                 return false;
             }
         }
@@ -258,6 +260,25 @@ public class Page implements Serializable{
             }
         }
         return -1;
+    }
+    public Vector<Tuple> selectLinearDataInPage(String columnName , Object value , String operator){
+        Vector<Tuple> rest = new Vector<Tuple>();
+        for(int i = 0 ; i < this.pageTuples.size() ; i++){
+            Hashtable<String , Object> tup = this.pageTuples.get(i).getTupleAttributes();
+            boolean flag = false;
+            switch(operator) {
+                case ">": flag = (compareTo(tup.get(columnName) , value , null) > 0) ; break;
+                case ">=": flag = (compareTo(tup.get(columnName) , value , null) >= 0) ; break;
+                case "<": flag = (compareTo(tup.get(columnName) , value , null) < 0) ; break;
+                case "<=": flag = (compareTo(tup.get(columnName) , value , null) <= 0) ; break;
+                case "!=": flag = (compareTo(tup.get(columnName) , value , null) != 0) ; break;
+                case "=": flag = (compareTo(tup.get(columnName) , value , null) == 0) ; break;
+            }
+            if(flag){
+                rest.add(this.pageTuples.get(i));
+            }
+        }
+        return rest;
     }
 
 

@@ -328,15 +328,16 @@ public class DBApp implements Serializable {
         checkSelectQuery(arrSQLTerms , strarrOperators);
         String tableName = arrSQLTerms[0].get_strTableName();
         Table T = FileManipulation.loadTable(this.tablesFilepath , tableName);
-        Hashtable<String , Object[]> htbl = new Hashtable<String ,Object[]>();
+        Vector<Vector<Tuple>> results = new Vector<Vector<Tuple>>();
         for(int i = 0; i < arrSQLTerms.length ; i++){
             String columnName = arrSQLTerms[i].get_strColumnName();
             String operator = arrSQLTerms[i].get_strOperator();
             Object value = arrSQLTerms[i].get_objValue();
-            Object[] arr = {operator , value};
-            htbl.put(columnName, arr);
+            Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
+            results.add(temp);
         }
-        Vector<Tuple> results = null;
+        // to do make the operators between the different queries
+
         return results.iterator();
     }
     public void checkSelectQuery(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
