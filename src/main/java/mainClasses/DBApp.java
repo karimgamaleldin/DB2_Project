@@ -340,6 +340,7 @@ public class DBApp implements Serializable {
         Vector<Tuple> result = results.get(0);
         for(int i = 1 ; i <= strarrOperators.length ; i++){
             String op = strarrOperators[i-1];
+            // should we throw an exception if the operator is not AND , OR , XOR and check that strarrOperators length is less than results by 1
             result = op.equals("XOR") ? XORSelect(result , results.get(i)) : op.equals("OR") ? ORSelect(result , results.get(i)) : ANDSelect(result , results.get(i));
         }
 

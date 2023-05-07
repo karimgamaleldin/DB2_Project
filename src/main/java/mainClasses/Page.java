@@ -1,6 +1,9 @@
 package mainClasses;
 
+import index.Octree;
+
 import java.io.*;
+import java.text.ParseException;
 import java.util.*;
 
 import static mainClasses.Comparison.compareTo;
@@ -89,7 +92,7 @@ public class Page implements Serializable{
         }
         System.out.println("-------------------");
     }
-    public Tuple insertIntoPage(Hashtable<String,Object> tuple) throws IOException, DBAppException {
+    public Tuple insertIntoPage(Hashtable<String,Object> tuple, Vector<String> octrees) throws IOException, DBAppException, ParseException, ClassNotFoundException {
         boolean wasFull = this.isPageFull();
         Tuple insertedTuple = new Tuple(tuple, clusteringKey,this.clusterKeyDataType);
         if(this.maxVal!=null&&insertedTuple.compareTo(this.maxVal) > 0&&wasFull){
@@ -98,6 +101,7 @@ public class Page implements Serializable{
         if(this.isPageEmpty()){
             this.pageTuples.add(insertedTuple);
             updateMinMax();
+            this.insertIntoOctree(insertedTuple,octrees);
 //            //print page -------------------
 //            printPageInfo();
             saveIntoPageFilepath();
@@ -107,6 +111,7 @@ public class Page implements Serializable{
         int end = this.getSizeOfPage() - 1;
         if(insertedTuple.compareTo(this.pageTuples.get(0)) <= 0){
             this.pageTuples.add(0, insertedTuple);
+            this.insertIntoOctree(insertedTuple,octrees);
         }
         else {
            while (start <= end) {
@@ -129,6 +134,7 @@ public class Page implements Serializable{
             }else {
                 this.pageTuples.add(start,insertedTuple);
             }
+            this.insertIntoOctree(insertedTuple,octrees);
         }
         updateMinMax();
         saveIntoPageFilepath();
@@ -172,7 +178,6 @@ public class Page implements Serializable{
     }
 
 
-
     public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
@@ -186,7 +191,7 @@ public class Page implements Serializable{
         return true;
     }
 
-    public void updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception{
+    public void updatePage (String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType, Vector<String> octrees) throws Exception{
         Hashtable tupleHashtable = new Hashtable<String,Object>();
         Object valueCorrectDataType= Column.adjustDataType(strClusteringKeyValue,dataType);
         tupleHashtable.put(this.getClusteringKey(),valueCorrectDataType);
@@ -196,6 +201,7 @@ public class Page implements Serializable{
         }
 
         Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
+//        this.updateOctree(tupleToBeUpdated,htblColNameValue,octrees);
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
             String keyToBeUpdated = entry.getKey();
@@ -208,6 +214,20 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
     }
 
+    public void updateOctree(Tuple tuple, Hashtable<String, Object> htblColNameValue,Vector<String> octrees) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+        for(String octreePath: octrees){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/",octreePath);
+            boolean isWidthUpdated = htblColNameValue.containsKey(currOctree.getStrColWidth());
+            boolean isLengthUpdated = htblColNameValue.containsKey(currOctree.getStrColLength());
+            boolean isHeightUpdated = htblColNameValue.containsKey(currOctree.getStrColHeight());
+            if(isWidthUpdated || isLengthUpdated || isHeightUpdated){
+                Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
+                Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
+                Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
+                currOctree.updateInOctree(width,length,height,htblColNameValue,this.filepath);
+            }
+        }
+    }
     public int getMaxSizePerPage() {
         return maxSizePerPage;
     }
@@ -260,6 +280,15 @@ public class Page implements Serializable{
             }
         }
         return -1;
+    }
+    public void insertIntoOctree(Tuple tuple, Vector<String> octrees) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+        for(String octreePath: octrees){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/",octreePath);
+            Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
+            Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
+            Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
+            currOctree.insertIntoOctree(width,length,height,this.filepath);
+        }
     }
     public Vector<Tuple> selectLinearDataInPage(String columnName , Object value , String operator){
         Vector<Tuple> rest = new Vector<Tuple>();

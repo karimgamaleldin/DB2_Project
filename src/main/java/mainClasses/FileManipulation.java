@@ -1,5 +1,7 @@
 package mainClasses;
 
+import index.Octree;
+
 import java.io.*;
 import java.util.Properties;
 import java.util.Vector;
@@ -87,6 +89,22 @@ public abstract class FileManipulation {
             try {
                 Table loadedTable = (Table) on.readObject();
                 return loadedTable;
+            }
+            catch (EOFException e) {
+                System.out.println("error:"+e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    public static Octree loadOctree(String dirPath, String fileName) throws IOException, ClassNotFoundException {
+        FileInputStream file = new FileInputStream(dirPath + fileName + ".class");
+        if(file.available()!=0){
+            ObjectInputStream on = new ObjectInputStream(file);
+            //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
+            try {
+                Octree loadedOctree = (Octree) on.readObject();
+                return loadedOctree;
             }
             catch (EOFException e) {
                 System.out.println("error:"+e.getMessage());

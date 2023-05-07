@@ -1,6 +1,9 @@
 package mainClasses;
 
+import index.Octree;
+
 import java.io.*;
+import java.text.ParseException;
 import java.util.*;
 
 public class Table implements Serializable {
@@ -13,6 +16,7 @@ public class Table implements Serializable {
     private String clusteringKey;
     private int nextPageID;
     private String filepath;
+    private Vector<String> octrees;
 
     public Table(String tableName , int tuplesSize , int maxPageSize, String clusteringKey) throws IOException{
         this.tableName = tableName;
@@ -25,9 +29,10 @@ public class Table implements Serializable {
         this.maxValues=new Vector<Tuple>();
         //"resources/data/tables/"+tableName+".class"
         this.filepath = "src/main/resources/data/tables/"+tableName+".class";
+        this.octrees = new Vector<String>();
         this.saveIntoTableFilepath();
         //"resources/data/pages/"
-//        FileManipulation.createDirectory("src/resources/data/pages/"+tableName);
+        FileManipulation.createDirectory("src/main/resources/data/indices/"+tableName);
     }
 
     public void saveIntoTableFilepath() throws IOException {
@@ -75,7 +80,7 @@ public class Table implements Serializable {
         return this.getTablePages().isEmpty();
     }
 
-    public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException {
+    public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException, ParseException {
         if(!htblColNameValue.containsKey(clusteringKey)){
             throw new DBAppException("clustering key not found");
         }
@@ -83,7 +88,7 @@ public class Table implements Serializable {
         Tuple wanted= new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
         if(isTableEmpty()){
             Page page = createNewPage();
-            page.insertIntoPage(htblColNameValue);
+            page.insertIntoPage(htblColNameValue,this.octrees);
             updateMinMax(page,0);
             saveIntoTableFilepath();
             return;
@@ -96,14 +101,14 @@ public class Table implements Serializable {
         Page loadedPage;
         if(wanted.compareTo(min) < 0){//if tuple less than first tuple in table
             loadedPage = FileManipulation.loadPage(this.tablePages.get(0));
-            Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+            Tuple shifted= loadedPage.insertIntoPage(htblColNameValue,this.octrees);
             updateMinMax(loadedPage,0);
             shift(1,shifted);
             saveIntoTableFilepath();
         }
         else if (wanted.compareTo(max) > 0) {//if tuple greater than biggest tuple in table
             loadedPage = FileManipulation.loadPage(this.tablePages.get(end));
-            Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+            Tuple shifted= loadedPage.insertIntoPage(htblColNameValue,this.octrees);
             updateMinMax(loadedPage,end);
             shift(end+1,shifted);
             saveIntoTableFilepath();
@@ -116,7 +121,7 @@ public class Table implements Serializable {
                 if(wanted.compareTo(min) > 0){
                     if(wanted.compareTo(max)<=0){
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
-                        Tuple shifted= loadedPage.insertIntoPage(htblColNameValue);
+                        Tuple shifted= loadedPage.insertIntoPage(htblColNameValue,this.octrees);
                         updateMinMax(loadedPage,mid);
                         shift(mid+1,shifted);
                         saveIntoTableFilepath();
@@ -129,7 +134,7 @@ public class Table implements Serializable {
                     Tuple maxOfPreviousPage = maxValues.get(mid-1);
                     if(wanted.compareTo(maxOfPreviousPage) > 0) {
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid-1));
-                        Tuple shifted = loadedPage.insertIntoPage(htblColNameValue);
+                        Tuple shifted = loadedPage.insertIntoPage(htblColNameValue,this.octrees);
                         updateMinMax(loadedPage,mid-1);
                         shift(mid,shifted);
                         saveIntoTableFilepath();
@@ -148,6 +153,7 @@ public class Table implements Serializable {
         loadedPage = null;
         System.gc();
     }
+
     public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue) throws Exception {
         if(isTableEmpty()){
             return;
@@ -191,7 +197,7 @@ public class Table implements Serializable {
 
     private void updateHelper(int mid, String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue, String clusterKeyDataType) throws Exception {
         Page loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
-        loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
+        loadedPage.updatePage(strClusteringKeyValue,htblColNameValue,clusterKeyDataType, this.octrees);
         if(loadedPage.isPageEmpty()){
             FileManipulation.deleteEntireFile(loadedPage.getFilepath());
             tablePages.remove(mid);
@@ -257,14 +263,15 @@ public class Table implements Serializable {
         maxValues.remove(index);
         maxValues.add(index,max);
     }
-    public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws IOException, ClassNotFoundException, DBAppException {
+    public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws IOException, ClassNotFoundException, DBAppException, ParseException {
         Page page = createNewPage();
-        page.insertIntoPage(shift);
+        page.insertIntoPage(shift,this.octrees);
         int lastIndex = this.tablePages.size()-1;
         updateMinMax(page,lastIndex);
+//        this.insertIntoOctree(wanted,page.getFilepath());
         page = null;
     }
-    public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException, DBAppException {
+    public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException, DBAppException, ParseException {
         if(shifted==null) {
             return;
         }
@@ -280,7 +287,7 @@ public class Table implements Serializable {
         while(shifted !=null){
             shift=shifted.getTupleAttributes();
             Page currentPage = FileManipulation.loadPage(this.tablePages.get(nextPage));
-            shifted=currentPage.insertIntoPage(shift);
+            shifted=currentPage.insertIntoPage(shift,this.octrees);
             updateMinMax(currentPage,nextPage);
             nextPage++;
             currentPage = null;

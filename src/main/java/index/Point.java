@@ -71,14 +71,6 @@ public class Point {
         boolean zEqual = Comparison.compareTo(this.height,p.getHeight(),null)==0;
         return xEqual && yEqual && zEqual;
     }
-    public void updateDataWithOctree(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue,String dataType) throws Exception {
-        for(int i = 0 ; i < references.size() ; i++){
-            Page p = FileManipulation.loadPage(references.get(i));
-            p.updatePage(strClusteringKeyValue,htblColNameValue,dataType);
-            // todo serilize
-        }
-    }
-
 
     @Override
     public String toString() {

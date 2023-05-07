@@ -3,6 +3,10 @@ package index;
 
 import mainClasses.DBApp;
 import mainClasses.DBAppException;
+import mainClasses.FileManipulation;
+import mainClasses.SimulatingNull;
+
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Hashtable;
@@ -43,7 +47,11 @@ public class Octree {
         return -1;
     }
     public void checkInsertedValues(Object valOfCol1, Object valOfCol2, Object valOfCol3) throws DBAppException {
-        if(valOfCol1==null || valOfCol2==null || valOfCol3==null) {
+        boolean isValOfColSimulatingNull1 = valOfCol1 instanceof SimulatingNull;
+        boolean isValOfColSimulatingNull2 = valOfCol2 instanceof SimulatingNull;
+        boolean isValOfColSimulatingNull3 = valOfCol3 instanceof SimulatingNull;
+        if(valOfCol1==null || valOfCol2==null || valOfCol3==null ||
+                isValOfColSimulatingNull1 || isValOfColSimulatingNull2 || isValOfColSimulatingNull3) {
             throw new DBAppException("one of the values inserted in octree is null");
         }
     }
@@ -78,7 +86,10 @@ public class Octree {
         }
         return eighthOctant.searchForOctree(p);
     }
-    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException, ParseException {
+    public void saveIntoOctreeFilepath() throws IOException {
+        FileManipulation.saveIntoFilepath(this,this.getFilepath());
+    }
+    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException, ParseException, IOException {
         checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
         Octree octreeToBeInsertedIn = searchForOctree(insertedPoint);
@@ -89,9 +100,11 @@ public class Octree {
         if(indexOfPoint!=-1){
             Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
             currPoint.insertDups(insertedPoint);
+            this.saveIntoOctreeFilepath();
             return true;
         }else if(octreeToBeInsertedIn.points.size()<octreeToBeInsertedIn.maxEntriesPerCube){
             octreeToBeInsertedIn.points.add(insertedPoint);
+            this.saveIntoOctreeFilepath();
             return true;
         }else{
             octreeToBeInsertedIn.divide();
@@ -129,11 +142,12 @@ public class Octree {
             octreeToBeDeletedFrom.points.get(indexOfPoint).removeDataWithOctree(htblColNameValue);
             octreeToBeDeletedFrom.points.remove(indexOfPoint);
         }
+        this.saveIntoOctreeFilepath();
     }
 
-    public void updateInOctree(String ref, Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException, ParseException {
-        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
-        Point tobeUpdatedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, null);
+    public void updateInOctree(Object oldValOfCol1, Object oldValOfCol2, Object oldValOfCol3, Hashtable<String, Object> htblColNameValue,String ref) throws DBAppException, IOException, ClassNotFoundException, ParseException {
+        checkInsertedValues(oldValOfCol1,oldValOfCol2,oldValOfCol3);
+        Point tobeUpdatedPoint = new Point(oldValOfCol1,oldValOfCol2,oldValOfCol3, null);
         Octree octreeToBeUpdated = searchForOctree(tobeUpdatedPoint);
         int indexOfPoint = octreeToBeUpdated.containsPoint(tobeUpdatedPoint);
         if(indexOfPoint==-1){
@@ -151,6 +165,8 @@ public class Octree {
             Object newLength = htblColNameValue.get(this.strColLength);
             Object newHeight = htblColNameValue.get(this.strColHeight);
             this.insertIntoOctree(newWidth,newLength,newHeight,ref);
+            // may cause an error
+//            this.saveIntoOctreeFilepath();
         }
     }
 //    public void updateFromOctree(String strTableName,String strClusteringKeyValue,Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws Exception {
@@ -169,7 +185,7 @@ public class Octree {
 //            octreeToBeDeletedFrom.points.get(indexOfPoint).updateDataWithOctree(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
 //        }
 //    }
-    public void divide() throws DBAppException, ParseException {
+    public void divide() throws DBAppException, ParseException, IOException {
         // calculate boundaries of each octant
         this.isDivided = true;
         Point center = this.cube.getCenter();
@@ -356,7 +372,7 @@ public class Octree {
         return s;
     }
 
-    public static void main(String[] args) throws ParseException, DBAppException {
+    public static void main(String[] args) throws ParseException, DBAppException, IOException {
         Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
         octree.insertIntoOctree(10,20,20,null);
         octree.insertIntoOctree(12,20,30,null);
