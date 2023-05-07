@@ -76,6 +76,13 @@ public class Table implements Serializable {
     public String getFilepath() {
         return filepath;
     }
+    public Vector<String> getOctrees() {
+        return octrees;
+    }
+
+    public void setOctrees(Vector<String> octrees) {
+        this.octrees = octrees;
+    }
     public boolean isTableEmpty() {
         return this.getTablePages().isEmpty();
     }
