@@ -82,7 +82,7 @@ public class Point {
                 ')';
     }
 
-    public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue) throws IOException, ClassNotFoundException , DBAppException {
+    public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue, String strColWidth, String strColLength, String strColHeight) throws IOException, ClassNotFoundException , DBAppException {
         Page p = FileManipulation.loadPage(pageName);
         String strTableName = p.getTableName();
         Table currTable = FileManipulation.loadTable("src/main/resources/data/tables/",strTableName);
@@ -95,10 +95,30 @@ public class Point {
                 currTable.getTablePages().remove(indexOfPage);
                 currTable.getMaxValues().remove(indexOfPage);
                 currTable.getMinValues().remove(indexOfPage);
+                this.references.remove(i);
+                i--;
             }else {
                 currTable.updateMinMax(p,indexOfPage);
+                if(!checkIfPointExistInPage(p,strColWidth,strColLength,strColHeight)){
+                    this.references.remove(i);
+                    i--;
+                }
             }
         }
         currTable.saveIntoTableFilepath();
     }
+    public boolean checkIfPointExistInPage(Page page, String strColWidth, String strColLength, String strColHeight){
+        for(int i = 0 ; i<page.getPageTuples().size();i++){
+            Tuple currentTuple = page.getPageTuples().get(i);
+            //maybe simulating null will cause an error
+            boolean checkWidth = Comparison.compareTo(width,currentTuple.getTupleAttributes().get(strColLength),null)==0;
+            boolean checkHeight = Comparison.compareTo(height,currentTuple.getTupleAttributes().get(strColLength),null)==0;
+            boolean checkLength = Comparison.compareTo(length,currentTuple.getTupleAttributes().get(strColLength),null)==0;
+            if(checkWidth && checkLength && checkHeight) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

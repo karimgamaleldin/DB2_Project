@@ -25,9 +25,9 @@ public class Cube {
         this.center = new Point(centerX,centerY,centerZ, null);
     }
     public boolean pointInRange(Point p){
-        boolean xInsideCube = Comparison.compareTo(p.getWidth(),minWidth,null)>=0&&Comparison.compareTo(p.getWidth(),maxWidth,null)<0;
-        boolean yInsideCube = Comparison.compareTo(p.getLength(),minLength,null)>=0&&Comparison.compareTo(p.getLength(),maxLength,null)<0;
-        boolean zInsideCube = Comparison.compareTo(p.getHeight(),minHeight,null)>=0&&Comparison.compareTo(p.getHeight(),maxHeight,null)<0;
+        boolean xInsideCube = Comparison.compareToOctree(p.getWidth(),minWidth,null)>=0&&Comparison.compareTo(p.getWidth(),maxWidth,null)<0;
+        boolean yInsideCube = Comparison.compareToOctree(p.getLength(),minLength,null)>=0&&Comparison.compareTo(p.getLength(),maxLength,null)<0;
+        boolean zInsideCube = Comparison.compareToOctree(p.getHeight(),minHeight,null)>=0&&Comparison.compareTo(p.getHeight(),maxHeight,null)<0;
         return xInsideCube && yInsideCube && zInsideCube;
     }
 

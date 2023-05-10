@@ -9,10 +9,7 @@ import mainClasses.SimulatingNull;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Vector;
+import java.util.*;
 
 public class Octree {
     private Cube cube;
@@ -23,6 +20,7 @@ public class Octree {
     private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eighthOctant;
     private String filepath;
     private String name;
+    private Vector<Point> overflow;
 
     public Octree(Object minWidth, Object maxWidth,
                   Object minLength, Object maxLength, Object minHeight, Object maxHeight,
@@ -32,6 +30,7 @@ public class Octree {
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
         this.points = new Vector<Point>();
+        this.overflow = new Vector<Point>();
         this.strColWidth = strColWidth;
         this.strColLength = strColLength;
         this.strColHeight = strColHeight;
@@ -46,53 +45,88 @@ public class Octree {
         }
         return -1;
     }
-    public void checkInsertedValues(Object valOfCol1, Object valOfCol2, Object valOfCol3) throws DBAppException {
-        boolean isValOfColSimulatingNull1 = valOfCol1 instanceof SimulatingNull;
-        boolean isValOfColSimulatingNull2 = valOfCol2 instanceof SimulatingNull;
-        boolean isValOfColSimulatingNull3 = valOfCol3 instanceof SimulatingNull;
-        if(valOfCol1==null || valOfCol2==null || valOfCol3==null ||
-                isValOfColSimulatingNull1 || isValOfColSimulatingNull2 || isValOfColSimulatingNull3) {
-            throw new DBAppException("one of the values inserted in octree is null");
+    public int containsPointInOverflow(Point p){
+        for(int i=0;i<overflow.size();i++){
+            Point currPoint = overflow.get(i);
+            if(p.isEqual(currPoint)){
+                return i;
+            }
         }
+        return -1;
     }
-    public Octree searchForOctree(Point p){
+    public boolean checkInsertedValues(Point p) throws DBAppException, IOException {
+        boolean isValOfColSimulatingNull1 = p.getWidth() instanceof SimulatingNull;
+        boolean isValOfColSimulatingNull2 = p.getLength() instanceof SimulatingNull;
+        boolean isValOfColSimulatingNull3 = p.getHeight() instanceof SimulatingNull;
+        if(p.getWidth()==null || p.getLength()==null || p.getHeight()==null ||
+                isValOfColSimulatingNull1 || isValOfColSimulatingNull2 || isValOfColSimulatingNull3) {
+            int indexOfPoint = this.containsPointInOverflow(p);
+            if(indexOfPoint!=-1){
+                Point currPoint = this.overflow.get(indexOfPoint);
+                currPoint.insertDups(p);
+                this.saveIntoOctreeFilepath();
+                return true;
+            }else if(this.points.size()<this.maxEntriesPerCube){
+                this.overflow.add(p);
+                this.saveIntoOctreeFilepath();
+                return true;
+            }
+        }
+        return false;
+    }
+    public void searchForOctree(Point p,Vector<Octree> octrees){
         if(!isDivided){
             if(this.cube.pointInRange(p)){
-                return this;
+                octrees.add(this);
+                return;
             }else {
-                return null;
+                return;
             }
         }
         if(firstOctant.cube.pointInRange(p)){
-            return firstOctant.searchForOctree(p);
+            firstOctant.searchForOctree(p,octrees);
         }
         else if(secondOctant.cube.pointInRange(p)){
-            return secondOctant.searchForOctree(p);
+            secondOctant.searchForOctree(p,octrees);
         }
         else if(thirdOctant.cube.pointInRange(p)){
-            return thirdOctant.searchForOctree(p);
+            thirdOctant.searchForOctree(p,octrees);
         }
         else if(fourthOctant.cube.pointInRange(p)){
-            return fourthOctant.searchForOctree(p);
+            fourthOctant.searchForOctree(p,octrees);
         }
         else if(fifthOctant.cube.pointInRange(p)){
-            return fifthOctant.searchForOctree(p);
+            fifthOctant.searchForOctree(p,octrees);
         }
         else if(sixthOctant.cube.pointInRange(p)){
-            return sixthOctant.searchForOctree(p);
+            sixthOctant.searchForOctree(p,octrees);
         }
         else if(seventhOctant.cube.pointInRange(p)){
-            return seventhOctant.searchForOctree(p);
+            seventhOctant.searchForOctree(p,octrees);
         }
-        return eighthOctant.searchForOctree(p);
+        else if(eighthOctant.cube.pointInRange(p)){
+            eighthOctant.searchForOctree(p,octrees);
+        }
+    }
+    public void searchInOverflow(Point p, Vector<Point> pointsFromOverflow) throws DBAppException, IOException, ClassNotFoundException {
+        for(int i=0;i<this.overflow.size();i++){
+            if(p.isEqual(overflow.get(i))){
+                pointsFromOverflow.add(overflow.get(i));
+            }
+        }
     }
     public void saveIntoOctreeFilepath() throws IOException {
         FileManipulation.saveIntoFilepath(this,this.getFilepath());
     }
     public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException, ParseException, IOException {
-        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
-        Octree octreeToBeInsertedIn = searchForOctree(insertedPoint);
+        if(checkInsertedValues(insertedPoint)) {
+            return true;
+        }
+        Vector<Octree> octrees = new Vector<>();
+        searchForOctree(insertedPoint,octrees);
+        if(octrees.size()==0) return false;
+        Octree octreeToBeInsertedIn = octrees.get(0);
         if(octreeToBeInsertedIn==null) return false;
 //        System.out.println(octreeToBeInsertedIn.cube);
         int indexOfPoint = octreeToBeInsertedIn.containsPoint(insertedPoint);
@@ -100,11 +134,11 @@ public class Octree {
         if(indexOfPoint!=-1){
             Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
             currPoint.insertDups(insertedPoint);
-            this.saveIntoOctreeFilepath();
+//            this.saveIntoOctreeFilepath();
             return true;
         }else if(octreeToBeInsertedIn.points.size()<octreeToBeInsertedIn.maxEntriesPerCube){
             octreeToBeInsertedIn.points.add(insertedPoint);
-            this.saveIntoOctreeFilepath();
+//            this.saveIntoOctreeFilepath();
             return true;
         }else{
             octreeToBeInsertedIn.divide();
@@ -129,26 +163,51 @@ public class Octree {
     }
 
     public void deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue) throws DBAppException , IOException, ClassNotFoundException {
-        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
         Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, null);
-        Octree octreeToBeDeletedFrom = searchForOctree(tobeDeletedPoint);
-        int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
-        if(indexOfPoint==-1){
-            // I think no need for exception just do nothing
-            return;
-//            throw new DBAppException("point to be deleted is not in the Octree");
+//        checkInsertedValues(tobeDeletedPoint);
+        Vector<Octree> octrees = new Vector<>();
+        searchForOctree(tobeDeletedPoint,octrees);
+//        searchInOverflow(tobeDeletedPoint,octrees);
+        for(int i=0;i<octrees.size();i++){
+            Octree octreeToBeDeletedFrom = octrees.get(i);
+            int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
+            if(indexOfPoint==-1){
+                // I think no need for exception just do nothing
+                continue;
+            }
+            else{
+                Point pointToBeDeleted = octreeToBeDeletedFrom.points.get(indexOfPoint);
+                pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
+                if(pointToBeDeleted.getReferences().size()==0){
+                    octreeToBeDeletedFrom.points.remove(indexOfPoint);
+                }
+            }
         }
-        else{
-            octreeToBeDeletedFrom.points.get(indexOfPoint).removeDataWithOctree(htblColNameValue);
-            octreeToBeDeletedFrom.points.remove(indexOfPoint);
+        Vector<Point> pointsFromOverflow = new Vector<>();
+        searchInOverflow(tobeDeletedPoint,pointsFromOverflow);
+        for(int i=0;i<pointsFromOverflow.size();i++){
+            Point pointToBeDeleted = pointsFromOverflow.get(i);
+            pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
         }
+        clearOverflow();
         this.saveIntoOctreeFilepath();
     }
 
+    public void clearOverflow(){
+        for(int i=0;i<this.overflow.size();i++){
+            Point currPoint = this.overflow.get(i);
+            if(currPoint.getReferences().size()==0){
+                this.overflow.remove(i);
+                i--;
+            }
+        }
+    }
     public void updateInOctree(Object oldValOfCol1, Object oldValOfCol2, Object oldValOfCol3, Hashtable<String, Object> htblColNameValue,String ref) throws DBAppException, IOException, ClassNotFoundException, ParseException {
-        checkInsertedValues(oldValOfCol1,oldValOfCol2,oldValOfCol3);
         Point tobeUpdatedPoint = new Point(oldValOfCol1,oldValOfCol2,oldValOfCol3, null);
-        Octree octreeToBeUpdated = searchForOctree(tobeUpdatedPoint);
+//        checkInsertedValues(tobeUpdatedPoint);
+        Vector<Octree> octrees = new Vector<>();
+        searchForOctree(tobeUpdatedPoint,octrees);
+        Octree octreeToBeUpdated = octrees.get(0);
         int indexOfPoint = octreeToBeUpdated.containsPoint(tobeUpdatedPoint);
         if(indexOfPoint==-1){
             // I think no need for exception just do nothing
@@ -371,6 +430,36 @@ public class Octree {
         }
         return s;
     }
+    public void printOctree(){
+       printOctreeHelper(this,0,0);
+    }
+    private void printOctreeHelper(Octree octree,int child,int shift){
+        Object minWidth = octree.cube.getMinWidth();
+        Object maxWidth = octree.cube.getMaxWidth();
+        Object minHeight = octree.cube.getMinHeight();
+        Object maxHeight = octree.cube.getMaxHeight();
+        Object minLength = octree.cube.getMinLength();
+        Object maxLength = octree.cube.getMaxLength();
+        String s="";
+        for(int i=0;i<shift;i++){
+            s+=" ";
+        }
+        s += "child "+child+": {mw:"+minWidth+",xw:"+maxWidth+",ml:"+minLength+",xl:"+maxLength+",mh:"+minHeight+",xh:"+maxHeight;
+        if(!octree.isDivided){
+            s+= octree.points;
+            System.out.println(s);
+            return;
+        }
+        System.out.println(s);
+        printOctreeHelper(octree.firstOctant,1,shift+2);
+        printOctreeHelper(octree.secondOctant,2,shift+2);
+        printOctreeHelper(octree.thirdOctant,3,shift+2);
+        printOctreeHelper(octree.fourthOctant,4,shift+2);
+        printOctreeHelper(octree.fifthOctant,5,shift+2);
+        printOctreeHelper(octree.sixthOctant,6,shift+2);
+        printOctreeHelper(octree.seventhOctant,7,shift+2);
+        printOctreeHelper(octree.eighthOctant,8,shift+2);
+    }
 
     public static void main(String[] args) throws ParseException, DBAppException, IOException {
         Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
@@ -380,10 +469,9 @@ public class Octree {
         octree.insertIntoOctree(6,8,20,"1");
         octree.insertIntoOctree(6,8,20,"2");
         octree.insertIntoOctree(60,8,20,"3");
-        System.out.println(octree);
         DBApp dbApp = new DBApp();
         dbApp.init();
 //        octree.deleteFromOctree(6,8,20);
-//        System.out.println(octree);
+        octree.printOctree();
     }
 }
