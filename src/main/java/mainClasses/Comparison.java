@@ -5,10 +5,15 @@ import java.util.Date;
 public abstract class Comparison {
     public static int compareTo(Object o1, Object o2, String type) {
         // return 0 if equal , returns -ve if o1 object is less than o2 else +ve
-        if(type==null){
-            type = o1.getClass().getName();
+        if((o1==null&&o2==null)||(o1 instanceof SimulatingNull && o2 instanceof SimulatingNull)) {
+            return 0;
         }
-        if((o1==null&&o2==null)||(o1 instanceof SimulatingNull && o2 instanceof SimulatingNull)) return 0;
+        else if(o1==null||o2==null||o1 instanceof SimulatingNull || o2 instanceof SimulatingNull){
+            return -1;
+        }
+        if(type==null){
+            type = o1!=null?o1.getClass().getName():o2.getClass().getName();
+        }
         if (type.equals("java.lang.Integer")) {
             return ((Integer) o1).compareTo((Integer) o2);
         } else if (type.equals("java.lang.String")) {

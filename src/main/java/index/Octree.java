@@ -64,11 +64,11 @@ public class Octree {
             if(indexOfPoint!=-1){
                 Point currPoint = this.overflow.get(indexOfPoint);
                 currPoint.insertDups(p);
-                this.saveIntoOctreeFilepath();
+//                this.saveIntoOctreeFilepath();
                 return true;
             }else if(this.points.size()<this.maxEntriesPerCube){
                 this.overflow.add(p);
-                this.saveIntoOctreeFilepath();
+//                this.saveIntoOctreeFilepath();
                 return true;
             }
         }
@@ -431,9 +431,9 @@ public class Octree {
         return s;
     }
     public void printOctree(){
-       printOctreeHelper(this,0,0);
+       printOctreeHelper(this,0,0,true);
     }
-    private void printOctreeHelper(Octree octree,int child,int shift){
+    private void printOctreeHelper(Octree octree,int child,int shift,boolean overflow){
         Object minWidth = octree.cube.getMinWidth();
         Object maxWidth = octree.cube.getMaxWidth();
         Object minHeight = octree.cube.getMinHeight();
@@ -444,21 +444,24 @@ public class Octree {
         for(int i=0;i<shift;i++){
             s+=" ";
         }
-        s += "child "+child+": {mw:"+minWidth+",xw:"+maxWidth+",ml:"+minLength+",xl:"+maxLength+",mh:"+minHeight+",xh:"+maxHeight;
+        s += "child "+child+": {mw:"+minWidth+",xw:"+maxWidth+",ml:"+minLength+",xl:"+maxLength+",mh:"+minHeight+",xh:"+maxHeight+"--";
+        if(overflow){
+            s+=this.overflow;
+        }
         if(!octree.isDivided){
             s+= octree.points;
             System.out.println(s);
             return;
         }
         System.out.println(s);
-        printOctreeHelper(octree.firstOctant,1,shift+2);
-        printOctreeHelper(octree.secondOctant,2,shift+2);
-        printOctreeHelper(octree.thirdOctant,3,shift+2);
-        printOctreeHelper(octree.fourthOctant,4,shift+2);
-        printOctreeHelper(octree.fifthOctant,5,shift+2);
-        printOctreeHelper(octree.sixthOctant,6,shift+2);
-        printOctreeHelper(octree.seventhOctant,7,shift+2);
-        printOctreeHelper(octree.eighthOctant,8,shift+2);
+        printOctreeHelper(octree.firstOctant,1,shift+2,false);
+        printOctreeHelper(octree.secondOctant,2,shift+2,false);
+        printOctreeHelper(octree.thirdOctant,3,shift+2,false);
+        printOctreeHelper(octree.fourthOctant,4,shift+2,false);
+        printOctreeHelper(octree.fifthOctant,5,shift+2,false);
+        printOctreeHelper(octree.sixthOctant,6,shift+2,false);
+        printOctreeHelper(octree.seventhOctant,7,shift+2,false);
+        printOctreeHelper(octree.eighthOctant,8,shift+2,false);
     }
 
     public static void main(String[] args) throws ParseException, DBAppException, IOException {
@@ -469,6 +472,9 @@ public class Octree {
         octree.insertIntoOctree(6,8,20,"1");
         octree.insertIntoOctree(6,8,20,"2");
         octree.insertIntoOctree(60,8,20,"3");
+        octree.insertIntoOctree(60,8,null,"3");
+        octree.insertIntoOctree(60,8,null,"2");
+        octree.insertIntoOctree(60,null,null,"2");
         DBApp dbApp = new DBApp();
         dbApp.init();
 //        octree.deleteFromOctree(6,8,20);
