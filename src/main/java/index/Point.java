@@ -71,6 +71,12 @@ public class Point {
         boolean zEqual = Comparison.compareTo(this.height,p.getHeight(),null)==0;
         return xEqual && yEqual && zEqual;
     }
+    public boolean isPartialEqual(Point p) {
+        boolean xEqual = Comparison.compareToOctree(this.width,p.getWidth(),null)==0;
+        boolean yEqual = Comparison.compareToOctree(this.length,p.getLength(),null)==0;
+        boolean zEqual = Comparison.compareToOctree(this.height,p.getHeight(),null)==0;
+        return xEqual && yEqual && zEqual;
+    }
 
     @Override
     public String toString() {

@@ -1,10 +1,7 @@
 package index;
 
 
-import mainClasses.DBApp;
-import mainClasses.DBAppException;
-import mainClasses.FileManipulation;
-import mainClasses.SimulatingNull;
+import mainClasses.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,40 +75,57 @@ public class Octree {
         if(!isDivided){
             if(this.cube.pointInRange(p)){
                 octrees.add(this);
-                return;
-            }else {
-                return;
             }
+            return;
         }
         if(firstOctant.cube.pointInRange(p)){
             firstOctant.searchForOctree(p,octrees);
         }
-        else if(secondOctant.cube.pointInRange(p)){
+        if(secondOctant.cube.pointInRange(p)){
             secondOctant.searchForOctree(p,octrees);
         }
-        else if(thirdOctant.cube.pointInRange(p)){
+        if(thirdOctant.cube.pointInRange(p)){
             thirdOctant.searchForOctree(p,octrees);
         }
-        else if(fourthOctant.cube.pointInRange(p)){
+        if(fourthOctant.cube.pointInRange(p)){
             fourthOctant.searchForOctree(p,octrees);
         }
-        else if(fifthOctant.cube.pointInRange(p)){
+        if(fifthOctant.cube.pointInRange(p)){
             fifthOctant.searchForOctree(p,octrees);
         }
-        else if(sixthOctant.cube.pointInRange(p)){
+        if(sixthOctant.cube.pointInRange(p)){
             sixthOctant.searchForOctree(p,octrees);
         }
-        else if(seventhOctant.cube.pointInRange(p)){
+        if(seventhOctant.cube.pointInRange(p)){
             seventhOctant.searchForOctree(p,octrees);
         }
-        else if(eighthOctant.cube.pointInRange(p)){
+        if(eighthOctant.cube.pointInRange(p)){
             eighthOctant.searchForOctree(p,octrees);
         }
     }
     public void searchInOverflow(Point p, Vector<Point> pointsFromOverflow) throws DBAppException, IOException, ClassNotFoundException {
         for(int i=0;i<this.overflow.size();i++){
-            if(p.isEqual(overflow.get(i))){
+            if(p.isPartialEqual(overflow.get(i))){
                 pointsFromOverflow.add(overflow.get(i));
+            }
+        }
+    }
+    public Vector<Point> search(Point p) throws DBAppException, IOException, ClassNotFoundException {
+        Vector<Point> pts = new Vector<>();
+        searchInOverflow(p,pts);
+        Vector<Octree> octrees = new Vector<>();
+        searchForOctree(p,octrees);
+        for(int i=0;i<octrees.size();i++){
+            Octree currOctree = octrees.get(i);
+            currOctree.containsPartialPoint(p,pts);
+        }
+        return pts;
+    }
+    public void containsPartialPoint(Point p,Vector<Point> pts){
+        for(int i=0;i<points.size();i++){
+            Point currPoint = points.get(i);
+            if(p.isPartialEqual(currPoint)){
+                pts.add(currPoint);
             }
         }
     }
@@ -464,7 +478,7 @@ public class Octree {
         printOctreeHelper(octree.eighthOctant,8,shift+2,false);
     }
 
-    public static void main(String[] args) throws ParseException, DBAppException, IOException {
+    public static void main(String[] args) throws ParseException, DBAppException, IOException, ClassNotFoundException {
         Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
         octree.insertIntoOctree(10,20,20,null);
         octree.insertIntoOctree(12,20,30,null);
@@ -479,5 +493,6 @@ public class Octree {
         dbApp.init();
 //        octree.deleteFromOctree(6,8,20);
         octree.printOctree();
+        System.out.println(octree.search(new Point(null,null,20,null)));
     }
 }

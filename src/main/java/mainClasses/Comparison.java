@@ -30,14 +30,15 @@ public abstract class Comparison {
     }
     public static int compareToOctree(Object o1, Object o2, String type) {
         // return 0 if equal , returns -ve if o1 object is less than o2 else +ve
-        if(type==null){
-            type = o1.getClass().getName();
-        }
+
         if(o1==null || o1 instanceof SimulatingNull) {
             return 0;
         }
         if(o2==null || o2 instanceof SimulatingNull) {
-            return 0;
+            return -1;
+        }
+        if(type==null){
+            type = o1.getClass().getName();
         }
 
         if (type.equals("java.lang.Integer")) {
