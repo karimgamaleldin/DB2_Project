@@ -11,6 +11,7 @@ public class Point {
     private Object width,length,height;
     private Vector<String> references;
     private String pageName;
+    private Octree parent;
 
     public Point(Object width , Object length, Object height, String ref) {
         this.width = width;
@@ -36,7 +37,13 @@ public class Point {
     public void setPageName(String pageName) {
         this.pageName = pageName;
     }
+    public Octree getParent() {
+        return parent;
+    }
 
+    public void setParent(Octree parent) {
+        this.parent = parent;
+    }
 
     public Object getWidth() {
         return width;
@@ -86,6 +93,10 @@ public class Point {
                 ", height=" + height +
                 ", ref="+references+
                 ')';
+    }
+    public boolean checkNulls(){
+        if(width==null||length==null||height==null) return true;
+        return false;
     }
 
     public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue, String strColWidth, String strColLength, String strColHeight) throws IOException, ClassNotFoundException , DBAppException {

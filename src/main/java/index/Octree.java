@@ -64,6 +64,7 @@ public class Octree {
 //                this.saveIntoOctreeFilepath();
                 return true;
             }else if(this.points.size()<this.maxEntriesPerCube){
+                p.setParent(this);
                 this.overflow.add(p);
 //                this.saveIntoOctreeFilepath();
                 return true;
@@ -132,8 +133,7 @@ public class Octree {
     public void saveIntoOctreeFilepath() throws IOException {
         FileManipulation.saveIntoFilepath(this,this.getFilepath());
     }
-    public boolean insertIntoOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, String ref) throws DBAppException, ParseException, IOException {
-        Point insertedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
+    public boolean insertIntoOctree(Point insertedPoint) throws DBAppException, ParseException, IOException {
         if(checkInsertedValues(insertedPoint)) {
             return true;
         }
@@ -151,59 +151,73 @@ public class Octree {
 //            this.saveIntoOctreeFilepath();
             return true;
         }else if(octreeToBeInsertedIn.points.size()<octreeToBeInsertedIn.maxEntriesPerCube){
+            insertedPoint.setParent(octreeToBeInsertedIn);
             octreeToBeInsertedIn.points.add(insertedPoint);
 //            this.saveIntoOctreeFilepath();
             return true;
         }else{
             octreeToBeInsertedIn.divide();
         }
-        if(octreeToBeInsertedIn.firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        if(octreeToBeInsertedIn.firstOctant.insertIntoOctree(insertedPoint)){
             return true;
-        }else if(octreeToBeInsertedIn.secondOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.secondOctant.insertIntoOctree( insertedPoint)){
             return true;
-        }else if(octreeToBeInsertedIn.thirdOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.thirdOctant.insertIntoOctree( insertedPoint)){
             return true;
-        }else if(octreeToBeInsertedIn.fourthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.fourthOctant.insertIntoOctree( insertedPoint)){
             return true;
-        }else if(octreeToBeInsertedIn.fifthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.fifthOctant.insertIntoOctree( insertedPoint)){
             return true;
-        }else if(octreeToBeInsertedIn.sixthOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.sixthOctant.insertIntoOctree( insertedPoint)){
             return true;
-        }else if(octreeToBeInsertedIn.seventhOctant.insertIntoOctree( valOfCol1,  valOfCol2,  valOfCol3, ref)){
+        }else if(octreeToBeInsertedIn.seventhOctant.insertIntoOctree( insertedPoint)){
             return true;
         }else {
-            return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
+            return octreeToBeInsertedIn.eighthOctant.insertIntoOctree(insertedPoint);
         }
     }
 
     public void deleteFromOctree(Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue) throws DBAppException , IOException, ClassNotFoundException {
         Point tobeDeletedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, null);
-//        checkInsertedValues(tobeDeletedPoint);
-        Vector<Octree> octrees = new Vector<>();
-        searchForOctree(tobeDeletedPoint,octrees);
-//        searchInOverflow(tobeDeletedPoint,octrees);
-        for(int i=0;i<octrees.size();i++){
-            Octree octreeToBeDeletedFrom = octrees.get(i);
-            int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
-            if(indexOfPoint==-1){
-                // I think no need for exception just do nothing
-                continue;
-            }
-            else{
-                Point pointToBeDeleted = octreeToBeDeletedFrom.points.get(indexOfPoint);
-                pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
-                if(pointToBeDeleted.getReferences().size()==0){
-                    octreeToBeDeletedFrom.points.remove(indexOfPoint);
+        Vector<Point> pointsToBeDeleted = search(tobeDeletedPoint);
+        for(int i=0;i<pointsToBeDeleted.size();i++){
+            Point currPoint = pointsToBeDeleted.get(i);
+            currPoint.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
+            if(currPoint.getReferences().size()==0){
+                Octree parent = currPoint.getParent();
+                if(currPoint.checkNulls()){
+                    parent.overflow.remove(currPoint);
+                }else {
+                    parent.points.remove(currPoint);
                 }
             }
         }
-        Vector<Point> pointsFromOverflow = new Vector<>();
-        searchInOverflow(tobeDeletedPoint,pointsFromOverflow);
-        for(int i=0;i<pointsFromOverflow.size();i++){
-            Point pointToBeDeleted = pointsFromOverflow.get(i);
-            pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
-        }
-        clearOverflow();
+//        checkInsertedValues(tobeDeletedPoint);
+//        Vector<Octree> octrees = new Vector<>();
+//        searchForOctree(tobeDeletedPoint,octrees);
+////        searchInOverflow(tobeDeletedPoint,octrees);
+//        for(int i=0;i<octrees.size();i++){
+//            Octree octreeToBeDeletedFrom = octrees.get(i);
+//            int indexOfPoint = octreeToBeDeletedFrom.containsPoint(tobeDeletedPoint);
+//            if(indexOfPoint==-1){
+//                // I think no need for exception just do nothing
+//                continue;
+//            }
+//            else{
+//                Point pointToBeDeleted = octreeToBeDeletedFrom.points.get(indexOfPoint);
+//                pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
+//                if(pointToBeDeleted.getReferences().size()==0){
+//                    octreeToBeDeletedFrom.points.remove(indexOfPoint);
+//                }
+//            }
+//        }
+//        Vector<Point> pointsFromOverflow = new Vector<>();
+//        searchInOverflow(tobeDeletedPoint,pointsFromOverflow);
+//        for(int i=0;i<pointsFromOverflow.size();i++){
+//            Point pointToBeDeleted = pointsFromOverflow.get(i);
+//            pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
+//        }
+//        clearOverflow();
         this.saveIntoOctreeFilepath();
     }
 
@@ -217,30 +231,46 @@ public class Octree {
         }
     }
     public void updateInOctree(Object oldValOfCol1, Object oldValOfCol2, Object oldValOfCol3, Hashtable<String, Object> htblColNameValue,String ref) throws DBAppException, IOException, ClassNotFoundException, ParseException {
-        Point tobeUpdatedPoint = new Point(oldValOfCol1,oldValOfCol2,oldValOfCol3, null);
-//        checkInsertedValues(tobeUpdatedPoint);
-        Vector<Octree> octrees = new Vector<>();
-        searchForOctree(tobeUpdatedPoint,octrees);
-        Octree octreeToBeUpdated = octrees.get(0);
-        int indexOfPoint = octreeToBeUpdated.containsPoint(tobeUpdatedPoint);
-        if(indexOfPoint==-1){
-            // I think no need for exception just do nothing
-            return;
-//            throw new DBAppException("point to be deleted is not in the Octree");
-        }
-        else{
-            Point updatePoint = octreeToBeUpdated.points.get(indexOfPoint);
-            updatePoint.getReferences().remove(ref);
-            if(updatePoint.getReferences().size()==0){
-                octreeToBeUpdated.points.remove(indexOfPoint);
+        Point oldPoint = new Point(oldValOfCol1,oldValOfCol2,oldValOfCol3, null);
+        Vector<Point> pointsToBeUpdated = search(oldPoint);
+        for(int i=0;i<pointsToBeUpdated.size();i++){
+            Point currPoint = pointsToBeUpdated.get(i);
+            if(oldPoint.isEqual(currPoint)){
+                currPoint.getReferences().remove(ref);
+                break;
             }
-            Object newWidth = htblColNameValue.get(this.strColWidth);
-            Object newLength = htblColNameValue.get(this.strColLength);
-            Object newHeight = htblColNameValue.get(this.strColHeight);
-            this.insertIntoOctree(newWidth,newLength,newHeight,ref);
-            // may cause an error
-//            this.saveIntoOctreeFilepath();
         }
+        Object newWidth = htblColNameValue.get(this.strColWidth)==null?oldValOfCol1:htblColNameValue.get(this.strColWidth);
+        Object newLength = htblColNameValue.get(this.strColLength)==null?oldValOfCol2:htblColNameValue.get(this.strColLength);
+        Object newHeight = htblColNameValue.get(this.strColHeight)==null?oldValOfCol3:htblColNameValue.get(this.strColHeight);
+        Point newPoint = new Point(newWidth,newLength,newHeight,ref);
+        if(!oldPoint.isEqual(newPoint)){
+            this.insertIntoOctree(newPoint);
+        }
+//        checkInsertedValues(tobeUpdatedPoint);
+//        Vector<Octree> octrees = new Vector<>();
+//        searchForOctree(tobeUpdatedPoint,octrees);
+//        Octree octreeToBeUpdated = octrees.get(0);
+//        int indexOfPoint = octreeToBeUpdated.containsPoint(tobeUpdatedPoint);
+//        if(indexOfPoint==-1){
+//            // I think no need for exception just do nothing
+//            return;
+////            throw new DBAppException("point to be deleted is not in the Octree");
+//        }
+//        else{
+//            Point updatePoint = octreeToBeUpdated.points.get(indexOfPoint);
+//            updatePoint.getReferences().remove(ref);
+//            if(updatePoint.getReferences().size()==0){
+//                octreeToBeUpdated.points.remove(indexOfPoint);
+//            }
+//            Object newWidth = htblColNameValue.get(this.strColWidth);
+//            Object newLength = htblColNameValue.get(this.strColLength);
+//            Object newHeight = htblColNameValue.get(this.strColHeight);
+//            Point newPoint = new Point(newWidth,newLength,newHeight,ref);
+//            this.insertIntoOctree(newPoint);
+//            // may cause an error
+////            this.saveIntoOctreeFilepath();
+//        }
     }
 //    public void updateFromOctree(String strTableName,String strClusteringKeyValue,Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws Exception {
 //        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
@@ -271,18 +301,15 @@ public class Octree {
         this.seventhOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
         this.eighthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
         for(int i=0;i<points.size();i++){
-            Object valOfCol1 = points.get(i).getWidth();
-            Object valOfCol2 = points.get(i).getLength();
-            Object valOfCol3 = points.get(i).getHeight();
-            String ref = points.get(i).getPageName();
-            boolean temp = firstOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || secondOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || thirdOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || fourthOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || fifthOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || sixthOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || seventhOctant.insertIntoOctree(valOfCol1,  valOfCol2,  valOfCol3, ref)
-            || eighthOctant.insertIntoOctree(valOfCol1, valOfCol2, valOfCol3, ref);
+            Point insertedPoint = points.get(i);
+            boolean temp = firstOctant.insertIntoOctree(insertedPoint)
+            || secondOctant.insertIntoOctree(insertedPoint)
+            || thirdOctant.insertIntoOctree(insertedPoint)
+            || fourthOctant.insertIntoOctree(insertedPoint)
+            || fifthOctant.insertIntoOctree(insertedPoint)
+            || sixthOctant.insertIntoOctree(insertedPoint)
+            || seventhOctant.insertIntoOctree(insertedPoint)
+            || eighthOctant.insertIntoOctree(insertedPoint);
         }
         this.points.clear();
     }
@@ -480,15 +507,47 @@ public class Octree {
 
     public static void main(String[] args) throws ParseException, DBAppException, IOException, ClassNotFoundException {
         Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
-        octree.insertIntoOctree(10,20,20,null);
-        octree.insertIntoOctree(12,20,30,null);
-        octree.insertIntoOctree(5,10,20,null);
-        octree.insertIntoOctree(6,8,20,"1");
-        octree.insertIntoOctree(6,8,20,"2");
-        octree.insertIntoOctree(60,8,20,"3");
-        octree.insertIntoOctree(60,8,null,"3");
-        octree.insertIntoOctree(60,8,null,"2");
-        octree.insertIntoOctree(60,null,null,"2");
+        Point p1 = new Point(10,20,20,null);
+        Point p2 = new Point(12,20,30,null);
+        Point p3 = new Point(5,10,20,null);
+        Point p4 = new Point(6,8,20,"1");
+        Point p5 = new Point(6,8,20,"2");
+        Point p6 = new Point(60,8,20,"3");
+        Point p7 = new Point(60,8,null,"3");
+        Point p8 = new Point(60,8,null,"2");
+        Point p9 = new Point(60,null,null,"2");
+        Point p10 = new Point(6,8,20,"3");
+        Point p11 = new Point(10,20,20,null);
+        Point p12 = new Point(10,20,20,null);
+        Point p13 = new Point(24,24,24,"2");
+        Point p14 = new Point(6,8,20,"4");
+        Point p15 = new Point(6,8,20,"5");
+        Point p16 = new Point(75,32,10,"2");
+        Point p17 = new Point(75,30,20,"2");
+        Point p18 = new Point(75,31,19,"2");
+        Point p19 = new Point(75,32,18,"2");
+        Point p20 = new Point(75,32,10,"2");
+
+        octree.insertIntoOctree(p1);
+        octree.insertIntoOctree(p2);
+        octree.insertIntoOctree(p3);
+        octree.insertIntoOctree(p4);
+        octree.insertIntoOctree(p5);
+        octree.insertIntoOctree(p6);
+        octree.insertIntoOctree(p7);
+        octree.insertIntoOctree(p8);
+        octree.insertIntoOctree(p9);
+        octree.insertIntoOctree(p10);
+        octree.insertIntoOctree(p11);
+        octree.insertIntoOctree(p12);
+        octree.insertIntoOctree(p13);
+        octree.insertIntoOctree(p14);
+        octree.insertIntoOctree(p15);
+        octree.insertIntoOctree(p16);
+        octree.insertIntoOctree(p17);
+        octree.insertIntoOctree(p18);
+        octree.insertIntoOctree(p19);
+        octree.insertIntoOctree(p20);
         DBApp dbApp = new DBApp();
         dbApp.init();
 //        octree.deleteFromOctree(6,8,20);

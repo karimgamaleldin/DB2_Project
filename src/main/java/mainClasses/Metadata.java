@@ -72,12 +72,12 @@ public class Metadata {
         this.fw = fw;
     }
 
-    public void loadMetaData() throws FileNotFoundException {
+    public static void loadMetaData() throws FileNotFoundException {
         // true: file empty
-        if(this.metafile.length()==0){
+        if(metafile.length()==0){
             return;
         }
-        Scanner sc = new Scanner(this.metafile);
+        Scanner sc = new Scanner(metafile);
         sc.useDelimiter(",");
         int i=1;
         for(;i<=8;i++){
@@ -104,7 +104,7 @@ public class Metadata {
             String indexType = temp.get(5);
             String minColValue = temp.get(6);
             String maxColValue = temp.get(7);
-            Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
+            Column col = new Column(strTableName,columnName,dataType,indexName,indexType,isClusteringKeyBool,minColValue,maxColValue);
             Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
             columns.add(col);
             columnsOfMetaData.put(strTableName,columns);
@@ -151,7 +151,7 @@ public class Metadata {
                 String minColValue = htblColNameMin.get(columnName);
                 String maxColValue = htblColNameMax.get(columnName);
                 Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
-                Column col = new Column(strTableName,columnName,dataType,isClusteringKeyBool,minColValue,maxColValue);
+                Column col = new Column(strTableName,columnName,dataType,null,null,isClusteringKeyBool,minColValue,maxColValue);
                 Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
                 columns.add(col);
                 columnsOfMetaData.put(strTableName,columns);
@@ -293,7 +293,7 @@ public class Metadata {
         fw=new FileWriter(metafile,false);
         fw.append(sb.toString()).flush();
         fw=new FileWriter(metafile,true);
-
+        loadMetaData();
 
         // Write to CSV file which is open
 //        CSVWriter writer = new CSVWriter(new FileWriter(inputFile));
@@ -301,7 +301,16 @@ public class Metadata {
 //        writer.flush();
 //        writer.close();
     }
-
+    public HashSet<String> getColumnNamesWithIndex(String strTableName){
+        HashSet<String> columnNamesWithIndex = new HashSet<>();
+        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        for(Column col: columns){
+            if(col.getIndexType()!=null){
+                columnNamesWithIndex.add(col.getColumnName());
+            }
+        }
+        return columnNamesWithIndex;
+    }
 }
 
 

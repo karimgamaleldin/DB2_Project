@@ -1,6 +1,7 @@
 package mainClasses;
 
 import index.Octree;
+import index.Point;
 
 import java.io.*;
 import java.text.ParseException;
@@ -287,7 +288,8 @@ public class Page implements Serializable{
             Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
             Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
             Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
-            currOctree.insertIntoOctree(width,length,height,this.filepath);
+            Point insertPoint = new Point(width,length,height,this.filepath);
+            currOctree.insertIntoOctree(insertPoint);
         }
     }
     public Vector<Tuple> selectLinearDataInPage(String columnName , Object value , String operator){

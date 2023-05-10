@@ -6,14 +6,18 @@ public class Column {
     private String tableName;
     private String columnName;
     private String columnType;
+    private  String indexName;
+    private  String indexType;
     private boolean isClusteringKey;
     private String min;
     private String max;
 
-    public Column(String tableName , String columnName , String columnType , boolean isClusteringKey , String min, String max){
+    public Column(String tableName , String columnName , String columnType , String indexName , String indexType ,boolean isClusteringKey , String min, String max){
         this.tableName = tableName;
         this.columnName = columnName;
         this.columnType = columnType;
+        this.indexName = indexName;
+        this.indexType = indexType;
         this.isClusteringKey = isClusteringKey;
         this.min = min;
         this.max = max;
@@ -46,7 +50,15 @@ public class Column {
         return max;
     }
 
-    public static Object adjustDataType(String key,String type) throws Exception {
+    public String getIndexName() {
+        return indexName;
+    }
+
+    public String getIndexType() {
+        return indexType;
+    }
+
+    public static Object adjustDataType(String key, String type) throws Exception {
         if (type.equals("java.lang.Integer")) {
             return Integer.parseInt(key);
         } else if (type.equals("java.lang.String")) {

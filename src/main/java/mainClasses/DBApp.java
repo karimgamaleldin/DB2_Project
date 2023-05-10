@@ -1,6 +1,7 @@
 package mainClasses;
 
 import index.Octree;
+import index.Point;
 import sqlterm.SQLTerm;
 
 import java.io.IOException;
@@ -140,6 +141,12 @@ public class DBApp implements Serializable {
                 throw new DBAppException("columns specified are not in the table");
             }
         }
+
+        HashSet<String> columnNamesWithIndex = metaData.getColumnNamesWithIndex(strTableName);
+        if(columnNamesWithIndex.contains(strarrColName[0])||columnNamesWithIndex.contains(strarrColName[1])||columnNamesWithIndex.contains(strarrColName[2])){
+            throw new DBAppException("one of the entered columns has an index created on it");
+        }
+
         Vector<Object> firstAttribute= null;
         Vector<Object> secondAttribute= null;
         Vector<Object> thirdAttribute= null;
@@ -160,12 +167,12 @@ public class DBApp implements Serializable {
                     Object valOfCol1 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[0]);
                     Object valOfCol2 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[1]);
                     Object valOfCol3 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[2]);
-                    octree.insertIntoOctree(valOfCol1,valOfCol2,valOfCol3,currPagePath);
+                    Point insertPoint = new Point(valOfCol1,valOfCol2,valOfCol3,currPagePath);
+                    octree.insertIntoOctree(insertPoint);
                 }
             }
         }
         Metadata.updateCSV(strTableName,strarrColName,indexName,"Octree");
-        metaData.loadMetaData();
         FileManipulation.createSerFile(octree.getFilepath());
     }
     public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
@@ -313,9 +320,6 @@ public class DBApp implements Serializable {
             throw new DBAppException(e.getMessage());
         }
     }
-//  public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws java.DBAppException {
-//
-//  }
     public boolean isSupported(String dt){
         HashSet<String> supportedDataTypes = new HashSet<String>();
         supportedDataTypes.add("java.lang.Integer");
