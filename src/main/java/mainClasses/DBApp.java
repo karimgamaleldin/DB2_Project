@@ -337,6 +337,15 @@ public class DBApp implements Serializable {
             results.add(temp);
         }
         // to make the operators between the different queries
+        boolean andFlag = true;
+        boolean useIndex = true;
+
+        for(int i = 0 ; i < strarrOperators.length; i++){
+            if(strarrOperators[i].equals("and")) andFlag = false;
+        }
+        if(andFlag && useIndex){
+//            Vector<Tuple> result =
+        }
         Vector<Tuple> result = results.get(0);
         for(int i = 1 ; i <= strarrOperators.length ; i++){
             String op = strarrOperators[i-1];
