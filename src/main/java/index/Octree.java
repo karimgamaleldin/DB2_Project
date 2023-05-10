@@ -147,7 +147,9 @@ public class Octree {
 //        System.out.println(indexOfPoint);
         if(indexOfPoint!=-1){
             Point currPoint = octreeToBeInsertedIn.points.get(indexOfPoint);
+//            System.out.println("-->" + currPoint.getReferences());
             currPoint.insertDups(insertedPoint);
+//            System.out.println("-->" + currPoint.getReferences());
 //            this.saveIntoOctreeFilepath();
             return true;
         }else if(octreeToBeInsertedIn.points.size()<octreeToBeInsertedIn.maxEntriesPerCube){
@@ -504,6 +506,8 @@ public class Octree {
         printOctreeHelper(octree.seventhOctant,7,shift+2,false);
         printOctreeHelper(octree.eighthOctant,8,shift+2,false);
     }
+    
+    
 
     public static void main(String[] args) throws ParseException, DBAppException, IOException, ClassNotFoundException {
         Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
