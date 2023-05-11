@@ -222,7 +222,15 @@ public class Octree {
 //        clearOverflow();
         this.saveIntoOctreeFilepath();
     }
-
+    public boolean canBeUsed(HashMap<String , Object> hashMap){
+        return hashMap.containsKey(strColHeight) && hashMap.containsKey(strColLength) && hashMap.containsKey(strColWidth);
+    }
+    public Point pointToBeSearchedFor(HashMap<String , Object> hashMap){
+        return new Point(hashMap.getOrDefault(strColWidth , null) , hashMap.getOrDefault(strColLength , null) ,hashMap.getOrDefault(strColHeight , null) , null);
+    }
+    public boolean partOfIndex(String colName){
+        return colName.equals(this.strColLength) || colName.equals(this.strColWidth) || colName.equals(this.strColHeight);
+    }
     public void clearOverflow(){
         for(int i=0;i<this.overflow.size();i++){
             Point currPoint = this.overflow.get(i);

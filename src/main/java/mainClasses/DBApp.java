@@ -341,14 +341,33 @@ public class DBApp implements Serializable {
             results.add(temp);
         }
         // to make the operators between the different queries
+        HashMap<String , Object> hashMap = new HashMap<>();
+        for(int i = 0 ; i < arrSQLTerms.length ; i++) hashMap.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue()); // puts all columns in the hashset for O(1) access
+        Octree indexToBeUsed = null;
+        boolean useIndex = false;
+        for(int i = 0 ; i < T.getOctrees().size() && !useIndex ;i++){
+            Octree o = FileManipulation.loadOctree("",T.getOctrees().get(i));
+            useIndex = o.canBeUsed(hashMap);
+            if(useIndex) indexToBeUsed = o;
+        }
         boolean andFlag = true;
-        boolean useIndex = true;
-
         for(int i = 0 ; i < strarrOperators.length; i++){
             if(strarrOperators[i].equals("and")) andFlag = false;
         }
         if(andFlag && useIndex){
-//            Vector<Tuple> result =
+            Point p = indexToBeUsed.pointToBeSearchedFor(hashMap);
+            Vector<Point> resultPoints = indexToBeUsed.search(p);
+            Vector<Tuple> result = new Vector<Tuple>();
+            for(int i = 0 ; i < resultPoints.size() ; i++){
+                Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
+                for(int j = 0 ; j < temp.size() ; j++) result.add(temp.get(j));
+            }
+            for(int i = 0 ; i < arrSQLTerms.length ; i++){
+                if(indexToBeUsed.partOfIndex(arrSQLTerms[i].get_strColumnName())) continue;
+                result = ANDSelect(result , results.get(i));
+            }
+            return result.iterator();
+
         }
         Vector<Tuple> result = results.get(0);
         for(int i = 1 ; i <= strarrOperators.length ; i++){

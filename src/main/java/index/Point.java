@@ -3,6 +3,7 @@ package index;
 
 import mainClasses.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -123,6 +124,24 @@ public class Point {
             }
         }
         currTable.saveIntoTableFilepath();
+    }
+    public Vector<Tuple> getPointsTuples() throws IOException, ClassNotFoundException {
+        Vector<Tuple> tuples = new Vector<Tuple>();
+        for(int i = 0 ; i < this.references.size()  ; i++){
+            Page page = FileManipulation.loadPage(this.references.get(i));
+            for(int j = 0 ; j < page.getPageTuples().size() ; i++){
+                Tuple temp = page.getPageTuples().get(j);
+                if(this.isInPoint(temp)) tuples.add(temp);
+            }
+        }
+        return tuples;
+    }
+    public boolean isInPoint(Tuple t){
+        Hashtable<String , Object> hash = t.getTupleAttributes();
+        boolean h = hash.get(this.parent.getStrColHeight()).equals(this.height);
+        boolean w = hash.get(this.parent.getStrColWidth()).equals(this.width);
+        boolean l = hash.get(this.parent.getStrColLength()).equals(this.length);
+        return h && w && l;
     }
     public boolean checkIfPointExistInPage(Page page, String strColWidth, String strColLength, String strColHeight){
         for(int i = 0 ; i<page.getPageTuples().size();i++){
