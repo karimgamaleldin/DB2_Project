@@ -5,6 +5,7 @@ import mainClasses.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -127,8 +128,12 @@ public class Point {
     }
     public Vector<Tuple> getPointsTuples() throws IOException, ClassNotFoundException {
         Vector<Tuple> tuples = new Vector<Tuple>();
+        HashSet<String> hashSet = new HashSet();
         for(int i = 0 ; i < this.references.size()  ; i++){
-            Page page = FileManipulation.loadPage(this.references.get(i));
+            String pageString = this.references.get(i);
+            if(hashSet.contains(pageString)) continue;
+            hashSet.add(pageString);
+            Page page = FileManipulation.loadPage(pageString);
             for(int j = 0 ; j < page.getPageTuples().size() ; i++){
                 Tuple temp = page.getPageTuples().get(j);
                 if(this.isInPoint(temp)) tuples.add(temp);
