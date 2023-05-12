@@ -5,11 +5,11 @@ import java.util.Date;
 public abstract class Comparison {
     public static int compareTo(Object o1, Object o2, String type) {
         // return 0 if equal , returns -ve if o1 object is less than o2 else +ve
-        if((o1==null && o2==null)||(o1 instanceof SimulatingNull && o2 instanceof SimulatingNull)||
-                (o1==null && o2 instanceof SimulatingNull)|| (o1 instanceof SimulatingNull && o2==null)) {
+        if((o1==null && o2==null)||(o1 instanceof DBAppNull && o2 instanceof DBAppNull)||
+                (o1==null && o2 instanceof DBAppNull)|| (o1 instanceof DBAppNull && o2==null)) {
             return 0;
         }
-        else if(o1==null||o2==null||o1 instanceof SimulatingNull || o2 instanceof SimulatingNull){
+        else if(o1==null||o2==null||o1 instanceof DBAppNull || o2 instanceof DBAppNull){
             return -1;
         }
         if(type==null){
@@ -32,10 +32,10 @@ public abstract class Comparison {
     public static int compareToOctree(Object o1, Object o2, String type) {
         // return 0 if equal , returns -ve if o1 object is less than o2 else +ve
 
-        if(o1==null || o1 instanceof SimulatingNull) {
+        if(o1==null || o1 instanceof DBAppNull) {
             return 0;
         }
-        if(o2==null || o2 instanceof SimulatingNull) {
+        if(o2==null || o2 instanceof DBAppNull) {
             return -1;
         }
         if(type==null){

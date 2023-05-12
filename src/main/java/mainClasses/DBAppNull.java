@@ -2,7 +2,7 @@ package mainClasses;
 
 import java.io.Serializable;
 
-public class SimulatingNull implements Serializable {
+public class DBAppNull implements Serializable {
     @Override
     public String toString(){
         return "null";

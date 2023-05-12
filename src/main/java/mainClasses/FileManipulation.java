@@ -88,7 +88,7 @@ public abstract class FileManipulation {
             //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
             try {
                 Table loadedTable = (Table) on.readObject();
-                Vector<String> octrees = FileManipulation.loadFilesFromDirectory("src/main/resources/indices/"+loadedTable.getTableName()+"/");
+                Vector<String> octrees = FileManipulation.loadFilesFromDirectory("src/main/resources/data/indices/"+loadedTable.getTableName()+"/");
                 loadedTable.setOctrees(octrees);
                 return loadedTable;
             }
