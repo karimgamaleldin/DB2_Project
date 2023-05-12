@@ -185,7 +185,7 @@ public class Page implements Serializable{
             String key = entry.getKey();
             Object value = entry.getValue();
             Object currentColValue = currentTuple.getTupleAttributes().get(key);
-            if(compareTo(currentColValue,value,null)!=0) {
+            if(Comparison.compareTo(currentColValue,value,null)!=0) {
                 return false;
             }
         }
@@ -200,9 +200,10 @@ public class Page implements Serializable{
         if(indexToBeUpdated == -1) {
             return;
         }
-
         Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
-//        this.updateOctree(tupleToBeUpdated,htblColNameValue,octrees);
+
+        this.updateOctree(tupleToBeUpdated,htblColNameValue,octrees);
+
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {
             String keyToBeUpdated = entry.getKey();

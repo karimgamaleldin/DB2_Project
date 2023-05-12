@@ -5,7 +5,8 @@ import java.util.Date;
 public abstract class Comparison {
     public static int compareTo(Object o1, Object o2, String type) {
         // return 0 if equal , returns -ve if o1 object is less than o2 else +ve
-        if((o1==null&&o2==null)||(o1 instanceof SimulatingNull && o2 instanceof SimulatingNull)) {
+        if((o1==null && o2==null)||(o1 instanceof SimulatingNull && o2 instanceof SimulatingNull)||
+                (o1==null && o2 instanceof SimulatingNull)|| (o1 instanceof SimulatingNull && o2==null)) {
             return 0;
         }
         else if(o1==null||o2==null||o1 instanceof SimulatingNull || o2 instanceof SimulatingNull){

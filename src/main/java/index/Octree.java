@@ -17,12 +17,13 @@ public class Octree {
     private Octree firstOctant, secondOctant, thirdOctant, fourthOctant, fifthOctant, sixthOctant, seventhOctant, eighthOctant;
     private String filepath;
     private String name;
+    private String tableName;
     private Vector<Point> overflow;
 
     public Octree(Object minWidth, Object maxWidth,
                   Object minLength, Object maxLength, Object minHeight, Object maxHeight,
                   int maxEntriesPerCube, String strColWidth, String strColLength,
-                  String strColHeight, String name) throws ParseException {
+                  String strColHeight, String name,String strTableName) throws ParseException {
         this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
@@ -31,7 +32,8 @@ public class Octree {
         this.strColWidth = strColWidth;
         this.strColLength = strColLength;
         this.strColHeight = strColHeight;
-        this.filepath = "src/main/resources/data/indices/"+name+"_octree.class";
+        this.tableName = strTableName;
+        this.filepath = "src/main/resources/data/indices/"+strTableName+"/"+name+"_octree.class";
     }
     public int containsPoint(Point p){
         for(int i=0;i<points.size();i++){
@@ -282,6 +284,50 @@ public class Octree {
 ////            this.saveIntoOctreeFilepath();
 //        }
     }
+    public boolean checkClusteringKey(String datatype,Object clusteringKeyValue,Point p, String strClusteringKey){
+        boolean hasWidthAsClusteringKey = this.getStrColWidth().equals(strClusteringKey);
+        boolean hasLengthAsClusteringKey = this.getStrColLength().equals(strClusteringKey);
+        boolean hasHeightAsClusteringKey = this.getStrColHeight().equals(strClusteringKey);
+        if(hasWidthAsClusteringKey){
+            return Comparison.compareTo(clusteringKeyValue,p.getWidth(),datatype)==0;
+        }else if(hasLengthAsClusteringKey){
+            return Comparison.compareTo(clusteringKeyValue,p.getLength(),datatype)==0;
+        }else if(hasHeightAsClusteringKey){
+            return Comparison.compareTo(clusteringKeyValue,p.getHeight(),datatype)==0;
+        }
+        return false;
+    }
+    public void updateInOctreeUsingClusteringKey(String dataType,Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue, String strClusteringKey, Vector<String> octrees) throws Exception {
+        boolean hasWidthAsClusteringKey = this.getStrColWidth().equals(strClusteringKey);
+        boolean hasLengthAsClusteringKey = this.getStrColLength().equals(strClusteringKey);
+        boolean hasHeightAsClusteringKey = this.getStrColHeight().equals(strClusteringKey);
+        Point oldPoint = null;
+        if(hasWidthAsClusteringKey){
+            oldPoint = new Point(clusteringKeyValue,null,null,null);
+        }else if(hasLengthAsClusteringKey){
+            oldPoint = new Point(null,clusteringKeyValue,null,null);
+        }else if(hasHeightAsClusteringKey){
+            oldPoint = new Point(null,null,clusteringKeyValue,null);
+        }
+        Vector<Point> pointsToBeUpdated = search(oldPoint);
+        for(int i=0;i<pointsToBeUpdated.size();i++){
+            Point currPoint = pointsToBeUpdated.get(i);
+            if(checkClusteringKey(dataType,clusteringKeyValue,currPoint,strClusteringKey)){
+                for(int j=0;j<currPoint.getReferences().size();j++){
+                    String currRef = currPoint.getReferences().get(j);
+                    Page currPage = FileManipulation.loadPage(currRef);
+                    currPage.updatePage(clusteringKeyValue+"",htblColNameValue,dataType, octrees);
+                }
+            }
+        }
+//        Object newWidth = htblColNameValue.get(this.strColWidth)==null?oldValOfCol1:htblColNameValue.get(this.strColWidth);
+//        Object newLength = htblColNameValue.get(this.strColLength)==null?oldValOfCol2:htblColNameValue.get(this.strColLength);
+//        Object newHeight = htblColNameValue.get(this.strColHeight)==null?oldValOfCol3:htblColNameValue.get(this.strColHeight);
+//        Point newPoint = new Point(newWidth,newLength,newHeight,ref);
+//        if(!oldPoint.isEqual(newPoint)){
+//            this.insertIntoOctree(newPoint);
+//        }
+    }
 //    public void updateFromOctree(String strTableName,String strClusteringKeyValue,Object valOfCol1, Object valOfCol2, Object valOfCol3, Hashtable<String, Object> htblColNameValue, String ref) throws Exception {
 //        checkInsertedValues(valOfCol1,valOfCol2,valOfCol3);
 //        Point tobeUpdatedPoint = new Point(valOfCol1,valOfCol2,valOfCol3, ref);
@@ -302,14 +348,14 @@ public class Octree {
         // calculate boundaries of each octant
         this.isDivided = true;
         Point center = this.cube.getCenter();
-        this.firstOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.secondOctant = new Octree(center.getWidth(), this.cube.getMaxWidth() ,this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.thirdOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.fourthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.fifthOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() ,this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.sixthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.seventhOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
-        this.eighthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name);
+        this.firstOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.secondOctant = new Octree(center.getWidth(), this.cube.getMaxWidth() ,this.cube.getMinLength() , center.getLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.thirdOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.fourthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , this.cube.getMinHeight() , center.getHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.fifthOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() ,this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.sixthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), this.cube.getMinLength() , center.getLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.seventhOctant = new Octree(this.cube.getMinWidth() , center.getWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
+        this.eighthOctant = new Octree(center.getWidth(), this.cube.getMaxWidth(), center.getLength() , this.cube.getMaxLength() , center.getHeight() , this.cube.getMaxHeight() , this.maxEntriesPerCube,this.strColWidth,this.strColLength,this.strColHeight, this.name,this.tableName);
         for(int i=0;i<points.size();i++){
             Point insertedPoint = points.get(i);
             boolean temp = firstOctant.insertIntoOctree(insertedPoint)
@@ -518,7 +564,7 @@ public class Octree {
     
 
     public static void main(String[] args) throws ParseException, DBAppException, IOException, ClassNotFoundException {
-        Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "");
+        Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "","");
         Point p1 = new Point(10,20,20,null);
         Point p2 = new Point(12,20,30,null);
         Point p3 = new Point(5,10,20,null);

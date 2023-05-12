@@ -157,7 +157,7 @@ public class DBApp implements Serializable {
         String indexName = strarrColName[0]+strarrColName[1]+strarrColName[2]+"Index";
         Octree octree=new Octree(firstAttribute.get(0),firstAttribute.get(1),secondAttribute.get(0),secondAttribute.get(1),
                 thirdAttribute.get(0),thirdAttribute.get(1),3,
-                strarrColName[0],strarrColName[1],strarrColName[2],indexName);
+                strarrColName[0],strarrColName[1],strarrColName[2],indexName,strTableName);
         if(!toBeInsertedInTable.isTableEmpty()){
             // insert all the existing values in octree
             for(int i=0;i<toBeInsertedInTable.getTablePages().size();i++){
@@ -320,6 +320,7 @@ public class DBApp implements Serializable {
             throw new DBAppException(e.getMessage());
         }
     }
+
     public boolean isSupported(String dt){
         HashSet<String> supportedDataTypes = new HashSet<String>();
         supportedDataTypes.add("java.lang.Integer");
@@ -609,7 +610,10 @@ public class DBApp implements Serializable {
 //        dbApp.createTable("Students", "dob", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
+//        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
+//        dbApp.createIndex("Students3",new String[]{"name","age","dob"});
+//        dbApp.createIndex("Students",new String[]{"name","age","dob"});
+//        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
 //////     //    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple1);
 //         dbApp.insertIntoTable("Students", tuple2);

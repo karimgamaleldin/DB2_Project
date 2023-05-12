@@ -305,7 +305,7 @@ public class Metadata {
         HashSet<String> columnNamesWithIndex = new HashSet<>();
         Vector<Column> columns = columnsOfMetaData.get(strTableName);
         for(Column col: columns){
-            if(col.getIndexType()!=null){
+            if(!col.getIndexType().equals("null")){
                 columnNamesWithIndex.add(col.getColumnName());
             }
         }

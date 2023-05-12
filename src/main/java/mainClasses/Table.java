@@ -168,9 +168,13 @@ public class Table implements Serializable {
         String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
         Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
         htblColNameValue.put(clusteringKey,correctValType);
+        if(this.updateUsingOctree(clusterKeyDataType,correctValType,htblColNameValue)){
+            saveIntoTableFilepath();
+            return;
+        }
         Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
         int start =0;
-        int end = this.getTablePages().size()-1;
+        int end = this.tablePages.size()-1;
         Tuple min=minValues.get(start);
         Tuple max=maxValues.get(end);
         if(toBeUpdated.compareTo(min) <0 || toBeUpdated.compareTo(max) >0){//if tuple less than first tuple in table
@@ -214,6 +218,22 @@ public class Table implements Serializable {
         loadedPage = null;
         System.gc();
     }
+    public boolean updateUsingOctree(String dataType, Object clusteringKeyValue,Hashtable<String,Object> htblColNameValue) throws Exception {
+        boolean useOctree = false;
+        for(String octreeName: octrees){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreeName);
+            boolean hasWidthAsClusteringKey = currOctree.getStrColWidth().equals(this.clusteringKey);
+            boolean hasLengthAsClusteringKey = currOctree.getStrColLength().equals(this.clusteringKey);
+            boolean hasHeightAsClusteringKey = currOctree.getStrColHeight().equals(this.clusteringKey);
+
+            if(hasWidthAsClusteringKey || hasLengthAsClusteringKey || hasHeightAsClusteringKey){
+                currOctree.updateInOctreeUsingClusteringKey(dataType, clusteringKeyValue,htblColNameValue, this.clusteringKey,this.octrees);
+                useOctree = true;
+                break;
+            }
+        }
+        return useOctree;
+    }
     public void emptyTable() throws IOException {
         for(int i=0;i<this.tablePages.size();i++){
             String currPagePath = this.tablePages.get(i);
@@ -235,6 +255,10 @@ public class Table implements Serializable {
             emptyTable();
             return;
         }
+        if(deleteUsingOctree(htblColNameValue)){
+            saveIntoTableFilepath();
+            return;
+        }
         for(int i=0;i<this.getTablePages().size();i++){
             Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
             boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
@@ -252,6 +276,23 @@ public class Table implements Serializable {
         saveIntoTableFilepath();
     }
 //    }
+    public boolean deleteUsingOctree(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException {
+        boolean useOctree = false;
+        for(String octreeName: octrees){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreeName);
+            boolean hasWidth = htblColNameValue.containsKey(currOctree.getStrColWidth());
+            boolean hasLength = htblColNameValue.containsKey(currOctree.getStrColLength());
+            boolean hasHeight = htblColNameValue.containsKey(currOctree.getStrColHeight());
+            Object width = htblColNameValue.get(currOctree.getStrColWidth());
+            Object length = htblColNameValue.get(currOctree.getStrColLength());
+            Object height = htblColNameValue.get(currOctree.getStrColHeight());
+            if(hasWidth || hasLength || hasHeight){
+                currOctree.deleteFromOctree(width,length,height,htblColNameValue);
+                useOctree = true;
+            }
+        }
+        return useOctree;
+    }
     public Page createNewPage(){
         String path = "page"+nextPageID;
         Page page = new Page(nextPageID,path,maxSizePerPage,clusteringKey,tableName);
