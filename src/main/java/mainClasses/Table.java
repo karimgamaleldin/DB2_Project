@@ -1,6 +1,7 @@
 package mainClasses;
 
 import index.Octree;
+import index.Point;
 
 import java.io.*;
 import java.text.ParseException;
@@ -97,6 +98,7 @@ public class Table implements Serializable {
             Page page = createNewPage();
             page.insertIntoPage(htblColNameValue,this.octrees);
             updateMinMax(page,0);
+            this.insertIntoOctree(wanted,false,page.getFilepath(),page.getFilepath());
             saveIntoTableFilepath();
             return;
         }
@@ -110,6 +112,7 @@ public class Table implements Serializable {
             loadedPage = FileManipulation.loadPage(this.tablePages.get(0));
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue,this.octrees);
             updateMinMax(loadedPage,0);
+            this.insertIntoOctree(wanted,false,loadedPage.getFilepath(),loadedPage.getFilepath());
             shift(1,shifted);
             saveIntoTableFilepath();
         }
@@ -117,6 +120,7 @@ public class Table implements Serializable {
             loadedPage = FileManipulation.loadPage(this.tablePages.get(end));
             Tuple shifted= loadedPage.insertIntoPage(htblColNameValue,this.octrees);
             updateMinMax(loadedPage,end);
+            this.insertIntoOctree(wanted,false,loadedPage.getFilepath(),loadedPage.getFilepath());
             shift(end+1,shifted);
             saveIntoTableFilepath();
         }
@@ -130,6 +134,7 @@ public class Table implements Serializable {
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid));
                         Tuple shifted= loadedPage.insertIntoPage(htblColNameValue,this.octrees);
                         updateMinMax(loadedPage,mid);
+                        this.insertIntoOctree(wanted,false,loadedPage.getFilepath(),loadedPage.getFilepath());
                         shift(mid+1,shifted);
                         saveIntoTableFilepath();
                         return;
@@ -143,6 +148,7 @@ public class Table implements Serializable {
                         loadedPage = FileManipulation.loadPage(this.tablePages.get(mid-1));
                         Tuple shifted = loadedPage.insertIntoPage(htblColNameValue,this.octrees);
                         updateMinMax(loadedPage,mid-1);
+                        this.insertIntoOctree(wanted,false,loadedPage.getFilepath(),loadedPage.getFilepath());
                         shift(mid,shifted);
                         saveIntoTableFilepath();
                         return;
@@ -159,6 +165,27 @@ public class Table implements Serializable {
         }
         loadedPage = null;
         System.gc();
+    }
+    public void insertIntoOctree(Tuple tuple, boolean isShifted, String oldRef, String newRef) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+        for(String octreePath: octrees){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreePath);
+            Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
+            Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
+            Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
+            Point insertPoint = new Point(width,length,height,newRef);
+            if(!isShifted) {
+                currOctree.insertIntoOctree(insertPoint);
+            }else {
+                Vector<Point> pts = currOctree.search(insertPoint);
+                for(Point currPoint: pts){
+                    if(insertPoint.isEqual(currPoint)){
+                        currPoint.getReferences().remove(oldRef);
+                        currPoint.getReferences().add(newRef);
+                    }
+                }
+            }
+            currOctree.saveIntoOctreeFilepath();
+        }
     }
 
     public void update(String strClusteringKeyValue,Hashtable<String,Object> htblColNameValue) throws Exception {
@@ -316,9 +343,14 @@ public class Table implements Serializable {
         page.insertIntoPage(shift,this.octrees);
         int lastIndex = this.tablePages.size()-1;
         updateMinMax(page,lastIndex);
+        String oldPage = this.tablePages.get(page.getPageID()-1);
+        String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
+        Tuple wanted = new Tuple(shift,this.clusteringKey,clusterKeyDataType);
+        this.insertIntoOctree(wanted,true,page.getFilepath(),page.getFilepath());
 //        this.insertIntoOctree(wanted,page.getFilepath());
         page = null;
     }
+
     public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException, DBAppException, ParseException {
         if(shifted==null) {
             return;
@@ -337,6 +369,10 @@ public class Table implements Serializable {
             Page currentPage = FileManipulation.loadPage(this.tablePages.get(nextPage));
             shifted=currentPage.insertIntoPage(shift,this.octrees);
             updateMinMax(currentPage,nextPage);
+            String oldPage = this.tablePages.get(nextPage-1);
+            String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
+            Tuple wanted = new Tuple(shift,this.clusteringKey,clusterKeyDataType);
+            this.insertIntoOctree(wanted,true,oldPage,currentPage.getFilepath());
             nextPage++;
             currentPage = null;
             System.gc();
@@ -346,8 +382,6 @@ public class Table implements Serializable {
                     insertIntoCreatedPage(shift);
                 }
                 return;
-//                this.minValues.add(page.getMinVal());
-//                this.maxValues.add(page.getMaxVal());
             }
         }
     }

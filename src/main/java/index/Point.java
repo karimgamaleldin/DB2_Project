@@ -5,11 +5,12 @@ import mainClasses.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Vector;
 
-public class Point {
+public class Point implements Serializable {
     private Object width,length,height;
     private Vector<String> references;
     private String pageName;

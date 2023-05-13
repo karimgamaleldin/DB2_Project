@@ -3,12 +3,12 @@ package index;
 
 import mainClasses.*;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
 
-public class Octree {
+public class Octree implements Serializable {
     private Cube cube;
     private String strColWidth, strColLength, strColHeight;
     private int maxEntriesPerCube;
@@ -23,7 +23,7 @@ public class Octree {
     public Octree(Object minWidth, Object maxWidth,
                   Object minLength, Object maxLength, Object minHeight, Object maxHeight,
                   int maxEntriesPerCube, String strColWidth, String strColLength,
-                  String strColHeight, String name,String strTableName) throws ParseException {
+                  String strColHeight, String name,String strTableName) throws ParseException, IOException {
         this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
@@ -34,6 +34,7 @@ public class Octree {
         this.strColHeight = strColHeight;
         this.tableName = strTableName;
         this.filepath = "src/main/resources/data/indices/"+strTableName+"/"+name+"_octree.class";
+//        this.saveIntoOctreeFilepath();
     }
     public int containsPoint(Point p){
         for(int i=0;i<points.size();i++){
@@ -54,21 +55,21 @@ public class Octree {
         return -1;
     }
     public boolean checkInsertedValues(Point p) throws DBAppException, IOException {
-        boolean isValOfColSimulatingNull1 = p.getWidth() instanceof SimulatingNull;
-        boolean isValOfColSimulatingNull2 = p.getLength() instanceof SimulatingNull;
-        boolean isValOfColSimulatingNull3 = p.getHeight() instanceof SimulatingNull;
+        boolean isValOfColSimulatingNull1 = p.getWidth() instanceof DBAppNull;
+        boolean isValOfColSimulatingNull2 = p.getLength() instanceof DBAppNull;
+        boolean isValOfColSimulatingNull3 = p.getHeight() instanceof DBAppNull;
         if(p.getWidth()==null || p.getLength()==null || p.getHeight()==null ||
                 isValOfColSimulatingNull1 || isValOfColSimulatingNull2 || isValOfColSimulatingNull3) {
             int indexOfPoint = this.containsPointInOverflow(p);
             if(indexOfPoint!=-1){
                 Point currPoint = this.overflow.get(indexOfPoint);
                 currPoint.insertDups(p);
-//                this.saveIntoOctreeFilepath();
+                this.saveIntoOctreeFilepath();
                 return true;
             }else if(this.points.size()<this.maxEntriesPerCube){
                 p.setParent(this);
                 this.overflow.add(p);
-//                this.saveIntoOctreeFilepath();
+                this.saveIntoOctreeFilepath();
                 return true;
             }
         }
@@ -76,6 +77,7 @@ public class Octree {
     }
     public void searchForOctree(Point p,Vector<Octree> octrees){
         if(!isDivided){
+//            System.out.println(p+": "+isDivided+", in range:"+this.cube.pointInRange(p));
             if(this.cube.pointInRange(p)){
                 octrees.add(this);
             }
@@ -141,7 +143,11 @@ public class Octree {
         }
         Vector<Octree> octrees = new Vector<>();
         searchForOctree(insertedPoint,octrees);
-        if(octrees.size()==0) return false;
+//        System.out.println(insertedPoint+": "+octrees.size());
+        if(octrees.size()==0) {
+//            octrees.add(this);
+            return false;
+        }
         Octree octreeToBeInsertedIn = octrees.get(0);
         if(octreeToBeInsertedIn==null) return false;
 //        System.out.println(octreeToBeInsertedIn.cube);
@@ -281,7 +287,7 @@ public class Octree {
 //            Point newPoint = new Point(newWidth,newLength,newHeight,ref);
 //            this.insertIntoOctree(newPoint);
 //            // may cause an error
-////            this.saveIntoOctreeFilepath();
+            this.saveIntoOctreeFilepath();
 //        }
     }
     public boolean checkClusteringKey(String datatype,Object clusteringKeyValue,Point p, String strClusteringKey){
@@ -368,6 +374,7 @@ public class Octree {
             || eighthOctant.insertIntoOctree(insertedPoint);
         }
         this.points.clear();
+//        this.saveIntoOctreeFilepath();
     }
 
     public String getFilepath() {

@@ -102,7 +102,7 @@ public class Page implements Serializable{
         if(this.isPageEmpty()){
             this.pageTuples.add(insertedTuple);
             updateMinMax();
-            this.insertIntoOctree(insertedTuple,octrees);
+//            this.insertIntoOctree(insertedTuple,octrees);
 //            //print page -------------------
 //            printPageInfo();
             saveIntoPageFilepath();
@@ -112,7 +112,7 @@ public class Page implements Serializable{
         int end = this.getSizeOfPage() - 1;
         if(insertedTuple.compareTo(this.pageTuples.get(0)) <= 0){
             this.pageTuples.add(0, insertedTuple);
-            this.insertIntoOctree(insertedTuple,octrees);
+//            this.insertIntoOctree(insertedTuple,octrees);
         }
         else {
            while (start <= end) {
@@ -135,7 +135,7 @@ public class Page implements Serializable{
             }else {
                 this.pageTuples.add(start,insertedTuple);
             }
-            this.insertIntoOctree(insertedTuple,octrees);
+//            this.insertIntoOctree(insertedTuple,octrees);
         }
         updateMinMax();
         saveIntoPageFilepath();
@@ -218,7 +218,7 @@ public class Page implements Serializable{
 
     public void updateOctree(Tuple tuple, Hashtable<String, Object> htblColNameValue,Vector<String> octrees) throws IOException, ClassNotFoundException, DBAppException, ParseException {
         for(String octreePath: octrees){
-            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/",octreePath);
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreePath);
             boolean isWidthUpdated = htblColNameValue.containsKey(currOctree.getStrColWidth());
             boolean isLengthUpdated = htblColNameValue.containsKey(currOctree.getStrColLength());
             boolean isHeightUpdated = htblColNameValue.containsKey(currOctree.getStrColHeight());
@@ -283,16 +283,16 @@ public class Page implements Serializable{
         }
         return -1;
     }
-    public void insertIntoOctree(Tuple tuple, Vector<String> octrees) throws IOException, ClassNotFoundException, DBAppException, ParseException {
-        for(String octreePath: octrees){
-            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/",octreePath);
-            Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
-            Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
-            Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
-            Point insertPoint = new Point(width,length,height,this.filepath);
-            currOctree.insertIntoOctree(insertPoint);
-        }
-    }
+//    public void insertIntoOctree(Tuple tuple, Vector<String> octrees) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+//        for(String octreePath: octrees){
+//            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreePath);
+//            Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
+//            Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
+//            Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
+//            Point insertPoint = new Point(width,length,height,this.filepath);
+//            currOctree.insertIntoOctree(insertPoint);
+//        }
+//    }
     public Vector<Tuple> selectLinearDataInPage(String columnName , Object value , String operator){
         Vector<Tuple> rest = new Vector<Tuple>();
         for(int i = 0 ; i < this.pageTuples.size() ; i++){

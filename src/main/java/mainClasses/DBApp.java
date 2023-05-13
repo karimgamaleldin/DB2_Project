@@ -6,7 +6,7 @@ import sqlterm.SQLTerm;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -155,8 +155,9 @@ public class DBApp implements Serializable {
         secondAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[1]);
         thirdAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[2]);
         String indexName = strarrColName[0]+strarrColName[1]+strarrColName[2]+"Index";
+        int maxEntries = FileManipulation.readFromConfig("MaximumEntriesinOctreeNode");
         Octree octree=new Octree(firstAttribute.get(0),firstAttribute.get(1),secondAttribute.get(0),secondAttribute.get(1),
-                thirdAttribute.get(0),thirdAttribute.get(1),3,
+                thirdAttribute.get(0),thirdAttribute.get(1),maxEntries,
                 strarrColName[0],strarrColName[1],strarrColName[2],indexName,strTableName);
         if(!toBeInsertedInTable.isTableEmpty()){
             // insert all the existing values in octree
@@ -174,6 +175,7 @@ public class DBApp implements Serializable {
         }
         Metadata.updateCSV(strTableName,strarrColName,indexName,"Octree");
         FileManipulation.createSerFile(octree.getFilepath());
+        octree.saveIntoOctreeFilepath();
     }
     public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
         String[] minMax=null;
@@ -213,7 +215,7 @@ public class DBApp implements Serializable {
     }
     public void insertingNulls(Vector<String> missingColumnNames,Hashtable<String,Object> htblColNameValue){
         for(int i=0;i<missingColumnNames.size();i++){
-            htblColNameValue.put(missingColumnNames.get(i), new SimulatingNull());
+            htblColNameValue.put(missingColumnNames.get(i), new DBAppNull());
         }
     }
     public void checkHtblValid(String strTableName, Hashtable<String,Object> htblColNameValue, boolean insert) throws Exception {
@@ -252,7 +254,7 @@ public class DBApp implements Serializable {
             //((""+value.getClass()).replaceAll("class","")).replaceAll(" ","")
             String valClass = value.getClass().getName();
 //            System.out.println(key+": "+valClass+","+columnType);
-            if(valClass.compareTo("java.SimulatingNull")==0){
+            if(value instanceof DBAppNull){
                 continue;
             }
             if(valClass.compareTo(columnType)!=0){
@@ -287,6 +289,7 @@ public class DBApp implements Serializable {
             toBeInsertedInTable = null;
             System.gc();
         }catch (Exception e){
+            e.printStackTrace();
             throw new DBAppException(e.getMessage());
         }
     }
@@ -486,103 +489,121 @@ public class DBApp implements Serializable {
 //        tuple0.put("name", "Soubra");
 //        tuple0.put("gpa", 1.6);
 
-//        Hashtable<String, Object> tuple1 = new Hashtable<>();
-//        tuple1.put("age", 1);
-//        tuple1.put("name", "Kimo2");
-//        tuple1.put("gpa", 5.0);
-//        tuple1.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("05-07-2002"));
-//
-//        Hashtable<String, Object> tuple2 = new Hashtable<>();
-//        tuple2.put("age", 2);
-//        tuple2.put("name", "Omar");
-//        tuple2.put("gpa", 4);
-//        tuple2.put("dob",new SimpleDateFormat("dd-MM-yyyy").parse("31-12-1956"));
-//
-//        Hashtable<String, Object> tuple3 = new Hashtable<>();
-//        tuple3.put("age", 3);
-//        tuple3.put("name", "Ahmed");
-//        tuple3.put("gpa", 0.9);
-//        tuple3.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("05-12-1999"));
-//
-//        Hashtable<String, Object> tuple4 = new Hashtable<>();
-//        tuple4.put("age", 4);
-//        tuple4.put("name", "biso");
-//        tuple4.put("gpa", 2.3);
-//        tuple4.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2024"));
-//
-//        Hashtable<String, Object> tuple5 = new Hashtable<>();
-//        tuple5.put("age", 5);
-//        tuple5.put("name", "Menna");
-//        tuple5.put("gpa", 0.8);
-//
-//        Hashtable<String, Object> tuple6 = new Hashtable<>();
-//        tuple6.put("age", 6);
-//        tuple6.put("name", "Lobna");
-//        tuple6.put("gpa", 1.4);
-//
-//        Hashtable<String, Object> tuple7 = new Hashtable<>();
-//        tuple7.put("age", 7);
-//        tuple7.put("name", "boni");
-//        tuple7.put("gpa", 3.2);
-//
-//        Hashtable<String, Object> tuple8 = new Hashtable<>();
-//        tuple8.put("age", 8);
-//        tuple8.put("name", "nada");
-//        tuple8.put("gpa", 2.5);
-//
-//        Hashtable<String, Object> tuple9 = new Hashtable<>();
-//        tuple9.put("age", 9);
-//        tuple9.put("name", "noura");
-//        tuple9.put("gpa", 3.4);
-//
-//        Hashtable<String, Object> tuple10 = new Hashtable<>();
-//        tuple10.put("age", 10);
-//        tuple10.put("name", "nada");
-//        tuple10.put("gpa", 0.9);
-//
-//        Hashtable<String, Object> tuple11 = new Hashtable<>();
-//        tuple11.put("age", 11);
-//        tuple11.put("name", "nada");
-//        tuple11.put("gpa", 0.9);
-//
-//        Hashtable<String, Object> tuple12 = new Hashtable<>();
-//        tuple12.put("age", 12);
-//        tuple12.put("name", "sara");
-//        tuple12.put("gpa", 0.9);
-//
-//        Hashtable<String, Object> tuple13 = new Hashtable<>();
-//        tuple13.put("age", 13);
-//        tuple13.put("name", "sara");
-//        tuple13.put("gpa", 0.9);
-//
-//        Hashtable<String, Object> tuple14 = new Hashtable<>();
-//        tuple14.put("age", 14);
-//
-//        Hashtable<String, Object> tuple15 = new Hashtable<>();
-//        tuple15.put("age", 29);
-//        tuple15.put("name", "afterMod");
-//
-//        Hashtable<String, Object> tuple16 = new Hashtable<>();
-//        tuple16.put("age", 18);
-//        tuple16.put("name", "kimo");
-//        tuple15.put("gpa", 4);
-//
-//        Hashtable<String, Object> tuple17 = new Hashtable<>();
-//        tuple17.put("age", 19);
-////        tuple17.put("name", "kimo");
-//        tuple17.put("gpa", 3.0);
-//
-//        Hashtable<String, Object> tuple18 = new Hashtable<>();
-//        tuple18.put("age", 17);
-//        tuple18.put("name", "kimo");
-////        tuple18.put("gpa", 3.0);
+        Hashtable<String, Object> tuple1 = new Hashtable<>();
+        tuple1.put("age", 1);
+        tuple1.put("name", "Kimo2");
+        tuple1.put("gpa", 5.0);
+        tuple1.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("05-07-2002"));
+
+        Hashtable<String, Object> tuple2 = new Hashtable<>();
+        tuple2.put("age", 2);
+        tuple2.put("name", "Omar");
+        tuple2.put("gpa", 4);
+        tuple2.put("dob",new SimpleDateFormat("dd-MM-yyyy").parse("31-12-1956"));
+
+        Hashtable<String, Object> tuple3 = new Hashtable<>();
+        tuple3.put("age", 3);
+        tuple3.put("name", "Ahmed");
+        tuple3.put("gpa", 0.9);
+        tuple3.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("05-12-1999"));
+
+        Hashtable<String, Object> tuple4 = new Hashtable<>();
+        tuple4.put("age", 4);
+        tuple4.put("name", "biso");
+        tuple4.put("gpa", 2.3);
+        tuple4.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2024"));
+
+        Hashtable<String, Object> tuple5 = new Hashtable<>();
+        tuple5.put("age", 5);
+        tuple5.put("name", "Menna");
+        tuple5.put("gpa", 0.8);
+
+        Hashtable<String, Object> tuple6 = new Hashtable<>();
+        tuple6.put("age", 6);
+        tuple6.put("name", "Lobna");
+        tuple6.put("gpa", 1.4);
+
+        Hashtable<String, Object> tuple7 = new Hashtable<>();
+        tuple7.put("age", 7);
+        tuple7.put("name", "boni");
+        tuple7.put("gpa", 3.2);
+
+        Hashtable<String, Object> tuple8 = new Hashtable<>();
+        tuple8.put("age", 8);
+        tuple8.put("name", "nada");
+        tuple8.put("gpa", 2.5);
+
+        Hashtable<String, Object> tuple9 = new Hashtable<>();
+        tuple9.put("age", 9);
+        tuple9.put("name", "noura");
+        tuple9.put("gpa", 3.4);
+
+        Hashtable<String, Object> tuple10 = new Hashtable<>();
+        tuple10.put("age", 10);
+        tuple10.put("name", "nada");
+        tuple10.put("gpa", 0.9);
+
+        Hashtable<String, Object> tuple11 = new Hashtable<>();
+        tuple11.put("age", 11);
+        tuple11.put("name", "nada");
+        tuple11.put("gpa", 0.9);
+
+        Hashtable<String, Object> tuple12 = new Hashtable<>();
+        tuple12.put("age", 12);
+        tuple12.put("name", "sara");
+        tuple12.put("gpa", 0.9);
+
+        Hashtable<String, Object> tuple13 = new Hashtable<>();
+        tuple13.put("age", 13);
+        tuple13.put("name", "sara");
+        tuple13.put("gpa", 0.9);
+
+        Hashtable<String, Object> tuple14 = new Hashtable<>();
+        tuple14.put("age", 14);
+
+        Hashtable<String, Object> tuple15 = new Hashtable<>();
+        tuple15.put("age", 29);
+        tuple15.put("name", "afterMod");
+
+        Hashtable<String, Object> tuple16 = new Hashtable<>();
+        tuple16.put("age", 18);
+        tuple16.put("name", "kimo");
+        tuple15.put("gpa", 4);
+
+        Hashtable<String, Object> tuple17 = new Hashtable<>();
+        tuple17.put("age", 19);
+//        tuple17.put("name", "kimo");
+        tuple17.put("gpa", 3.0);
+
+        Hashtable<String, Object> tuple18 = new Hashtable<>();
+        tuple18.put("age", 17);
+        tuple18.put("name", "kimo");
 //        tuple18.put("gpa", 3.0);
-//
-//        Hashtable<String, Object> tuple19 = new Hashtable<>();
-//        tuple19.put("age", 16);
-//        tuple19.put("name", "kimo");
-////        tuple19.put("gpa", 3.0);
+        tuple18.put("gpa", 3.0);
+
+        Hashtable<String, Object> tuple19 = new Hashtable<>();
+        tuple19.put("age", 16);
+        tuple19.put("name", "kimo");
 //        tuple19.put("gpa", 3.0);
+        tuple19.put("gpa", 3.0);
+
+        Hashtable<String, Object> tuple20 = new Hashtable<>();
+        tuple20.put("age", 4);
+        tuple20.put("name", "biso");
+        tuple20.put("gpa", 2.3);
+        tuple20.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2020"));
+
+        Hashtable<String, Object> tuple21 = new Hashtable<>();
+        tuple21.put("age", 20);
+        tuple21.put("name", "biso");
+        tuple21.put("gpa", 2.3);
+        tuple21.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2020"));
+
+        Hashtable<String, Object> tuple22 = new Hashtable<>();
+        tuple22.put("age", 22);
+        tuple22.put("name", "abbas");
+        tuple22.put("gpa", 2.2);
+        tuple22.put("dob" , new SimpleDateFormat("dd-MM-yyyy").parse("01-02-2020"));
 //
         Hashtable<String, String> htblColNameType = new Hashtable<>();
         htblColNameType.put("age", "java.lang.Integer");
@@ -605,35 +626,39 @@ public class DBApp implements Serializable {
         htblColNameMax.put("dob", "2023-12-31");
 //        htblColNameMax.put("job", "e");
 
+
         DBApp dbApp = new DBApp();
         dbApp.init();
-//        dbApp.createTable("Students", "dob", htblColNameType, htblColNameMin, htblColNameMax);
-//        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
-//        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
-//        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
-//        dbApp.createIndex("Students3",new String[]{"name","age","dob"});
-//        dbApp.createIndex("Students",new String[]{"name","age","dob"});
-//        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
-//////     //    dbApp.insertIntoTable("Students", tuple0);
-//         dbApp.insertIntoTable("Students", tuple1);
-//         dbApp.insertIntoTable("Students", tuple2);
-//         dbApp.insertIntoTable("Students", tuple6);
-//         dbApp.insertIntoTable("Students", tuple7);
-//         dbApp.insertIntoTable("Students", tuple8);
-//         dbApp.insertIntoTable("Students", tuple3);
-//         dbApp.insertIntoTable("Students", tuple5);
+        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
+        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
+        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
+        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
+////        dbApp.createIndex("Students3",new String[]{"name","age","dob"});
+////        dbApp.createIndex("Students",new String[]{"name","age","dob"});
+////        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
+////////     //    dbApp.insertIntoTable("Students", tuple0);
+         dbApp.insertIntoTable("Students", tuple1);
+         dbApp.insertIntoTable("Students", tuple2);
+         dbApp.insertIntoTable("Students", tuple6);
+         dbApp.insertIntoTable("Students", tuple7);
+         dbApp.insertIntoTable("Students", tuple8);
+         dbApp.insertIntoTable("Students", tuple3);
+         dbApp.insertIntoTable("Students", tuple5);
 //         dbApp.insertIntoTable("Students", tuple4);
-//         dbApp.insertIntoTable("Students", tuple9);
-//         dbApp.insertIntoTable("Students", tuple11);
-//         dbApp.insertIntoTable("Students", tuple10);
-//         dbApp.insertIntoTable("Students", tuple12);
-//         dbApp.insertIntoTable("Students", tuple13);
-//         dbApp.insertIntoTable("Students", tuple14);
-//         dbApp.insertIntoTable("Students", tuple15);
-//         dbApp.insertIntoTable("Students", tuple16);
-//         dbApp.insertIntoTable("Students", tuple17);
-//         dbApp.insertIntoTable("Students", tuple18);
-//         dbApp.insertIntoTable("Students", tuple19);
+         dbApp.insertIntoTable("Students", tuple9);
+         dbApp.insertIntoTable("Students", tuple11);
+         dbApp.insertIntoTable("Students", tuple10);
+         dbApp.insertIntoTable("Students", tuple12);
+         dbApp.insertIntoTable("Students", tuple13);
+         dbApp.insertIntoTable("Students", tuple14);
+         dbApp.insertIntoTable("Students", tuple15);
+         dbApp.insertIntoTable("Students", tuple16);
+         dbApp.insertIntoTable("Students", tuple17);
+         dbApp.insertIntoTable("Students", tuple18);
+         dbApp.insertIntoTable("Students", tuple19);
+         dbApp.insertIntoTable("Students", tuple20);
+         dbApp.insertIntoTable("Students", tuple21);
+         dbApp.insertIntoTable("Students", tuple22);
 
 
 //         Hashtable<String, Object> updateHtbl = new Hashtable<>();
@@ -672,14 +697,20 @@ public class DBApp implements Serializable {
 //        dbApp.deleteFromTable("Students", deletingCriteria2);
 //        dbApp.deleteFromTable("Students", deletingCriteria3);
 //    System.out.println(dbApp.tables);
-//        Table table = FileManipulation.loadTable(dbApp.tablesFilepath,dbApp.tables.get(0));
-//
-//        for (String pageName : table.getTablePages()) {
-//            Page p = FileManipulation.loadPage(pageName);
-//            System.out.println("PAGE " + p.getPageID());
-//            System.out.println(p.getPageTuples());
-//            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-//            p.serialize();l
-//        }
+        Table table = FileManipulation.loadTable(dbApp.tablesFilepath,dbApp.tables.get(0));
+
+        for (String pageName : table.getTablePages()) {
+            Page p = FileManipulation.loadPage(pageName);
+            System.out.println("PAGE " + p.getPageID());
+            System.out.println(p.getPageTuples());
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        }
+        System.out.println(table.getOctrees());
+        for(int i=0;i<table.getOctrees().size();i++){
+            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/"+table.getTableName()+"/",table.getOctrees().get(i));
+            System.out.println(octree.getName());
+            octree.printOctree();
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        }
     }
 }

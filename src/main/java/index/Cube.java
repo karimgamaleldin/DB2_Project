@@ -2,12 +2,13 @@ package index;
 
 import mainClasses.Comparison;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Cube {
+public class Cube implements Serializable {
     private Point center;
 //    private Object halfWidth, halfHeight, halfLength;
     private Object minWidth, maxWidth, minLength, maxLength, minHeight, maxHeight; //boundaries of cube
