@@ -9,8 +9,5 @@
         <module name="DB2_Project" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="DB2_Project" target="19" />
-    </bytecodeTargetLevel>
   </component>
 </project>
