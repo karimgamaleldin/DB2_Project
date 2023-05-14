@@ -378,7 +378,7 @@ public class DBApp implements Serializable {
         Octree indexToBeUsed = null;
         boolean useIndex = false;
         for(int i = 0 ; i < T.getOctrees().size() && !useIndex ;i++){
-            Octree o = FileManipulation.loadOctree("",T.getOctrees().get(i));
+            Octree o = FileManipulation.loadOctree("src/main/resources/data/indices/"+T.getTableName()+"/",T.getOctrees().get(i));
             useIndex = o.canBeUsed(hashMap);
             if(useIndex) indexToBeUsed = o;
         }
@@ -752,8 +752,9 @@ public class DBApp implements Serializable {
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
         System.out.println(table.getOctrees());
+        Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/"+table.getTableName()+"/","namegpadobIndex_octree");
         for(int i=0;i<table.getOctrees().size();i++){
-            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/"+table.getTableName()+"/",table.getOctrees().get(i));
+//            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/"+table.getTableName()+"/",table.getOctrees().get(i));
             System.out.println(octree.getName());
             octree.printOctree();
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");

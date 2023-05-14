@@ -196,7 +196,7 @@ public class Octree implements Serializable {
         Vector<Point> pointsToBeDeleted = search(tobeDeletedPoint);
         for(int i=0;i<pointsToBeDeleted.size();i++){
             Point currPoint = pointsToBeDeleted.get(i);
-            currPoint.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
+            currPoint.removeDataWithOctree(this.tableName,htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
             if(currPoint.getReferences().size()==0){
                 Octree parent = currPoint.getParent();
                 if(currPoint.checkNulls()){

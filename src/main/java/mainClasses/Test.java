@@ -1,6 +1,7 @@
 package mainClasses;
 
 import index.Octree;
+import sqlterm.SQLTerm;
 
 import java.text.SimpleDateFormat;
 import java.util.Hashtable;
@@ -162,7 +163,7 @@ public class Test {
 //        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
-//////    dbApp.insertIntoTable("Students", tuple0);
+////////    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple1);
 //         dbApp.insertIntoTable("Students", tuple2);
 //         dbApp.insertIntoTable("Students", tuple6);
@@ -192,15 +193,33 @@ public class Test {
 //         dbApp.insertIntoTable("Students", tuple27);
 
         Hashtable<String, Object> updateHtbl = new Hashtable();
-        updateHtbl.put("name", "updatedName");
-        updateHtbl.put("gpa", 2);
+//        updateHtbl.put("name", "updatedName");
+        updateHtbl.put("gpa", 2.5);
 //        updateHtbl.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("01-02-2019"));
+//        dbApp.updateTable("Students","11",updateHtbl);
 
         Hashtable<String, Object> deletingCriteria0 = new Hashtable();
-        deletingCriteria0.put("gpa", 3);
+        deletingCriteria0.put("name",new DBAppNull());
+//        deletingCriteria0.put("gpa",5);
+//        deletingCriteria0.put("dob",new SimpleDateFormat("dd-MM-yyyy").parse("31-12-2023"));
+
+//        deletingCriteria0.put("age",30);
+//        dbApp.deleteFromTable("Students",deletingCriteria0);
+
+//        StringBuffer sb = new StringBuffer();
+//        sb.append("Insert Into Students (job , gpa , age , name , dob) values ('eng' , 2, 40 , 'lulu' , '2002-10-30')" );
+//        dbApp.parseSQL(sb);
+        SQLTerm sqlTerm1 = new SQLTerm("Students","gpa","=","0.9");
+        SQLTerm sqlTerm2 = new SQLTerm("Students","name","=","kimo");
+        SQLTerm[] arrSqlTerm = new SQLTerm[]{sqlTerm1,sqlTerm2};
+        Iterator selItr= dbApp.selectFromTable(arrSqlTerm,new String[]{"AND"});
+        while(selItr.hasNext()){
+            System.out.println(selItr.next());
+        }
         Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), (String)dbApp.getTables().get(0));
         Iterator var35 = table.getTablePages().iterator();
 //
+
         while(var35.hasNext()) {
             String pageName = (String)var35.next();
             Page p = FileManipulation.loadPage(pageName);
@@ -211,15 +230,14 @@ public class Test {
 
         System.out.println(table.getOctrees());
 
-        for(int i = 0; i < table.getOctrees().size(); ++i) {
-            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/" + table.getTableName() + "/", (String)table.getOctrees().get(i));
+        for(int i = 0; i < table.getOctrees().size(); i++) {
+            System.out.println("src/main/resources/data/indices/" + table.getTableName() + "/"+table.getOctrees().get(i));
+            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/" + table.getTableName() + "/", table.getOctrees().get(i));
             System.out.println(octree.getName());
             octree.printOctree();
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
-//        StringBuffer sb = new StringBuffer();
-//        sb.append("Insert Into Students (job , gpa , age , name , dob) values ('eng' , 2, 37 , 'lulu' , '2002-10-30')" );
-//        dbApp.parseSQL(sb);
+
 
 
     }
