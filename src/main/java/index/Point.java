@@ -6,6 +6,7 @@ import mainClasses.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -98,7 +99,10 @@ public class Point implements Serializable {
                 ')';
     }
     public boolean checkNulls(){
-        if(width==null||length==null||height==null) return true;
+        if(width==null||length==null||height==null
+        || width instanceof DBAppNull || length instanceof DBAppNull || height instanceof DBAppNull) {
+            return true;
+        }
         return false;
     }
 
@@ -109,7 +113,7 @@ public class Point implements Serializable {
         for(int i = 0 ; i < references.size() ; i++){
             String currPage = references.get(i);
             p = FileManipulation.loadPage(currPage);
-            boolean isDeleted = p.deleteFromPage(htblColNameValue);
+            boolean isDeleted = p.deleteFromPageFromPoint(htblColNameValue);
             int indexOfPage = currTable.getTablePages().indexOf(currPage);
             if(isDeleted){
                 currTable.getTablePages().remove(indexOfPage);
@@ -119,13 +123,24 @@ public class Point implements Serializable {
                 i--;
             }else {
                 currTable.updateMinMax(p,indexOfPage);
-                if(!checkIfPointExistInPage(p,strColWidth,strColLength,strColHeight)){
-                    this.references.remove(i);
-                    i--;
-                }
             }
         }
+        this.adjustReferences(strColWidth,strColLength,strColHeight);
         currTable.saveIntoTableFilepath();
+    }
+    public void adjustReferences(String strColWidth, String strColLength, String strColHeight) throws IOException, ClassNotFoundException {
+        HashMap<String,Integer> map = new HashMap<>();
+        for(int i=0;i<this.references.size();i++){
+            map.put(references.get(i),map.getOrDefault(references.get(i),0)+1);
+        }
+        for(String currPage: map.keySet()){
+            Page p = FileManipulation.loadPage(currPage);
+            int similarTuples = checkIfPointExistInPage(p,strColWidth,strColLength,strColHeight);
+            for(int j=0;j<map.get(currPage)-similarTuples;j++){
+                this.references.remove(currPage);
+            }
+        }
+
     }
     public Vector<Tuple> getPointsTuples() throws IOException, ClassNotFoundException {
         Vector<Tuple> tuples = new Vector<Tuple>();
@@ -149,18 +164,19 @@ public class Point implements Serializable {
         boolean l = hash.get(this.parent.getStrColLength()).equals(this.length);
         return h && w && l;
     }
-    public boolean checkIfPointExistInPage(Page page, String strColWidth, String strColLength, String strColHeight){
+    public int checkIfPointExistInPage(Page page, String strColWidth, String strColLength, String strColHeight){
+        int tuples = 0;
         for(int i = 0 ; i<page.getPageTuples().size();i++){
             Tuple currentTuple = page.getPageTuples().get(i);
             //maybe simulating null will cause an error
-            boolean checkWidth = Comparison.compareTo(width,currentTuple.getTupleAttributes().get(strColLength),null)==0;
-            boolean checkHeight = Comparison.compareTo(height,currentTuple.getTupleAttributes().get(strColLength),null)==0;
+            boolean checkWidth = Comparison.compareTo(width,currentTuple.getTupleAttributes().get(strColWidth),null)==0;
+            boolean checkHeight = Comparison.compareTo(height,currentTuple.getTupleAttributes().get(strColHeight),null)==0;
             boolean checkLength = Comparison.compareTo(length,currentTuple.getTupleAttributes().get(strColLength),null)==0;
             if(checkWidth && checkLength && checkHeight) {
-                return true;
+                tuples+=1;
             }
         }
-        return false;
+        return tuples;
     }
 
 }

@@ -307,6 +307,7 @@ public class DBApp implements Serializable {
             currTable = null;
             System.gc();
         } catch (Exception e){
+            e.printStackTrace();
             throw new DBAppException(e.getMessage());
         }
     }
@@ -320,6 +321,7 @@ public class DBApp implements Serializable {
             currTable = null;
             System.gc();
         } catch (Exception e){
+            e.printStackTrace();
             throw new DBAppException(e.getMessage());
         }
     }
@@ -517,6 +519,8 @@ public class DBApp implements Serializable {
         tuple5.put("age", 5);
         tuple5.put("name", "Menna");
         tuple5.put("gpa", 0.8);
+        tuple5.put("job", "eng");
+        tuple5.put("dob", new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2004"));
 
         Hashtable<String, Object> tuple6 = new Hashtable<>();
         tuple6.put("age", 6);
@@ -532,16 +536,19 @@ public class DBApp implements Serializable {
         tuple8.put("age", 8);
         tuple8.put("name", "nada");
         tuple8.put("gpa", 2.5);
+        tuple8.put("job", "eng");
 
         Hashtable<String, Object> tuple9 = new Hashtable<>();
         tuple9.put("age", 9);
         tuple9.put("name", "noura");
         tuple9.put("gpa", 3.4);
+        tuple9.put("job", "doc");
 
         Hashtable<String, Object> tuple10 = new Hashtable<>();
         tuple10.put("age", 10);
         tuple10.put("name", "nada");
         tuple10.put("gpa", 0.9);
+        tuple10.put("job", "eng");
 
         Hashtable<String, Object> tuple11 = new Hashtable<>();
         tuple11.put("age", 11);
@@ -564,16 +571,19 @@ public class DBApp implements Serializable {
         Hashtable<String, Object> tuple15 = new Hashtable<>();
         tuple15.put("age", 29);
         tuple15.put("name", "afterMod");
+        tuple15.put("job", "eng");
 
         Hashtable<String, Object> tuple16 = new Hashtable<>();
         tuple16.put("age", 18);
         tuple16.put("name", "kimo");
         tuple15.put("gpa", 4);
+        tuple15.put("job", "doc");
 
         Hashtable<String, Object> tuple17 = new Hashtable<>();
         tuple17.put("age", 19);
 //        tuple17.put("name", "kimo");
         tuple17.put("gpa", 3.0);
+        tuple17.put("job", "eng");
 
         Hashtable<String, Object> tuple18 = new Hashtable<>();
         tuple18.put("age", 17);
@@ -610,70 +620,76 @@ public class DBApp implements Serializable {
         htblColNameType.put("name", "java.lang.String");
         htblColNameType.put("gpa", "java.lang.Double");
         htblColNameType.put("dob", "java.util.Date");
-//        htblColNameType.put("job", "java.lang.String");
+        htblColNameType.put("job", "java.lang.String");
 
         Hashtable<String, String> htblColNameMin = new Hashtable<>();
         htblColNameMin.put("age", "0");
         htblColNameMin.put("name", "A");
         htblColNameMin.put("gpa", "0");
         htblColNameMin.put("dob", "1950-12-31");
-//        htblColNameMin.put("job", "1900-012-31");
+        htblColNameMin.put("job", "a");
 
         Hashtable<String, String> htblColNameMax = new Hashtable<>();
         htblColNameMax.put("age", "40");
         htblColNameMax.put("name", "ZZZZZZZZZZ");
         htblColNameMax.put("gpa", "5");
         htblColNameMax.put("dob", "2023-12-31");
-//        htblColNameMax.put("job", "e");
+        htblColNameMax.put("job", "zzzzzzzzzzzzzzzzzzzz");
 
 
         DBApp dbApp = new DBApp();
         dbApp.init();
-        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
-////        dbApp.createIndex("Students3",new String[]{"name","age","dob"});
-////        dbApp.createIndex("Students",new String[]{"name","age","dob"});
-////        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
-////////     //    dbApp.insertIntoTable("Students", tuple0);
-         dbApp.insertIntoTable("Students", tuple1);
-         dbApp.insertIntoTable("Students", tuple2);
-         dbApp.insertIntoTable("Students", tuple6);
-         dbApp.insertIntoTable("Students", tuple7);
-         dbApp.insertIntoTable("Students", tuple8);
-         dbApp.insertIntoTable("Students", tuple3);
-         dbApp.insertIntoTable("Students", tuple5);
-//         dbApp.insertIntoTable("Students", tuple4);
-         dbApp.insertIntoTable("Students", tuple9);
-         dbApp.insertIntoTable("Students", tuple11);
-         dbApp.insertIntoTable("Students", tuple10);
-         dbApp.insertIntoTable("Students", tuple12);
-         dbApp.insertIntoTable("Students", tuple13);
-         dbApp.insertIntoTable("Students", tuple14);
-         dbApp.insertIntoTable("Students", tuple15);
-         dbApp.insertIntoTable("Students", tuple16);
-         dbApp.insertIntoTable("Students", tuple17);
-         dbApp.insertIntoTable("Students", tuple18);
-         dbApp.insertIntoTable("Students", tuple19);
-         dbApp.insertIntoTable("Students", tuple20);
-         dbApp.insertIntoTable("Students", tuple21);
-         dbApp.insertIntoTable("Students", tuple22);
+//        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
+//////        dbApp.createIndex("Students3",new String[]{"name","age","dob"});
+//////        dbApp.createIndex("Students",new String[]{"name","age","dob"});
+//////        dbApp.createIndex("Students2",new String[]{"name","gpa","dob"});
+//////////     //    dbApp.insertIntoTable("Students", tuple0);
+//         dbApp.insertIntoTable("Students", tuple1);
+//         dbApp.insertIntoTable("Students", tuple2);
+//         dbApp.insertIntoTable("Students", tuple6);
+//         dbApp.insertIntoTable("Students", tuple7);
+//         dbApp.insertIntoTable("Students", tuple8);
+//         dbApp.insertIntoTable("Students", tuple3);
+//         dbApp.insertIntoTable("Students", tuple5);
+////         dbApp.insertIntoTable("Students", tuple4);
+//         dbApp.insertIntoTable("Students", tuple9);
+//         dbApp.insertIntoTable("Students", tuple11);
+//         dbApp.insertIntoTable("Students", tuple10);
+//         dbApp.insertIntoTable("Students", tuple12);
+//         dbApp.insertIntoTable("Students", tuple13);
+//         dbApp.insertIntoTable("Students", tuple14);
+//         dbApp.insertIntoTable("Students", tuple15);
+//         dbApp.insertIntoTable("Students", tuple16);
+//         dbApp.insertIntoTable("Students", tuple17);
+//         dbApp.insertIntoTable("Students", tuple18);
+//         dbApp.insertIntoTable("Students", tuple19);
+//         dbApp.insertIntoTable("Students", tuple20);
+//         dbApp.insertIntoTable("Students", tuple21);
+//         dbApp.insertIntoTable("Students", tuple22);
 
 
-//         Hashtable<String, Object> updateHtbl = new Hashtable<>();
-//         updateHtbl.put("name", "a");
-//         updateHtbl.put("gpa", 2);
-//         dbApp.updateTable("Students", "2002-07-05", updateHtbl);
+         Hashtable<String, Object> updateHtbl = new Hashtable<>();
+         updateHtbl.put("name", "updatedName");
+         updateHtbl.put("gpa", 2);
+         updateHtbl.put("dob", new SimpleDateFormat("dd-MM-yyyy").parse("01-02-2019"));
+         dbApp.updateTable("Students", "19", updateHtbl);
 
-//         updateHtbl.put("name", "boniiiii");
 
-//         Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
+         Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria1 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria2 = new Hashtable<>();
 //         Hashtable<String,Object> deletingCriteria3 = new Hashtable<>();
 //         deletingCriteria0.put( "dob",new SimpleDateFormat("dd-MM-yyyy").parse("05-12-1999"));
-//         deletingCriteria0.put("gpa",2);
+         deletingCriteria0.put("gpa",3);
+//         deletingCriteria0.put("gpa",3.4);
+//         deletingCriteria0.put("dob",new DBAppNull());
+//         deletingCriteria0.put("name","noura");
+//         deletingCriteria0.put("dob",new DBAppNull());
+//         deletingCriteria0.put("name","nada");
+//         deletingCriteria0.put("age",10);
 //         deletingCriteria0.put("name","a");
 //         deletingCriteria1.put("gpa", 0.9);
 //         deletingCriteria2.put( "name", "nada");

@@ -195,10 +195,10 @@ public class Table implements Serializable {
         String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
         Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
         htblColNameValue.put(clusteringKey,correctValType);
-        if(this.updateUsingOctree(clusterKeyDataType,correctValType,htblColNameValue)){
-            saveIntoTableFilepath();
-            return;
-        }
+//        if(this.updateUsingOctree(clusterKeyDataType,correctValType,htblColNameValue)){
+//            saveIntoTableFilepath();
+//            return;
+//        }
         Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
         int start =0;
         int end = this.tablePages.size()-1;
@@ -261,7 +261,7 @@ public class Table implements Serializable {
         }
         return useOctree;
     }
-    public void emptyTable() throws IOException {
+    public void emptyTable() throws IOException, ClassNotFoundException {
         for(int i=0;i<this.tablePages.size();i++){
             String currPagePath = this.tablePages.get(i);
             FileManipulation.deleteEntireFile(currPagePath);
@@ -270,7 +270,12 @@ public class Table implements Serializable {
         this.nextPageID = 0;
         this.minValues=new Vector<Tuple>();
         this.maxValues=new Vector<Tuple>();
-        FileManipulation.saveIntoFilepath(this,this.filepath);
+        for(int i=0;i<this.octrees.size();i++){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octrees.get(i));
+            currOctree.clearOctree();
+            currOctree.saveIntoOctreeFilepath();
+        }
+        this.saveIntoTableFilepath();
     }
 
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
@@ -283,11 +288,12 @@ public class Table implements Serializable {
             return;
         }
         if(deleteUsingOctree(htblColNameValue)){
-            saveIntoTableFilepath();
+//            saveIntoTableFilepath();
             return;
         }
-        for(int i=0;i<this.getTablePages().size();i++){
-            Page loadedPage = FileManipulation.loadPage(this.getTablePages().get(i));
+        for(int i=0;i<this.tablePages.size();i++){
+//            System.out.println(this.tablePages.get(i));
+            Page loadedPage = FileManipulation.loadPage(this.tablePages.get(i));
             boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
             if(isPageDeleted){
                 this.getTablePages().remove(i);
@@ -343,10 +349,10 @@ public class Table implements Serializable {
         page.insertIntoPage(shift,this.octrees);
         int lastIndex = this.tablePages.size()-1;
         updateMinMax(page,lastIndex);
-        String oldPage = this.tablePages.get(page.getPageID()-1);
+        String oldPage = this.tablePages.get(lastIndex-1);
         String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
         Tuple wanted = new Tuple(shift,this.clusteringKey,clusterKeyDataType);
-        this.insertIntoOctree(wanted,true,page.getFilepath(),page.getFilepath());
+        this.insertIntoOctree(wanted,true,oldPage,page.getFilepath());
 //        this.insertIntoOctree(wanted,page.getFilepath());
         page = null;
     }
