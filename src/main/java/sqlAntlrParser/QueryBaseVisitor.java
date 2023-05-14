@@ -40,14 +40,14 @@ public class QueryBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitColumn_name(QueryParser.Column_nameContext ctx) { return visitChildren(ctx); }
+	@Override public T visitValue(QueryParser.ValueContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitValue(QueryParser.ValueContext ctx) { return visitChildren(ctx); }
+	@Override public T visitInsertValue(QueryParser.InsertValueContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -174,4 +174,18 @@ public class QueryBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitOtherUpdateColumnToSet(QueryParser.OtherUpdateColumnToSetContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitInsertColumnName(QueryParser.InsertColumnNameContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitAdditionalColumnInsert(QueryParser.AdditionalColumnInsertContext ctx) { return visitChildren(ctx); }
 }

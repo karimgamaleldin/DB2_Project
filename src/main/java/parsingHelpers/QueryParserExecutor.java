@@ -30,6 +30,7 @@ public class QueryParserExecutor {
             case "createindex": createIndexQuery();break;
             case "delete": deleteQuery(); break;
             case "update": updateQuery(); break;
+            case "insert": insertQuery(); break;
             default: throw new DBAppException("This Query isn't supported!");
         }
     }
@@ -54,8 +55,14 @@ public class QueryParserExecutor {
         System.out.println(qvh.getUpdateColumnToSetNames());
         System.out.println(qvh.getUpdateColumToSetValues());
     }
+    public void insertQuery(){
+        System.out.println(qvh.getStatement_Type());
+        System.out.println(qvh.getTableName());
+        System.out.println(qvh.getInsertColumns());
+        System.out.println(qvh.getInsertValues());
+    }
     public static void main(String[] args) throws DBAppException {
-        QueryParserExecutor qf = new QueryParserExecutor(null , "Update Students set name = 'Karim' , gpa = '0.7' where age = 10");
+        QueryParserExecutor qf = new QueryParserExecutor(null , "Insert into Employees (Name , age , address) values ('karim' , 20 , 232)");
         qf.queryExecute();
     }
 

@@ -18,11 +18,11 @@ sql_query :  update_table | insert_into | delete_from | select_from | create_ind
 
 update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition ;
 
-insert_into : INSERT INTO IDENTIFIER LPAREN column_name (COMMA column_name)* RPAREN VALUES LPAREN value (COMMA value)* RPAREN;
-
-column_name : IDENTIFIER;
+insert_into : INSERT INTO tableName '(' insertColumnName (additionalColumnInsert)* ')' VALUES '(' insertValue (',' insertValue)* ')';
 
 value : INTEGER | DECIMAL | STRING;
+
+insertValue: value;
 
 delete_from : DELETE FROM tableName (WHERE updateDeleteCondition (otherDeleteCondition)*)?;
 
@@ -59,6 +59,10 @@ updateValue: INTEGER | DECIMAL | STRING;
 updateColumnToSet : updateColumnName '=' updateValue;
 
 otherUpdateColumnToSet : ',' updateColumnName '=' updateValue;
+
+insertColumnName: IDENTIFIER;
+
+additionalColumnInsert: ',' insertColumnName ;
 
 
 

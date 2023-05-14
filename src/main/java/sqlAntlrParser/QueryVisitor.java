@@ -31,17 +31,17 @@ public interface QueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInsert_into(QueryParser.Insert_intoContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QueryParser#column_name}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitColumn_name(QueryParser.Column_nameContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link QueryParser#value}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitValue(QueryParser.ValueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#insertValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInsertValue(QueryParser.InsertValueContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link QueryParser#delete_from}.
 	 * @param ctx the parse tree
@@ -150,4 +150,16 @@ public interface QueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitOtherUpdateColumnToSet(QueryParser.OtherUpdateColumnToSetContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#insertColumnName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInsertColumnName(QueryParser.InsertColumnNameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#additionalColumnInsert}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAdditionalColumnInsert(QueryParser.AdditionalColumnInsertContext ctx);
 }
