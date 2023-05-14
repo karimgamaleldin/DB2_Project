@@ -26,7 +26,7 @@ column_name : IDENTIFIER;
 
 value : INTEGER | DECIMAL | STRING;
 
-delete_from : DELETE FROM IDENTIFIER WHERE condition;
+delete_from : DELETE FROM tableName (WHERE deleteCondition (otherDeleteCondition)*)?;
 
 select_from : SELECT '*' FROM tableName (WHERE condition (otherSelectCondition)*)?;
 
@@ -45,6 +45,18 @@ operator: GREATERTHAN | GREATERTHANOREQUAL | LESSTHAN | LESSTHANOREQUAL | NOTEQU
 otherSelectCondition: columnOperators columnName operator value;
 
 columnOperators: AND | XOR | OR ;
+
+deleteColumnName: IDENTIFIER;
+
+deleteOperator: GREATERTHAN | GREATERTHANOREQUAL | LESSTHAN | LESSTHANOREQUAL | NOTEQUAL | EQUAL;
+
+deleteValue: INTEGER | DECIMAL | STRING;
+
+deleteCondition : deleteColumnName deleteOperator deleteValue;
+
+otherDeleteCondition: ',' deleteColumnName deleteOperator deleteValue;
+
+
 
 
 

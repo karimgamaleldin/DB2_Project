@@ -21,6 +21,10 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     private Vector<String> selectColumnOperators = new Vector<String>();
     //create index
     private Vector<String> createIndexColumns = new Vector<String>();
+    //delete
+    private Vector<String> deleteColumnNames = new Vector<String>();
+    private Vector<String> deleteOperatorValues = new Vector<String>();
+    private Vector<String> deleteObjectValues = new Vector<String>();
 
     //Select From
 
@@ -65,6 +69,26 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         this.createIndexColumns.add(ctx.getText());
         return visitChildren(ctx);
     }
+
+    //delete
+    public Void visitDelete_from(QueryParser.Delete_fromContext ctx) {
+        this.statement_Type = "delete";
+        return visitChildren(ctx);
+    }
+
+    public Void visitDeleteColumnName(QueryParser.DeleteColumnNameContext ctx) {
+        this.deleteColumnNames.add(ctx.getText());
+        return visitChildren(ctx); }
+    public Void visitDeleteOperator(QueryParser.DeleteOperatorContext ctx) {
+        this.deleteOperatorValues.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+    public Void visitDeleteValue(QueryParser.DeleteValueContext ctx) {
+        this.deleteObjectValues.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+    //getters and setters
+
     public String getStatement_Type() {
         return statement_Type;
     }
@@ -129,8 +153,32 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         this.createIndexColumns = createIndexColumns;
     }
 
+    public Vector<String> getDeleteColumnNames() {
+        return deleteColumnNames;
+    }
+
+    public void setDeleteColumnNames(Vector<String> deleteColumnNames) {
+        this.deleteColumnNames = deleteColumnNames;
+    }
+
+    public Vector<String> getDeleteObjectValues() {
+        return deleteObjectValues;
+    }
+
+    public void setDeleteObjectValues(Vector<String> deleteObjectValues) {
+        this.deleteObjectValues = deleteObjectValues;
+    }
+
+    public Vector<String> getDeleteOperatorValues() {
+        return deleteOperatorValues;
+    }
+
+    public void setDeleteOperatorValues(Vector<String> deleteOperatorValues) {
+        this.deleteOperatorValues = deleteOperatorValues;
+    }
+
     public static void main(String[] args){
-        String in = "Create Index on Student(age,gpa,name)";
+        String in = "Delete From Students where age = 10";
         in = in.toUpperCase();
         QueryLexer q = new QueryLexer(CharStreams.fromString(in));
         CommonTokenStream commonTokenStream = new CommonTokenStream(q);
@@ -139,9 +187,11 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
 //        System.out.println(tree.toStringTree(parser));
         QueryVisitorHelper qv = new QueryVisitorHelper();
         qv.visit(parser.sql_query());
-        System.out.println(qv.tableName);
         System.out.println(qv.statement_Type);
-        System.out.print(qv.createIndexColumns);
+        System.out.println(qv.tableName);
+        System.out.println(qv.getDeleteColumnNames());
+        System.out.println(qv.getDeleteOperatorValues());
+        System.out.print(qv.getDeleteObjectValues());
 
 
     }

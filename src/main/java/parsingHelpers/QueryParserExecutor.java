@@ -26,8 +26,9 @@ public class QueryParserExecutor {
     public void queryExecute() throws DBAppException {
         visitQuery();
         switch(qvh.getStatement_Type()){
-            case"select": selectQuery(); break;
-            case"createindex": createIndexQuery();break;
+            case "select": selectQuery(); break;
+            case "createindex": createIndexQuery();break;
+            case "delete": deleteQuery(); break;
             default: throw new DBAppException("This Query isn't supported!");
         }
     }
@@ -41,9 +42,15 @@ public class QueryParserExecutor {
         System.out.println(qvh.getTableName());
         System.out.println("createIndex!!!!!!!!!!!!!!!!!!!!!");
     }
+    public void deleteQuery(){
+        System.out.println(qvh.getDeleteColumnNames());
+        System.out.println(qvh.getDeleteOperatorValues());
+        System.out.println(qvh.getDeleteObjectValues());
+        System.out.println("Delete!!!!!!!!!!!!!!!!!!!!!");
+    }
 
     public static void main(String[] args) throws DBAppException {
-        QueryParserExecutor qf = new QueryParserExecutor(null , "Create Index on Student(age,gpa,name)");
+        QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students where name = \'karim\'");
         qf.queryExecute();
     }
 

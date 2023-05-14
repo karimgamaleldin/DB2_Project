@@ -108,4 +108,34 @@ public interface QueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitColumnOperators(QueryParser.ColumnOperatorsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#deleteColumnName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteColumnName(QueryParser.DeleteColumnNameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#deleteOperator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteOperator(QueryParser.DeleteOperatorContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#deleteValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteValue(QueryParser.DeleteValueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#deleteCondition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDeleteCondition(QueryParser.DeleteConditionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#otherDeleteCondition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOtherDeleteCondition(QueryParser.OtherDeleteConditionContext ctx);
 }
