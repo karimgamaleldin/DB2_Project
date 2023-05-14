@@ -45,4 +45,7 @@ public class SQLTerm {
     public void set_objValue(Object _objValue) {
         this._objValue = _objValue;
     }
+    public String toString(){
+        return this._strTableName + "-->" + this._strColumnName + "-->" + this._strOperator + "-->" + this._objValue;
+    }
 }
