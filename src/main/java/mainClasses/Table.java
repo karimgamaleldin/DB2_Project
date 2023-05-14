@@ -175,14 +175,21 @@ public class Table implements Serializable {
             Point insertPoint = new Point(width,length,height,newRef);
             if(!isShifted) {
                 currOctree.insertIntoOctree(insertPoint);
+                System.out.println("not shifted: "+oldRef+","+newRef+"-"+insertPoint);
             }else {
                 Vector<Point> pts = currOctree.search(insertPoint);
-                for(Point currPoint: pts){
-                    if(insertPoint.isEqual(currPoint)){
-                        currPoint.getReferences().remove(oldRef);
-                        currPoint.getReferences().add(newRef);
+                System.out.println("shifted: "+oldRef+","+newRef+"-"+insertPoint+", "+pts);
+                if(pts.size()==0){
+                    currOctree.insertIntoOctree(insertPoint);
+                }else {
+                    for(Point currPoint: pts){
+                        if(insertPoint.isEqual(currPoint)){
+                            currPoint.getReferences().remove(oldRef);
+                            currPoint.getReferences().add(newRef);
+                        }
                     }
                 }
+
             }
             currOctree.saveIntoOctreeFilepath();
         }

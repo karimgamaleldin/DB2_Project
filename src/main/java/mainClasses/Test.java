@@ -119,16 +119,19 @@ public class Test {
         tuple24.put("name", "ZZZZZZZZZZ");
         tuple24.put("gpa", 5.0);
         tuple24.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("31-12-2023"));
+
         Hashtable<String, Object> tuple25 = new Hashtable();
         tuple25.put("age", 28);
         tuple25.put("name", "ZZZZZZZZZZ");
         tuple25.put("gpa", 5.0);
         tuple25.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("31-12-2023"));
+
         Hashtable<String, Object> tuple26 = new Hashtable();
         tuple26.put("age", 31);
         tuple26.put("name", "ZZZZZZZZZZ");
         tuple26.put("gpa", 5.0);
         tuple26.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("31-12-2021"));
+
         Hashtable<String, Object> tuple27 = new Hashtable();
         tuple27.put("age", 30);
         tuple27.put("name", "ZZZZZZZZZZ");
@@ -158,6 +161,7 @@ public class Test {
 
         DBApp dbApp = new DBApp();
         dbApp.init();
+
         dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
         dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
         dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
