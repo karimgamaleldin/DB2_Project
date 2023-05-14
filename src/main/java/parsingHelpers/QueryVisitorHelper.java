@@ -33,8 +33,13 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     private Vector<String> insertColumns = new Vector<String>();
     private Vector<String> insertValues = new Vector<String>();
 
-    //Select From
+    // Create Table
+    private Vector<String> createColumnNames = new Vector<String>();
+    private Vector<String> createColumnTypes = new Vector<String>();
+    private Vector<String> createTableClusteringKey = new Vector<String>();
+    private String lastSeen = "";
 
+    //Select From
     public Void visitSelect_from (QueryParser.Select_fromContext ctx){
         this.statement_Type = "select";
         return visitChildren(ctx);
@@ -69,7 +74,7 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
 
     // Create Index
     public Void visitCreate_index(QueryParser.Create_indexContext ctx) {
-        this.statement_Type = "createindex";
+        this.statement_Type = "create-index";
         return visitChildren(ctx);
     }
     public Void visitIndexColumnName(QueryParser.IndexColumnNameContext ctx) {
@@ -120,6 +125,26 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     }
     public Void visitInsertValue(QueryParser.InsertValueContext ctx) {
         this.insertValues.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+
+    //Create Table
+
+    public Void visitCreate_table(QueryParser.Create_tableContext ctx) {
+        this.statement_Type = "create-table";
+        return visitChildren(ctx);
+    }
+    public Void visitCreateColumnName(QueryParser.CreateColumnNameContext ctx) {
+        this.lastSeen = ctx.getText();
+        this.createColumnNames.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+    public Void visitPrimaryKey(QueryParser.PrimaryKeyContext ctx) {
+        this.createTableClusteringKey.add(this.lastSeen);
+        return visitChildren(ctx);
+    }
+    public Void visitDatatype(QueryParser.DatatypeContext ctx) {
+        this.createColumnTypes.add(ctx.getText());
         return visitChildren(ctx);
     }
     //getters and setters
@@ -237,8 +262,40 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         this.insertValues = insertValues;
     }
 
+    public Vector<String> getCreateColumnNames() {
+        return createColumnNames;
+    }
+
+    public void setCreateColumnNames(Vector<String> createColumnNames) {
+        this.createColumnNames = createColumnNames;
+    }
+
+    public Vector<String> getCreateColumnTypes() {
+        return createColumnTypes;
+    }
+
+    public void setCreateColumnTypes(Vector<String> createColumnTypes) {
+        this.createColumnTypes = createColumnTypes;
+    }
+
+    public Vector<String> getCreateTableClusteringKey() {
+        return createTableClusteringKey;
+    }
+
+    public void setCreateTableClusteringKey(Vector<String> createTableClusteringKey) {
+        this.createTableClusteringKey = createTableClusteringKey;
+    }
+
+    public String getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(String lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
     public static void main(String[] args){
-        String in = "Insert into Students (Name , age , gpa) values ('karim' , 20 , 2)" ;
+        String in = "CREATE TABLE STUDENTS (Name varchar Primary Key , age int , gpa decimal)" ;
         in = in.toUpperCase();
         QueryLexer q = new QueryLexer(CharStreams.fromString(in));
         CommonTokenStream commonTokenStream = new CommonTokenStream(q);
@@ -247,9 +304,5 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
 //        System.out.println(tree.toStringTree(parser));
         QueryVisitorHelper qv = new QueryVisitorHelper();
         qv.visit(parser.sql_query());
-        System.out.println(qv.statement_Type);
-        System.out.println(qv.tableName);
-        System.out.println(qv.insertColumns);
-        System.out.println(qv.insertValues);
     }
 }

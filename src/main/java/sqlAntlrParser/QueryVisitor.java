@@ -19,6 +19,36 @@ public interface QueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSql_query(QueryParser.Sql_queryContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link QueryParser#create_table}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreate_table(QueryParser.Create_tableContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#column_def}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitColumn_def(QueryParser.Column_defContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#createColumnName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreateColumnName(QueryParser.CreateColumnNameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#primaryKey}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrimaryKey(QueryParser.PrimaryKeyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#datatype}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDatatype(QueryParser.DatatypeContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link QueryParser#update_table}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

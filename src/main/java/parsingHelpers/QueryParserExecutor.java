@@ -7,6 +7,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import sqlAntlrParser.QueryLexer;
 import sqlAntlrParser.QueryParser;
 
+import java.util.Hashtable;
+import java.util.Vector;
+
 public class QueryParserExecutor {
     private DBApp app;
     private String query;
@@ -27,10 +30,11 @@ public class QueryParserExecutor {
         visitQuery();
         switch(qvh.getStatement_Type()){
             case "select": selectQuery(); break;
-            case "createindex": createIndexQuery();break;
+            case "create-index": createIndexQuery();break;
             case "delete": deleteQuery(); break;
             case "update": updateQuery(); break;
             case "insert": insertQuery(); break;
+            case "create-table": createTableQuery(); break;
             default: throw new DBAppException("This Query isn't supported!");
         }
     }
@@ -46,6 +50,7 @@ public class QueryParserExecutor {
     }
     public void deleteQuery(){
         System.out.println(qvh.getUpdateDeleteColumnNames());
+        System.out.println(qvh.getTableName());
         System.out.println(qvh.getUpdateDeleteObjectValues());
         System.out.println("Delete!!!!!!!!!!!!!!!!!!!!!");
     }
@@ -61,8 +66,23 @@ public class QueryParserExecutor {
         System.out.println(qvh.getInsertColumns());
         System.out.println(qvh.getInsertValues());
     }
+    public void createTableQuery(){
+        System.out.println("column Names: " + qvh.getCreateColumnNames());
+        System.out.println("column types: " +qvh.getCreateColumnTypes());
+        System.out.println("clusteringKey: " +qvh.getCreateTableClusteringKey()); // if more than 1 throw error
+        System.out.println("create Tableeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    }
+    public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values){
+        String tableName = qvh.getTableName();
+        for(int i = 0 ; i < keys.size() ; i++){
+            String keyTemp = keys.get(i);
+//            String columnType = this.app.
+//            String valueString = keys.get(i);
+        }
+        return null;
+    }
     public static void main(String[] args) throws DBAppException {
-        QueryParserExecutor qf = new QueryParserExecutor(null , "Insert into Employees (Name , age , address) values ('karim' , 20 , 232)");
+        QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students  where name = 'karim'");
         qf.queryExecute();
     }
 

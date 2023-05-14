@@ -8,13 +8,17 @@ package sqlAntlrParser;
 package sqlAntlrParser;
 }
 /* Parser Rules */
-sql_query :  update_table | insert_into | delete_from | select_from | create_index;
+sql_query :  update_table | insert_into | delete_from | select_from | create_index | create_table;
 
-//create_table : CREATE TABLE IDENTIFIER LPAREN column_def (COMMA column_def)* RPAREN SEMICOLON;
+create_table : CREATE TABLE tableName '(' column_def (',' column_def)* ')';
 
-//column_def : IDENTIFIER datatype (PRIMARY KEY)?;
+column_def : createColumnName datatype (primaryKey)?;
 
-//datatype : 'INT' | 'DECIMAL' | 'VARCHAR';
+createColumnName: IDENTIFIER;
+
+primaryKey: PRIMARY KEY;
+
+datatype : 'INT' | 'DECIMAL' | 'VARCHAR' | 'DATE' ;
 
 update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition ;
 
@@ -86,6 +90,8 @@ INDEX : 'INDEX';
 ON : 'ON';
 INTO : 'INTO';
 VALUES : 'VALUES';
+PRIMARY: 'PRIMARY';
+KEY: 'KEY';
 IDENTIFIER : LETTER (LETTER | DIGIT | '_')*;
 INTEGER: DIGIT+;
 DECIMAL : DIGIT+ '.' DIGIT*;
