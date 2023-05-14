@@ -88,7 +88,7 @@ public class Table implements Serializable {
         return this.getTablePages().isEmpty();
     }
 
-    public void insert(Hashtable<String,Object> htblColNameValue) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+    public void insert(Hashtable<String,Object> htblColNameValue) throws Exception {
         if(!htblColNameValue.containsKey(clusteringKey)){
             throw new DBAppException("clustering key not found");
         }
@@ -166,7 +166,7 @@ public class Table implements Serializable {
         loadedPage = null;
         System.gc();
     }
-    public void insertIntoOctree(Tuple tuple, boolean isShifted, String oldRef, String newRef) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+    public void insertIntoOctree(Tuple tuple, boolean isShifted, String oldRef, String newRef) throws Exception {
         for(String octreePath: octrees){
             Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreePath);
             Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
@@ -344,7 +344,7 @@ public class Table implements Serializable {
         maxValues.remove(index);
         maxValues.add(index,max);
     }
-    public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+    public void insertIntoCreatedPage(Hashtable<String, Object> shift) throws Exception {
         Page page = createNewPage();
         page.insertIntoPage(shift,this.octrees);
         int lastIndex = this.tablePages.size()-1;
@@ -357,7 +357,7 @@ public class Table implements Serializable {
         page = null;
     }
 
-    public void shift(int nextPage,Tuple shifted) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+    public void shift(int nextPage,Tuple shifted) throws Exception {
         if(shifted==null) {
             return;
         }
