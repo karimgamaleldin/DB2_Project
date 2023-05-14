@@ -154,6 +154,14 @@ public abstract class FileManipulation {
 //        System.out.println("value"+Integer.parseInt(prop.getProperty(cfgPath)));
         return Integer.parseInt(prop.getProperty(cfgPath));
     }
+//    public static String fixTableName(String tableName){
+//        return tableName.toUpperCase().charAt(0) + tableName.substring(1).toLowerCase();
+//    }
+//
+//    public static String fixColumnName(String columnName){
+//        return columnName.toUpperCase().charAt(0) + columnName.substring(1).toLowerCase();
+//
+//    }
 
 
 }

@@ -1,12 +1,12 @@
 package parsingHelpers;
 
-import mainClasses.DBApp;
-import mainClasses.DBAppException;
+import mainClasses.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import sqlAntlrParser.QueryLexer;
 import sqlAntlrParser.QueryParser;
 
+import java.io.File;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -26,7 +26,7 @@ public class QueryParserExecutor {
         qvh.visit(parser.sql_query());
     }
 
-    public void queryExecute() throws DBAppException {
+    public void queryExecute() throws Exception {
         visitQuery();
         switch(qvh.getStatement_Type()){
             case "select": selectQuery(); break;
@@ -48,23 +48,26 @@ public class QueryParserExecutor {
         System.out.println(qvh.getTableName());
         System.out.println("createIndex!!!!!!!!!!!!!!!!!!!!!");
     }
-    public void deleteQuery(){
-        System.out.println(qvh.getUpdateDeleteColumnNames());
-        System.out.println(qvh.getTableName());
-        System.out.println(qvh.getUpdateDeleteObjectValues());
-        System.out.println("Delete!!!!!!!!!!!!!!!!!!!!!");
+    public void deleteQuery() throws Exception {
+        Hashtable<String , Object> htbl = getHashTable(qvh.getUpdateDeleteColumnNames() , qvh.getUpdateDeleteObjectValues());
+        String tableName = qvh.getTableName();
+        app.deleteFromTable(this.fixTableName(tableName) , htbl);
     }
-    public void updateQuery(){
-        System.out.println(qvh.getUpdateDeleteColumnNames());
-        System.out.println(qvh.getUpdateDeleteObjectValues());
-        System.out.println(qvh.getUpdateColumnToSetNames());
-        System.out.println(qvh.getUpdateColumToSetValues());
+    public void updateQuery() throws Exception {
+        String tableName = this.fixTableName(qvh.getTableName());
+        Hashtable<String , Object> htbl = getHashTable(qvh.getUpdateColumnToSetNames() , qvh.getUpdateColumToSetValues());
+        String tempClusteringKey = qvh.getUpdateDeleteObjectValues().get(0);
+        Metadata metaData = this.app.getMetaData();
+        String columnType = metaData.getColumnType(tableName , qvh.getUpdateDeleteColumnNames().get(0));
+        String valueString = tempClusteringKey.replaceAll("'" , "");
+//        Object valueObject = Column.adjustDataType(valueString , columnType);
+        app.updateTable(tableName , valueString , htbl);
     }
-    public void insertQuery(){
-        System.out.println(qvh.getStatement_Type());
-        System.out.println(qvh.getTableName());
-        System.out.println(qvh.getInsertColumns());
-        System.out.println(qvh.getInsertValues());
+    public void insertQuery() throws Exception {
+        Hashtable<String , Object> htbl = getHashTable(qvh.getInsertColumns() , qvh.getInsertValues());
+        String tableName = qvh.getTableName();
+        System.out.println(htbl);
+        app.insertIntoTable(this.fixTableName(tableName) , htbl);
     }
     public void createTableQuery(){
         System.out.println("column Names: " + qvh.getCreateColumnNames());
@@ -72,16 +75,25 @@ public class QueryParserExecutor {
         System.out.println("clusteringKey: " +qvh.getCreateTableClusteringKey()); // if more than 1 throw error
         System.out.println("create Tableeeeeeeeeeeeeeeeeeeeeeeeeeee");
     }
-    public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values){
-        String tableName = qvh.getTableName();
+    public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values) throws Exception {
+        String tableName = this.fixTableName(qvh.getTableName());
+        Hashtable<String , Object> hashTable = new Hashtable<String , Object>();
         for(int i = 0 ; i < keys.size() ; i++){
-            String keyTemp = keys.get(i);
-//            String columnType = this.app.
-//            String valueString = keys.get(i);
+            String keyTemp = keys.get(i).toLowerCase();
+            Metadata metaData = this.app.getMetaData();
+            String columnType = metaData.getColumnType(tableName , keyTemp);
+            String valueString = values.get(i).replaceAll("'" , "");
+            Object valueObject = Column.adjustDataType(valueString , columnType);
+            hashTable.put(keyTemp , valueObject);
         }
-        return null;
+        return hashTable;
     }
-    public static void main(String[] args) throws DBAppException {
+
+    public String fixTableName(String s){
+        return s.toUpperCase().charAt(0) + s.substring(1).toLowerCase();
+    }
+
+    public static void main(String[] args) throws Exception {
         QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students  where name = 'karim'");
         qf.queryExecute();
     }

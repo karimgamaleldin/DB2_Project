@@ -24,9 +24,9 @@ update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* 
 
 insert_into : INSERT INTO tableName '(' insertColumnName (additionalColumnInsert)* ')' VALUES '(' insertValue (',' insertValue)* ')';
 
-value : INTEGER | DECIMAL | STRING;
+value : INTEGER | DECIMAL | STRING | DATE;
 
-insertValue: value;
+insertValue: INTEGER | DECIMAL | STRING | DATE;
 
 delete_from : DELETE FROM tableName (WHERE updateDeleteCondition (otherDeleteCondition)*)?;
 
@@ -50,7 +50,7 @@ columnOperators: AND | XOR | OR ;
 
 updateDeleteColumnName: IDENTIFIER;
 
-updateDeleteValue: INTEGER | DECIMAL | STRING;
+updateDeleteValue: INTEGER | DECIMAL | STRING | DATE;
 
 updateDeleteCondition : updateDeleteColumnName '=' updateDeleteValue;
 
@@ -58,7 +58,7 @@ otherDeleteCondition: ',' updateDeleteColumnName '=' updateDeleteValue;
 
 updateColumnName: IDENTIFIER;
 
-updateValue: INTEGER | DECIMAL | STRING;
+updateValue: INTEGER | DECIMAL | STRING | DATE;
 
 updateColumnToSet : updateColumnName '=' updateValue;
 
@@ -74,6 +74,10 @@ additionalColumnInsert: ',' insertColumnName ;
 /* Lexer Rules */
 fragment LETTER : [a-zA-Z];
 fragment DIGIT : [0-9];
+fragment DAY: [0-9][0-9];
+fragment MONTH: [0-9][0-9];
+fragment YEAR: [0-9][0-9][0-9][0-9];
+
 TABLE : 'TABLE';
 CREATE : 'CREATE';
 UPDATE : 'UPDATE';
@@ -96,6 +100,7 @@ IDENTIFIER : LETTER (LETTER | DIGIT | '_')*;
 INTEGER: DIGIT+;
 DECIMAL : DIGIT+ '.' DIGIT*;
 STRING : '\'' ~('\''|'\r'|'\n')* '\'';
+DATE: YEAR '-' MONTH '-' DAY ;
 GREATERTHAN: '>';
 GREATERTHANOREQUAL: '>=';
 LESSTHAN: '<';

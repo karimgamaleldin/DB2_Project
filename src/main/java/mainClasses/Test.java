@@ -155,41 +155,41 @@ public class Test {
         htblColNameMax.put("gpa", "5");
         htblColNameMax.put("dob", "2023-12-31");
         htblColNameMax.put("job", "zzzzzzzzzzzzzzzzzzzz");
-
+//
         DBApp dbApp = new DBApp();
         dbApp.init();
-        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
-        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
-////    dbApp.insertIntoTable("Students", tuple0);
-         dbApp.insertIntoTable("Students", tuple1);
-         dbApp.insertIntoTable("Students", tuple2);
-         dbApp.insertIntoTable("Students", tuple6);
-         dbApp.insertIntoTable("Students", tuple7);
-         dbApp.insertIntoTable("Students", tuple8);
-         dbApp.insertIntoTable("Students", tuple3);
-         dbApp.insertIntoTable("Students", tuple5);
-         dbApp.insertIntoTable("Students", tuple4);
-         dbApp.insertIntoTable("Students", tuple9);
-         dbApp.insertIntoTable("Students", tuple11);
-         dbApp.insertIntoTable("Students", tuple10);
-         dbApp.insertIntoTable("Students", tuple12);
-         dbApp.insertIntoTable("Students", tuple13);
-         dbApp.insertIntoTable("Students", tuple14);
-         dbApp.insertIntoTable("Students", tuple15);
-         dbApp.insertIntoTable("Students", tuple16);
-         dbApp.insertIntoTable("Students", tuple17);
-         dbApp.insertIntoTable("Students", tuple18);
-         dbApp.insertIntoTable("Students", tuple19);
-         dbApp.insertIntoTable("Students", tuple20);
-         dbApp.insertIntoTable("Students", tuple21);
-         dbApp.insertIntoTable("Students", tuple22);
-         dbApp.insertIntoTable("Students", tuple23);
-         dbApp.insertIntoTable("Students", tuple24);
-         dbApp.insertIntoTable("Students", tuple25);
-         dbApp.insertIntoTable("Students", tuple26);
-         dbApp.insertIntoTable("Students", tuple27);
+//        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
+//        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
+//////    dbApp.insertIntoTable("Students", tuple0);
+//         dbApp.insertIntoTable("Students", tuple1);
+//         dbApp.insertIntoTable("Students", tuple2);
+//         dbApp.insertIntoTable("Students", tuple6);
+//         dbApp.insertIntoTable("Students", tuple7);
+//         dbApp.insertIntoTable("Students", tuple8);
+//         dbApp.insertIntoTable("Students", tuple3);
+//         dbApp.insertIntoTable("Students", tuple5);
+//         dbApp.insertIntoTable("Students", tuple4);
+//         dbApp.insertIntoTable("Students", tuple9);
+//         dbApp.insertIntoTable("Students", tuple11);
+//         dbApp.insertIntoTable("Students", tuple10);
+//         dbApp.insertIntoTable("Students", tuple12);
+//         dbApp.insertIntoTable("Students", tuple13);
+//         dbApp.insertIntoTable("Students", tuple14);
+//         dbApp.insertIntoTable("Students", tuple15);
+//         dbApp.insertIntoTable("Students", tuple16);
+//         dbApp.insertIntoTable("Students", tuple17);
+//         dbApp.insertIntoTable("Students", tuple18);
+//         dbApp.insertIntoTable("Students", tuple19);
+//         dbApp.insertIntoTable("Students", tuple20);
+//         dbApp.insertIntoTable("Students", tuple21);
+//         dbApp.insertIntoTable("Students", tuple22);
+//         dbApp.insertIntoTable("Students", tuple23);
+//         dbApp.insertIntoTable("Students", tuple24);
+//         dbApp.insertIntoTable("Students", tuple25);
+//         dbApp.insertIntoTable("Students", tuple26);
+//         dbApp.insertIntoTable("Students", tuple27);
 
         Hashtable<String, Object> updateHtbl = new Hashtable();
         updateHtbl.put("name", "updatedName");
@@ -200,7 +200,7 @@ public class Test {
         deletingCriteria0.put("gpa", 3);
         Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), (String)dbApp.getTables().get(0));
         Iterator var35 = table.getTablePages().iterator();
-
+//
         while(var35.hasNext()) {
             String pageName = (String)var35.next();
             Page p = FileManipulation.loadPage(pageName);
@@ -217,6 +217,10 @@ public class Test {
             octree.printOctree();
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
+//        StringBuffer sb = new StringBuffer();
+//        sb.append("Insert Into Students (job , gpa , age , name , dob) values ('eng' , 2, 37 , 'lulu' , '2002-10-30')" );
+//        dbApp.parseSQL(sb);
+
 
     }
 }

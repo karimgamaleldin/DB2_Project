@@ -2,6 +2,7 @@ package mainClasses;
 
 import index.Octree;
 import index.Point;
+import parsingHelpers.QueryParserExecutor;
 import sqlterm.SQLTerm;
 
 import java.io.IOException;
@@ -502,6 +503,10 @@ public class DBApp implements Serializable {
                 }
             }
         }
+    }
+    public void parseSQL( StringBuffer strbufSQL ) throws Exception {
+        QueryParserExecutor qpe = new QueryParserExecutor(this , strbufSQL.toString());
+        qpe.queryExecute();
     }
 
 

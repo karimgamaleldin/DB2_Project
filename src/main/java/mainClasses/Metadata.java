@@ -222,7 +222,7 @@ public class Metadata {
         Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
         for(int i = 0 ; i < columns.size(); i++){
             Column currentColumn = columns.get(i);
-            if(strTableName.equals(currentColumn.getTableName()) && columnName.equals(currentColumn.getColumnName())){
+            if(strTableName.equalsIgnoreCase(currentColumn.getTableName()) && columnName.equalsIgnoreCase(currentColumn.getColumnName())){
                 type = currentColumn.getColumnType();
                 break;
             }
