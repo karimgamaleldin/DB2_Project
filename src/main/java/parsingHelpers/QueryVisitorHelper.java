@@ -28,6 +28,11 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     //update :
     private Vector<String> updateColumnToSetNames = new Vector<String>();
     private Vector<String> updateColumToSetValues = new Vector<String>();
+
+    //insert:
+    private Vector<String> insertColumns = new Vector<String>();
+    private Vector<String> insertValues = new Vector<String>();
+
     //Select From
 
     public Void visitSelect_from (QueryParser.Select_fromContext ctx){
@@ -103,7 +108,21 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         return visitChildren(ctx);
     }
 
-        //getters and setters
+    //Insert
+    public Void visitInsert_into(QueryParser.Insert_intoContext ctx) {
+        this.statement_Type = "insert";
+        return visitChildren(ctx);
+    }
+
+    public Void visitInsertColumnName(QueryParser.InsertColumnNameContext ctx) {
+        this.insertColumns.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+    public Void visitInsertValue(QueryParser.InsertValueContext ctx) {
+        this.insertValues.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+    //getters and setters
 
     public String getStatement_Type() {
         return statement_Type;
@@ -202,8 +221,24 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         this.updateColumToSetValues = updateColumToSetValues;
     }
 
+    public Vector<String> getInsertColumns() {
+        return insertColumns;
+    }
+
+    public void setInsertColumns(Vector<String> insertColumns) {
+        this.insertColumns = insertColumns;
+    }
+
+    public Vector<String> getInsertValues() {
+        return insertValues;
+    }
+
+    public void setInsertValues(Vector<String> insertValues) {
+        this.insertValues = insertValues;
+    }
+
     public static void main(String[] args){
-        String in = "Update Students set name = 'Karim' , gpa = '0.7' where age = 10";
+        String in = "Insert into Students (Name , age , gpa) values ('karim' , 20 , 2)" ;
         in = in.toUpperCase();
         QueryLexer q = new QueryLexer(CharStreams.fromString(in));
         CommonTokenStream commonTokenStream = new CommonTokenStream(q);
@@ -214,12 +249,7 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         qv.visit(parser.sql_query());
         System.out.println(qv.statement_Type);
         System.out.println(qv.tableName);
-        System.out.println(qv.getUpdateDeleteColumnNames());
-        System.out.println(qv.getUpdateDeleteObjectValues());
-        System.out.println(qv.getUpdateColumnToSetNames());
-        System.out.println(qv.getUpdateColumToSetValues());
-
-
-
+        System.out.println(qv.insertColumns);
+        System.out.println(qv.insertValues);
     }
 }
