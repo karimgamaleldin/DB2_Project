@@ -144,7 +144,7 @@ public class Page implements Serializable{
 
         return lastTuple;
     }
-    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException {
+    public boolean deleteFromPageFromPoint(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         // true: page is empty and deleted so delete from table
         // false: page is not empty so don't delete from table
         if(htblColNameValue.containsKey(this.getClusteringKey())){
@@ -178,7 +178,70 @@ public class Page implements Serializable{
         return false;
     }
 
+    public boolean deleteFromPage(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
+        // true: page is empty and deleted so delete from table
+        // false: page is not empty so don't delete from table
+        if(htblColNameValue.containsKey(this.getClusteringKey())){
+            int indexDeleted = getIndexBinarySearch(htblColNameValue);
+            if(indexDeleted == -1){
+                return false;
+            }
+            Tuple tupleToBeDeleted = this.pageTuples.get(indexDeleted);
+            if(shouldBeDeleted(tupleToBeDeleted,htblColNameValue)){
+                pageTuples.remove(indexDeleted);
+                this.deleteFromOctree(tupleToBeDeleted);
+            }
+        } else {
+            for(int i = 0 ; i<pageTuples.size();i++){
+                Tuple currentTuple = pageTuples.get(i);
+                boolean getDeleted = shouldBeDeleted(currentTuple,htblColNameValue);
+                if(getDeleted) {
+                    pageTuples.remove(i);
+                    i--;
+                    this.deleteFromOctree(currentTuple);
+                }
+            }
+        }
+//        //print page -------------------
+//        printPageInfo();
 
+        if(isPageEmpty()) {
+            FileManipulation.deleteEntireFile(this.filepath);
+            return true;
+        }
+        updateMinMax();
+        saveIntoPageFilepath();
+        return false;
+    }
+
+    public void deleteFromOctree(Tuple tuple) throws IOException, ClassNotFoundException, DBAppException {
+        Table currTable = FileManipulation.loadTable("src/main/resources/data/tables/",this.tableName);
+        for(int i=0;i<currTable.getOctrees().size();i++){
+            Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",currTable.getOctrees().get(i));
+            Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
+            Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
+            Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
+            Point currPoint = new Point(width,length,height,null);
+            Vector<Point> pts = currOctree.search(currPoint);
+            System.out.println(pts);
+            for(Point p : pts){
+                System.out.println(currPoint+"---"+p+": "+currPoint.isEqual(p));
+                if(currPoint.isEqual(p)){
+                    p.getReferences().remove(this.filepath);
+                    if(p.getReferences().size()==0){
+                        Octree parent = p.getParent();
+                        if(p.checkNulls()){
+                            parent.getOverflow().remove(p);
+                        }else {
+                            parent.getPoints().remove(p);
+                        }
+                    }
+                    break;
+                }
+            }
+            currOctree.saveIntoOctreeFilepath();
+        }
+    }
     public boolean shouldBeDeleted(Tuple currentTuple, Hashtable<String, Object> htblColNameValue){
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
         for (Map.Entry<String, Object> entry : entrySet) {

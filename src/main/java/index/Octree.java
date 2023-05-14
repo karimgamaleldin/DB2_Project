@@ -33,6 +33,7 @@ public class Octree implements Serializable {
         this.strColLength = strColLength;
         this.strColHeight = strColHeight;
         this.tableName = strTableName;
+        this.name = strColWidth+strColLength+strColHeight+"Index_octree";
         this.filepath = "src/main/resources/data/indices/"+strTableName+"/"+name+"_octree.class";
 //        this.saveIntoOctreeFilepath();
     }
@@ -64,12 +65,12 @@ public class Octree implements Serializable {
             if(indexOfPoint!=-1){
                 Point currPoint = this.overflow.get(indexOfPoint);
                 currPoint.insertDups(p);
-                this.saveIntoOctreeFilepath();
+//                this.saveIntoOctreeFilepath();
                 return true;
             }else if(this.points.size()<this.maxEntriesPerCube){
                 p.setParent(this);
                 this.overflow.add(p);
-                this.saveIntoOctreeFilepath();
+//                this.saveIntoOctreeFilepath();
                 return true;
             }
         }
@@ -202,6 +203,7 @@ public class Octree implements Serializable {
                 }
             }
         }
+        this.saveIntoOctreeFilepath();
 //        checkInsertedValues(tobeDeletedPoint);
 //        Vector<Octree> octrees = new Vector<>();
 //        searchForOctree(tobeDeletedPoint,octrees);
@@ -228,7 +230,7 @@ public class Octree implements Serializable {
 //            pointToBeDeleted.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
 //        }
 //        clearOverflow();
-        this.saveIntoOctreeFilepath();
+//        this.saveIntoOctreeFilepath();
     }
     public boolean canBeUsed(HashMap<String , Object> hashMap){
         return hashMap.containsKey(strColHeight) && hashMap.containsKey(strColLength) && hashMap.containsKey(strColWidth);
@@ -251,10 +253,11 @@ public class Octree implements Serializable {
     public void updateInOctree(Object oldValOfCol1, Object oldValOfCol2, Object oldValOfCol3, Hashtable<String, Object> htblColNameValue,String ref) throws DBAppException, IOException, ClassNotFoundException, ParseException {
         Point oldPoint = new Point(oldValOfCol1,oldValOfCol2,oldValOfCol3, null);
         Vector<Point> pointsToBeUpdated = search(oldPoint);
+        Point requiredPoint = null;
         for(int i=0;i<pointsToBeUpdated.size();i++){
             Point currPoint = pointsToBeUpdated.get(i);
             if(oldPoint.isEqual(currPoint)){
-                currPoint.getReferences().remove(ref);
+                requiredPoint = currPoint;
                 break;
             }
         }
@@ -263,8 +266,19 @@ public class Octree implements Serializable {
         Object newHeight = htblColNameValue.get(this.strColHeight)==null?oldValOfCol3:htblColNameValue.get(this.strColHeight);
         Point newPoint = new Point(newWidth,newLength,newHeight,ref);
         if(!oldPoint.isEqual(newPoint)){
+            requiredPoint.getReferences().remove(ref);
+            if(requiredPoint.getReferences().size()==0){
+                Octree parent = requiredPoint.getParent();
+                if(requiredPoint.checkNulls()){
+                    parent.overflow.remove(requiredPoint);
+                }else {
+                    parent.points.remove(requiredPoint);
+                }
+            }
             this.insertIntoOctree(newPoint);
         }
+        this.saveIntoOctreeFilepath();
+
 //        checkInsertedValues(tobeUpdatedPoint);
 //        Vector<Octree> octrees = new Vector<>();
 //        searchForOctree(tobeUpdatedPoint,octrees);
@@ -287,8 +301,8 @@ public class Octree implements Serializable {
 //            Point newPoint = new Point(newWidth,newLength,newHeight,ref);
 //            this.insertIntoOctree(newPoint);
 //            // may cause an error
-            this.saveIntoOctreeFilepath();
 //        }
+//        this.saveIntoOctreeFilepath();
     }
     public boolean checkClusteringKey(String datatype,Object clusteringKeyValue,Point p, String strClusteringKey){
         boolean hasWidthAsClusteringKey = this.getStrColWidth().equals(strClusteringKey);
@@ -538,6 +552,7 @@ public class Octree implements Serializable {
        printOctreeHelper(this,0,0,true);
     }
     private void printOctreeHelper(Octree octree,int child,int shift,boolean overflow){
+        if(octree==null) return;
         Object minWidth = octree.cube.getMinWidth();
         Object maxWidth = octree.cube.getMaxWidth();
         Object minHeight = octree.cube.getMinHeight();
@@ -618,5 +633,27 @@ public class Octree implements Serializable {
 //        octree.deleteFromOctree(6,8,20);
         octree.printOctree();
         System.out.println(octree.search(new Point(null,null,20,null)));
+    }
+
+    public void clearOctree() {
+        this.firstOctant = null;
+        this.secondOctant = null;
+        this.thirdOctant = null;
+        this.fourthOctant = null;
+        this.fifthOctant = null;
+        this.sixthOctant = null;
+        this.seventhOctant = null;
+        this.eighthOctant = null;
+        this.isDivided = false;
+        this.points.clear();
+        this.overflow.clear();
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public Vector<Point> getOverflow() {
+        return overflow;
     }
 }

@@ -90,6 +90,8 @@ public abstract class FileManipulation {
                 Table loadedTable = (Table) on.readObject();
                 Vector<String> octrees = FileManipulation.loadFilesFromDirectory("src/main/resources/data/indices/"+loadedTable.getTableName()+"/");
                 loadedTable.setOctrees(octrees);
+                on.close();
+                file.close();
                 return loadedTable;
             }
             catch (EOFException e) {
@@ -106,6 +108,8 @@ public abstract class FileManipulation {
             //System.out.println(((Vector<Tuple>) on.readObject()).get(0).getClusteringKey());
             try {
                 Octree loadedOctree = (Octree) on.readObject();
+                on.close();
+                file.close();
                 return loadedOctree;
             }
             catch (EOFException e) {
