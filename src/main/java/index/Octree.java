@@ -23,8 +23,11 @@ public class Octree implements Serializable {
     public Octree(Object minWidth, Object maxWidth,
                   Object minLength, Object maxLength, Object minHeight, Object maxHeight,
                   int maxEntriesPerCube, String strColWidth, String strColLength,
-                  String strColHeight, String name,String strTableName) throws ParseException, IOException {
-        this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight);
+                  String strColHeight, String name,String strTableName) throws Exception {
+        Vector<Object> widthRange = Metadata.getColumnMinAndMax(strTableName, strColWidth);
+        Vector<Object> lengthRange = Metadata.getColumnMinAndMax(strTableName, strColLength);
+        Vector<Object> heightRange = Metadata.getColumnMinAndMax(strTableName, strColHeight);
+        this.cube = new Cube(minWidth,maxWidth,minLength,maxLength,minHeight,maxHeight, widthRange, lengthRange, heightRange);
         this.maxEntriesPerCube = maxEntriesPerCube;
         this.isDivided = false;
         this.points = new Vector<Point>();
@@ -138,7 +141,7 @@ public class Octree implements Serializable {
     public void saveIntoOctreeFilepath() throws IOException {
         FileManipulation.saveIntoFilepath(this,this.getFilepath());
     }
-    public boolean insertIntoOctree(Point insertedPoint) throws DBAppException, ParseException, IOException {
+    public boolean insertIntoOctree(Point insertedPoint) throws Exception {
         if(checkInsertedValues(insertedPoint)) {
             return true;
         }
@@ -250,7 +253,7 @@ public class Octree implements Serializable {
             }
         }
     }
-    public void updateInOctree(Object oldValOfCol1, Object oldValOfCol2, Object oldValOfCol3, Hashtable<String, Object> htblColNameValue,String ref) throws DBAppException, IOException, ClassNotFoundException, ParseException {
+    public void updateInOctree(Object oldValOfCol1, Object oldValOfCol2, Object oldValOfCol3, Hashtable<String, Object> htblColNameValue,String ref) throws Exception {
         Point oldPoint = new Point(oldValOfCol1,oldValOfCol2,oldValOfCol3, null);
         Vector<Point> pointsToBeUpdated = search(oldPoint);
         Point requiredPoint = null;
@@ -364,7 +367,7 @@ public class Octree implements Serializable {
 //            octreeToBeDeletedFrom.points.get(indexOfPoint).updateDataWithOctree(strClusteringKeyValue,htblColNameValue,clusterKeyDataType);
 //        }
 //    }
-    public void divide() throws DBAppException, ParseException, IOException {
+    public void divide() throws Exception {
         // calculate boundaries of each octant
         this.isDivided = true;
         Point center = this.cube.getCenter();
@@ -585,7 +588,7 @@ public class Octree implements Serializable {
     
     
 
-    public static void main(String[] args) throws ParseException, DBAppException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws Exception {
         Octree octree = new Octree(0,100,0,100,0,100,3,"","","", "","");
         Point p1 = new Point(10,20,20,null);
         Point p2 = new Point(12,20,30,null);

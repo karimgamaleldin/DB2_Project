@@ -279,7 +279,7 @@ public class Page implements Serializable{
         saveIntoPageFilepath();
     }
 
-    public void updateOctree(Tuple tuple, Hashtable<String, Object> htblColNameValue,Vector<String> octrees) throws IOException, ClassNotFoundException, DBAppException, ParseException {
+    public void updateOctree(Tuple tuple, Hashtable<String, Object> htblColNameValue,Vector<String> octrees) throws Exception {
         for(String octreePath: octrees){
             Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreePath);
             boolean isWidthUpdated = htblColNameValue.containsKey(currOctree.getStrColWidth());

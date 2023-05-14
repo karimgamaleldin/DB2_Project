@@ -7,19 +7,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Vector;
 
 public class Cube implements Serializable {
     private Point center;
 //    private Object halfWidth, halfHeight, halfLength;
     private Object minWidth, maxWidth, minLength, maxLength, minHeight, maxHeight; //boundaries of cube
+    private Vector<Object> widthRange, lengthRange, heightRange;
     public Cube(Object minWidth, Object maxWidth,
-                Object minLength, Object maxLength, Object minHeight, Object maxHeight) throws ParseException {
+                Object minLength, Object maxLength, Object minHeight, Object maxHeight,
+                Vector<Object> widthRange, Vector<Object> lengthRange, Vector<Object> heightRange
+    ) throws ParseException {
         this.minWidth = minWidth;
         this.maxWidth = maxWidth;
         this.minLength = minLength;
         this.maxLength = maxLength;
         this.minHeight = minHeight;
         this.maxHeight = maxHeight;
+        this.widthRange = widthRange;
+        this.lengthRange = lengthRange;
+        this.heightRange = heightRange;
         Object centerX = this.getMiddleObject(minWidth,maxWidth);
         Object centerY = this.getMiddleObject(minLength,maxLength);
         Object centerZ = this.getMiddleObject(minHeight,maxHeight);
@@ -29,9 +36,15 @@ public class Cube implements Serializable {
         boolean xInsideCube = Comparison.compareToOctree(p.getWidth(),minWidth,null)>=0&&Comparison.compareTo(p.getWidth(),maxWidth,null)<0;
         boolean yInsideCube = Comparison.compareToOctree(p.getLength(),minLength,null)>=0&&Comparison.compareTo(p.getLength(),maxLength,null)<0;
         boolean zInsideCube = Comparison.compareToOctree(p.getHeight(),minHeight,null)>=0&&Comparison.compareTo(p.getHeight(),maxHeight,null)<0;
+        if(checkMax(p.getWidth(),widthRange.get(1))&&checkMax(p.getWidth(),maxWidth)) xInsideCube = true;
+        if(checkMax(p.getLength(),lengthRange.get(1))&&checkMax(p.getLength(),maxLength)) yInsideCube = true;
+        if(checkMax(p.getHeight(),heightRange.get(1))&&checkMax(p.getHeight(),maxHeight)) zInsideCube = true;
         return xInsideCube && yInsideCube && zInsideCube;
     }
 
+    public boolean checkMax(Object pointMax, Object max) {
+        return Comparison.compareTo(pointMax,max,null)==0;
+    }
     public Object getMiddleObject(Object o1, Object o2) throws ParseException {
         String type = ((""+o1.getClass())
                 .replaceAll("class",""))

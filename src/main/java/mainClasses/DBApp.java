@@ -18,6 +18,31 @@ public class DBApp implements Serializable {
     private String tablesFilepath;
     private String indicesFilepath;
     private int maxPageSize;
+
+    public Vector<String> getTables() {
+        return tables;
+    }
+
+    public Metadata getMetaData() {
+        return metaData;
+    }
+
+    public String getPagesFilepath() {
+        return pagesFilepath;
+    }
+
+    public String getTablesFilepath() {
+        return tablesFilepath;
+    }
+
+    public String getIndicesFilepath() {
+        return indicesFilepath;
+    }
+
+    public int getMaxPageSize() {
+        return maxPageSize;
+    }
+
     public DBApp(){
         this.tables = new Vector<String>();        //src/resources/data/pages
         this.pagesFilepath = "src/main/resources/data/";
@@ -675,7 +700,7 @@ public class DBApp implements Serializable {
          updateHtbl.put("name", "updatedName");
          updateHtbl.put("gpa", 2);
          updateHtbl.put("dob", new SimpleDateFormat("dd-MM-yyyy").parse("01-02-2019"));
-         dbApp.updateTable("Students", "19", updateHtbl);
+//         dbApp.updateTable("Students", "19", updateHtbl);
 
 
          Hashtable<String,Object> deletingCriteria0 = new Hashtable<>();
