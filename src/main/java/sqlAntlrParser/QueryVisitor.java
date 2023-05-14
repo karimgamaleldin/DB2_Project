@@ -25,12 +25,6 @@ public interface QueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUpdate_table(QueryParser.Update_tableContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QueryParser#column_equals}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitColumn_equals(QueryParser.Column_equalsContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link QueryParser#insert_into}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -109,33 +103,51 @@ public interface QueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitColumnOperators(QueryParser.ColumnOperatorsContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QueryParser#deleteColumnName}.
+	 * Visit a parse tree produced by {@link QueryParser#updateDeleteColumnName}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeleteColumnName(QueryParser.DeleteColumnNameContext ctx);
+	T visitUpdateDeleteColumnName(QueryParser.UpdateDeleteColumnNameContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QueryParser#deleteOperator}.
+	 * Visit a parse tree produced by {@link QueryParser#updateDeleteValue}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeleteOperator(QueryParser.DeleteOperatorContext ctx);
+	T visitUpdateDeleteValue(QueryParser.UpdateDeleteValueContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QueryParser#deleteValue}.
+	 * Visit a parse tree produced by {@link QueryParser#updateDeleteCondition}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeleteValue(QueryParser.DeleteValueContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link QueryParser#deleteCondition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeleteCondition(QueryParser.DeleteConditionContext ctx);
+	T visitUpdateDeleteCondition(QueryParser.UpdateDeleteConditionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link QueryParser#otherDeleteCondition}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitOtherDeleteCondition(QueryParser.OtherDeleteConditionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#updateColumnName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUpdateColumnName(QueryParser.UpdateColumnNameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#updateValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUpdateValue(QueryParser.UpdateValueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#updateColumnToSet}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUpdateColumnToSet(QueryParser.UpdateColumnToSetContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QueryParser#otherUpdateColumnToSet}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOtherUpdateColumnToSet(QueryParser.OtherUpdateColumnToSetContext ctx);
 }

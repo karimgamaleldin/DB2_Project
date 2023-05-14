@@ -29,6 +29,7 @@ public class QueryParserExecutor {
             case "select": selectQuery(); break;
             case "createindex": createIndexQuery();break;
             case "delete": deleteQuery(); break;
+            case "update": updateQuery(); break;
             default: throw new DBAppException("This Query isn't supported!");
         }
     }
@@ -43,14 +44,18 @@ public class QueryParserExecutor {
         System.out.println("createIndex!!!!!!!!!!!!!!!!!!!!!");
     }
     public void deleteQuery(){
-        System.out.println(qvh.getDeleteColumnNames());
-        System.out.println(qvh.getDeleteOperatorValues());
-        System.out.println(qvh.getDeleteObjectValues());
+        System.out.println(qvh.getUpdateDeleteColumnNames());
+        System.out.println(qvh.getUpdateDeleteObjectValues());
         System.out.println("Delete!!!!!!!!!!!!!!!!!!!!!");
     }
-
+    public void updateQuery(){
+        System.out.println(qvh.getUpdateDeleteColumnNames());
+        System.out.println(qvh.getUpdateDeleteObjectValues());
+        System.out.println(qvh.getUpdateColumnToSetNames());
+        System.out.println(qvh.getUpdateColumToSetValues());
+    }
     public static void main(String[] args) throws DBAppException {
-        QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students where name = \'karim\'");
+        QueryParserExecutor qf = new QueryParserExecutor(null , "Update Students set name = 'Karim' , gpa = '0.7' where age = 10");
         qf.queryExecute();
     }
 

@@ -21,11 +21,13 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     private Vector<String> selectColumnOperators = new Vector<String>();
     //create index
     private Vector<String> createIndexColumns = new Vector<String>();
-    //delete
-    private Vector<String> deleteColumnNames = new Vector<String>();
-    private Vector<String> deleteOperatorValues = new Vector<String>();
-    private Vector<String> deleteObjectValues = new Vector<String>();
+    //delete & update
+    private Vector<String> updateDeleteColumnNames = new Vector<String>();
+    private Vector<String> updateDeleteObjectValues = new Vector<String>();
 
+    //update :
+    private Vector<String> updateColumnToSetNames = new Vector<String>();
+    private Vector<String> updateColumToSetValues = new Vector<String>();
     //Select From
 
     public Void visitSelect_from (QueryParser.Select_fromContext ctx){
@@ -76,18 +78,32 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         return visitChildren(ctx);
     }
 
-    public Void visitDeleteColumnName(QueryParser.DeleteColumnNameContext ctx) {
-        this.deleteColumnNames.add(ctx.getText());
-        return visitChildren(ctx); }
-    public Void visitDeleteOperator(QueryParser.DeleteOperatorContext ctx) {
-        this.deleteOperatorValues.add(ctx.getText());
+    public Void visitUpdateDeleteColumnName(QueryParser.UpdateDeleteColumnNameContext ctx) {
+        this.updateDeleteColumnNames.add(ctx.getText());
         return visitChildren(ctx);
     }
-    public Void visitDeleteValue(QueryParser.DeleteValueContext ctx) {
-        this.deleteObjectValues.add(ctx.getText());
+    public Void visitUpdateDeleteValue(QueryParser.UpdateDeleteValueContext ctx) {
+        this.updateDeleteObjectValues.add(ctx.getText());
         return visitChildren(ctx);
     }
-    //getters and setters
+
+    //update:
+
+    public Void visitUpdate_table(QueryParser.Update_tableContext ctx) {
+        this.statement_Type = "update";
+        return visitChildren(ctx);
+    }
+
+    public Void visitUpdateColumnName(QueryParser.UpdateColumnNameContext ctx) {
+        this.updateColumnToSetNames.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+    public Void visitUpdateValue(QueryParser.UpdateValueContext ctx) {
+        this.updateColumToSetValues.add(ctx.getText());
+        return visitChildren(ctx);
+    }
+
+        //getters and setters
 
     public String getStatement_Type() {
         return statement_Type;
@@ -153,32 +169,41 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         this.createIndexColumns = createIndexColumns;
     }
 
-    public Vector<String> getDeleteColumnNames() {
-        return deleteColumnNames;
+    public Vector<String> getUpdateDeleteColumnNames() {
+        return updateDeleteColumnNames;
     }
 
-    public void setDeleteColumnNames(Vector<String> deleteColumnNames) {
-        this.deleteColumnNames = deleteColumnNames;
+    public void setUpdateDeleteColumnNames(Vector<String> updateDeleteColumnNames) {
+        this.updateDeleteColumnNames = updateDeleteColumnNames;
     }
 
-    public Vector<String> getDeleteObjectValues() {
-        return deleteObjectValues;
+    public Vector<String> getUpdateDeleteObjectValues() {
+        return updateDeleteObjectValues;
     }
 
-    public void setDeleteObjectValues(Vector<String> deleteObjectValues) {
-        this.deleteObjectValues = deleteObjectValues;
+    public void setUpdateDeleteObjectValues(Vector<String> updateDeleteObjectValues) {
+        this.updateDeleteObjectValues = updateDeleteObjectValues;
     }
 
-    public Vector<String> getDeleteOperatorValues() {
-        return deleteOperatorValues;
+
+    public Vector<String> getUpdateColumnToSetNames() {
+        return updateColumnToSetNames;
     }
 
-    public void setDeleteOperatorValues(Vector<String> deleteOperatorValues) {
-        this.deleteOperatorValues = deleteOperatorValues;
+    public void setUpdateColumnToSetNames(Vector<String> updateColumnToSetNames) {
+        this.updateColumnToSetNames = updateColumnToSetNames;
+    }
+
+    public Vector<String> getUpdateColumToSetValues() {
+        return updateColumToSetValues;
+    }
+
+    public void setUpdateColumToSetValues(Vector<String> updateColumToSetValues) {
+        this.updateColumToSetValues = updateColumToSetValues;
     }
 
     public static void main(String[] args){
-        String in = "Delete From Students where age = 10";
+        String in = "Update Students set name = 'Karim' , gpa = '0.7' where age = 10";
         in = in.toUpperCase();
         QueryLexer q = new QueryLexer(CharStreams.fromString(in));
         CommonTokenStream commonTokenStream = new CommonTokenStream(q);
@@ -189,9 +214,11 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         qv.visit(parser.sql_query());
         System.out.println(qv.statement_Type);
         System.out.println(qv.tableName);
-        System.out.println(qv.getDeleteColumnNames());
-        System.out.println(qv.getDeleteOperatorValues());
-        System.out.print(qv.getDeleteObjectValues());
+        System.out.println(qv.getUpdateDeleteColumnNames());
+        System.out.println(qv.getUpdateDeleteObjectValues());
+        System.out.println(qv.getUpdateColumnToSetNames());
+        System.out.println(qv.getUpdateColumToSetValues());
+
 
 
     }

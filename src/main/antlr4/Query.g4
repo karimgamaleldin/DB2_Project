@@ -16,9 +16,7 @@ sql_query :  update_table | insert_into | delete_from | select_from | create_ind
 
 //datatype : 'INT' | 'DECIMAL' | 'VARCHAR';
 
-update_table : UPDATE IDENTIFIER SET column_equals (COMMA column_equals)* WHERE condition;
-
-column_equals : IDENTIFIER '=' (INTEGER | DECIMAL | STRING);
+update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition ;
 
 insert_into : INSERT INTO IDENTIFIER LPAREN column_name (COMMA column_name)* RPAREN VALUES LPAREN value (COMMA value)* RPAREN;
 
@@ -26,7 +24,7 @@ column_name : IDENTIFIER;
 
 value : INTEGER | DECIMAL | STRING;
 
-delete_from : DELETE FROM tableName (WHERE deleteCondition (otherDeleteCondition)*)?;
+delete_from : DELETE FROM tableName (WHERE updateDeleteCondition (otherDeleteCondition)*)?;
 
 select_from : SELECT '*' FROM tableName (WHERE condition (otherSelectCondition)*)?;
 
@@ -46,16 +44,21 @@ otherSelectCondition: columnOperators columnName operator value;
 
 columnOperators: AND | XOR | OR ;
 
-deleteColumnName: IDENTIFIER;
+updateDeleteColumnName: IDENTIFIER;
 
-deleteOperator: GREATERTHAN | GREATERTHANOREQUAL | LESSTHAN | LESSTHANOREQUAL | NOTEQUAL | EQUAL;
+updateDeleteValue: INTEGER | DECIMAL | STRING;
 
-deleteValue: INTEGER | DECIMAL | STRING;
+updateDeleteCondition : updateDeleteColumnName '=' updateDeleteValue;
 
-deleteCondition : deleteColumnName deleteOperator deleteValue;
+otherDeleteCondition: ',' updateDeleteColumnName '=' updateDeleteValue;
 
-otherDeleteCondition: ',' deleteColumnName deleteOperator deleteValue;
+updateColumnName: IDENTIFIER;
 
+updateValue: INTEGER | DECIMAL | STRING;
+
+updateColumnToSet : updateColumnName '=' updateValue;
+
+otherUpdateColumnToSet : ',' updateColumnName '=' updateValue;
 
 
 
