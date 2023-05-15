@@ -164,9 +164,9 @@ public class Point implements Serializable {
     }
     public boolean isInPoint(Tuple t){
         Hashtable<String , Object> hash = t.getTupleAttributes();
-        boolean h = hash.get(this.parent.getStrColHeight()).equals(this.height);
-        boolean w = hash.get(this.parent.getStrColWidth()).equals(this.width);
-        boolean l = hash.get(this.parent.getStrColLength()).equals(this.length);
+        boolean h = Comparison.compareTo(hash.get(this.parent.getStrColHeight()),this.height,null)==0;
+        boolean w = Comparison.compareTo(hash.get(this.parent.getStrColWidth()),this.width,null)==0;
+        boolean l = Comparison.compareTo(hash.get(this.parent.getStrColLength()),this.length,null)==0;
         return h && w && l;
     }
     public int checkIfPointExistInPage(Page page, String strColWidth, String strColLength, String strColHeight){

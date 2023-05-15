@@ -13,7 +13,12 @@ public abstract class Comparison {
             return -1;
         }
         if(type==null){
-            type = o1!=null?o1.getClass().getName():o2.getClass().getName();
+            String type1 = o1.getClass().getName();
+            String type2 = o2.getClass().getName();
+            type = o1!=null?type1:type2;
+//            if(o1 instanceof Integer && o2 instanceof Double){
+//                type = "java.lang.Double";
+//            }
         }
         if (type.equals("java.lang.Integer")) {
             return ((Integer) o1).compareTo((Integer) o2);

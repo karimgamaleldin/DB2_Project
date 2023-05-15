@@ -505,6 +505,16 @@ public class DBApp implements Serializable {
 //        return result.iterator();
         return result.iterator();
     }
+    public void filter(Vector<Tuple> result, String colName, Object colValue){
+        for(int i=0;i<result.size();i++){
+            Tuple currTuple = result.get(i);
+            Object currValue = currTuple.getTupleAttributes().get(colName);
+            if(Comparison.compareTo(currValue,colValue,null)!=0){
+                result.remove(i);
+                i--;
+            }
+        }
+    }
     public Vector<Tuple> XORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
         String clusteringKey = vec1.get(0).getClusteringKey();
@@ -557,9 +567,6 @@ public class DBApp implements Serializable {
     }
     public Vector<Tuple> ANDSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
-        if(vec1.size()==0) {
-            return vec2;
-        }
         String clusteringKey = vec1.get(0).getClusteringKey();
         Hashtable<Object , Tuple> hash1 = new Hashtable<Object , Tuple>();
         for(int i = 0 ; i < vec1.size() ; i++){
