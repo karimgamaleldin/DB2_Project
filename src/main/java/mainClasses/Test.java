@@ -161,7 +161,7 @@ public class Test {
 //        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
-//        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
+////        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
 //////    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple1);
 //         dbApp.insertIntoTable("Students", tuple2);
@@ -218,9 +218,8 @@ public class Test {
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
 //        StringBuffer sb = new StringBuffer();
-//        sb.append("Insert Into Students (job , gpa , age , name , dob) values ('eng' , 2, 37 , 'lulu' , '2002-10-30')" );
+//        sb.append("Create Index on Students ( name , gpa , dob )" );
 //        dbApp.parseSQL(sb);
-
 
     }
 }

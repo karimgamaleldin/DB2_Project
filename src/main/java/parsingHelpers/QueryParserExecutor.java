@@ -43,10 +43,14 @@ public class QueryParserExecutor {
         System.out.println((qvh.getSelectColumnOperators()));
         System.out.println("Select!!!!!!!!!!!!!!1");
     }
-    public void createIndexQuery(){
-        System.out.println(qvh.getCreateIndexColumns());
-        System.out.println(qvh.getTableName());
-        System.out.println("createIndex!!!!!!!!!!!!!!!!!!!!!");
+    public void createIndexQuery() throws Exception {
+        String tableName = qvh.getTableName();
+        Vector<String> vectorcolumns = qvh.getCreateIndexColumns();
+        String[] vectorColumnsString = new String[vectorcolumns.size()];
+        for(int i = 0 ; i < vectorcolumns.size() ; i++){
+            vectorColumnsString[i] = vectorcolumns.get(i).toLowerCase();
+        }
+        app.createIndex(this.fixTableName(tableName) , vectorColumnsString);
     }
     public void deleteQuery() throws Exception {
         Hashtable<String , Object> htbl = getHashTable(qvh.getUpdateDeleteColumnNames() , qvh.getUpdateDeleteObjectValues());
