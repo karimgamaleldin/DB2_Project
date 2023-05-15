@@ -5,9 +5,12 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import sqlAntlrParser.QueryLexer;
 import sqlAntlrParser.QueryParser;
+import sqlterm.SQLTerm;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 public class QueryParserExecutor {
@@ -38,10 +41,38 @@ public class QueryParserExecutor {
             default: throw new DBAppException("This Query isn't supported!");
         }
     }
-    public void selectQuery(){
+    public void selectQuery() throws Exception {
+        SQLTerm[] arrSQLTerms = fixSQLVector(qvh.getSelectConditions());
+        String[] strarrOperators = fixStringVector(qvh.getSelectColumnOperators());
         System.out.println(qvh.getSelectConditions());
-        System.out.println((qvh.getSelectColumnOperators()));
-        System.out.println("Select!!!!!!!!!!!!!!1");
+        Iterator x = app.selectFromTable(arrSQLTerms , strarrOperators);
+        System.out.println(x.next());
+    }
+    public String[] fixStringVector(Vector<String> vector){
+        int n = vector.size();
+        String[] re = new String[n];
+        for(int i = 0 ; i < n ; i++){
+            re[i] = vector.get(i).toLowerCase();
+        }
+        return re;
+    }
+    public SQLTerm[] fixSQLVector(Vector<SQLTerm> vector) throws Exception {
+        int n = vector.size();
+        SQLTerm[] re = new SQLTerm[n];
+        for(int i = 0 ; i < n ; i++){
+            SQLTerm sql = vector.get(i);
+            sql.set_strTableName(this.fixTableName(sql.get_strTableName()));
+            sql.set_strColumnName(sql.get_strColumnName().toLowerCase());
+            sql.set_strOperator(sql.get_strOperator());
+            String value = (String) sql.get_objValue();
+            Metadata metaData = this.app.getMetaData();
+            String columnType = metaData.getColumnType(sql.get_strTableName() , sql.get_strColumnName());
+            String valueString = value.replaceAll("'" , "");
+            Object valueObject = Column.adjustDataType(valueString , columnType);
+            sql.set_objValue(valueObject);
+            re[i] = sql;
+        }
+        return re;
     }
     public void createIndexQuery() throws Exception {
         String tableName = qvh.getTableName();
@@ -73,11 +104,12 @@ public class QueryParserExecutor {
         System.out.println(htbl);
         app.insertIntoTable(this.fixTableName(tableName) , htbl);
     }
-    public void createTableQuery(){
-        System.out.println("column Names: " + qvh.getCreateColumnNames());
-        System.out.println("column types: " +qvh.getCreateColumnTypes());
-        System.out.println("clusteringKey: " +qvh.getCreateTableClusteringKey()); // if more than 1 throw error
-        System.out.println("create Tableeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    public void createTableQuery() throws DBAppException {
+        String[] columnNames = this.fixStringVector(qvh.getCreateColumnNames());
+        String[] columnTypes = this.fixStringVector(qvh.getCreateColumnTypes());
+        Vector<String> clusteringKey = qvh.getCreateTableClusteringKey();
+        if(clusteringKey.size() != 0) throw new DBAppException("The clustering key in the Query is wrongly specified");
+
     }
     public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values) throws Exception {
         String tableName = this.fixTableName(qvh.getTableName());
@@ -98,7 +130,7 @@ public class QueryParserExecutor {
     }
 
     public static void main(String[] args) throws Exception {
-        QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students  where name = 'karim'");
+        QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students where name = 'karim'");
         qf.queryExecute();
     }
 

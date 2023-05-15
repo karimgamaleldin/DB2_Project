@@ -22,6 +22,8 @@ datatype : 'INT' | 'DECIMAL' | 'VARCHAR' | 'DATE' ;
 
 update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition ;
 
+
+
 insert_into : INSERT INTO tableName '(' insertColumnName (additionalColumnInsert)* ')' VALUES '(' insertValue (',' insertValue)* ')';
 
 value : INTEGER | DECIMAL | STRING | DATE;

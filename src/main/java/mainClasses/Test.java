@@ -161,7 +161,7 @@ public class Test {
 //        dbApp.createTable("Students", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students2", "age", htblColNameType, htblColNameMin, htblColNameMax);
 //        dbApp.createTable("Students3", "age", htblColNameType, htblColNameMin, htblColNameMax);
-////        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
+//////        dbApp.createIndex("Students",new String[]{"name","gpa","dob"});
 //////    dbApp.insertIntoTable("Students", tuple0);
 //         dbApp.insertIntoTable("Students", tuple1);
 //         dbApp.insertIntoTable("Students", tuple2);
@@ -211,15 +211,15 @@ public class Test {
 
         System.out.println(table.getOctrees());
 
-        for(int i = 0; i < table.getOctrees().size(); ++i) {
-            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/" + table.getTableName() + "/", (String)table.getOctrees().get(i));
-            System.out.println(octree.getName());
-            octree.printOctree();
-            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        }
-//        StringBuffer sb = new StringBuffer();
-//        sb.append("Create Index on Students ( name , gpa , dob )" );
-//        dbApp.parseSQL(sb);
+//        for(int i = 0; i < table.getOctrees().size(); ++i) {
+//            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/" + table.getTableName() + "/", (String)table.getOctrees().get(i));
+//            System.out.println(octree.getName());
+//            octree.printOctree();
+//            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+//        }
+        StringBuffer sb = new StringBuffer();
+        sb.append("Select * From Students where age = 5" );
+        dbApp.parseSQL(sb);
 
     }
 }
