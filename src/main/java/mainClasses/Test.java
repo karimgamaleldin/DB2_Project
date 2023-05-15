@@ -211,12 +211,12 @@ public class Test {
 
         System.out.println(table.getOctrees());
 
-//        for(int i = 0; i < table.getOctrees().size(); ++i) {
-//            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/" + table.getTableName() + "/", (String)table.getOctrees().get(i));
-//            System.out.println(octree.getName());
-//            octree.printOctree();
-//            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-//        }
+        for(int i = 0; i < table.getOctrees().size(); ++i) {
+            Octree octree = FileManipulation.loadOctree("src/main/resources/data/indices/" + table.getTableName() + "/", (String)table.getOctrees().get(i));
+            System.out.println(octree.getName());
+            octree.printOctree();
+            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        }
         StringBuffer sb = new StringBuffer();
         StringBuffer sbi = new StringBuffer();
 //        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
