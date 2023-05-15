@@ -106,12 +106,17 @@ public class Point implements Serializable {
         return false;
     }
 
-    public void removeDataWithOctree(Hashtable<String, Object> htblColNameValue, String strColWidth, String strColLength, String strColHeight) throws IOException, ClassNotFoundException , DBAppException {
-        Page p = FileManipulation.loadPage(pageName);
-        String strTableName = p.getTableName();
+    public void removeDataWithOctree(String strTableName,Hashtable<String, Object> htblColNameValue, String strColWidth, String strColLength, String strColHeight) throws IOException, ClassNotFoundException , DBAppException {
+        Page p;
+//        HashSet<String> notDeletedPages = new HashSet<>();
         Table currTable = FileManipulation.loadTable("src/main/resources/data/tables/",strTableName);
         for(int i = 0 ; i < references.size() ; i++){
             String currPage = references.get(i);
+            if(!currTable.getTablePages().contains(currPage)){
+                references.remove(i);
+                i--;
+                continue;
+            }
             p = FileManipulation.loadPage(currPage);
             boolean isDeleted = p.deleteFromPageFromPoint(htblColNameValue);
             int indexOfPage = currTable.getTablePages().indexOf(currPage);

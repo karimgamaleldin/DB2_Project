@@ -196,7 +196,7 @@ public class Octree implements Serializable {
         Vector<Point> pointsToBeDeleted = search(tobeDeletedPoint);
         for(int i=0;i<pointsToBeDeleted.size();i++){
             Point currPoint = pointsToBeDeleted.get(i);
-            currPoint.removeDataWithOctree(htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
+            currPoint.removeDataWithOctree(this.tableName,htblColNameValue,this.strColWidth,this.strColLength,this.strColHeight);
             if(currPoint.getReferences().size()==0){
                 Octree parent = currPoint.getParent();
                 if(currPoint.checkNulls()){
@@ -639,6 +639,9 @@ public class Octree implements Serializable {
     }
 
     public void clearOctree() {
+//        if(this==null) return;
+//        clearOctreeHelper(this);
+
         this.firstOctant = null;
         this.secondOctant = null;
         this.thirdOctant = null;
@@ -650,6 +653,19 @@ public class Octree implements Serializable {
         this.isDivided = false;
         this.points.clear();
         this.overflow.clear();
+    }
+    public void clearOctreeHelper(Octree octree){
+        if(octree==null) return;
+        this.points.clear();
+        this.overflow.clear();
+        clearOctreeHelper(this.firstOctant);
+        clearOctreeHelper(this.secondOctant);
+        clearOctreeHelper(this.thirdOctant);
+        clearOctreeHelper(this.fourthOctant);
+        clearOctreeHelper(this.fifthOctant);
+        clearOctreeHelper(this.sixthOctant);
+        clearOctreeHelper(this.seventhOctant);
+        clearOctreeHelper(this.eighthOctant);
     }
 
     public String getTableName() {

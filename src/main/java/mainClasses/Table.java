@@ -175,10 +175,10 @@ public class Table implements Serializable {
             Point insertPoint = new Point(width,length,height,newRef);
             if(!isShifted) {
                 currOctree.insertIntoOctree(insertPoint);
-                System.out.println("not shifted: "+oldRef+","+newRef+"-"+insertPoint);
+//                System.out.println("not shifted: "+oldRef+","+newRef+"-"+insertPoint);
             }else {
                 Vector<Point> pts = currOctree.search(insertPoint);
-                System.out.println("shifted: "+oldRef+","+newRef+"-"+insertPoint+", "+pts);
+//                System.out.println("shifted: "+oldRef+","+newRef+"-"+insertPoint+", "+pts);
                 if(pts.size()==0){
                     currOctree.insertIntoOctree(insertPoint);
                 }else {
