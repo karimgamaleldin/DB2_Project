@@ -360,6 +360,7 @@ public class DBApp implements Serializable {
         supportedDataTypes.add("java.util.Date");
         return supportedDataTypes.contains(dt);
     }
+
     public Iterator selectFromTable(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
         checkSelectQuery(arrSQLTerms , strarrOperators);
         String tableName = arrSQLTerms[0].get_strTableName();
@@ -382,9 +383,10 @@ public class DBApp implements Serializable {
             useIndex = o.canBeUsed(hashMap);
             if(useIndex) indexToBeUsed = o;
         }
+        // problem?
         boolean andFlag = true;
         for(int i = 0 ; i < strarrOperators.length; i++){
-            if(strarrOperators[i].equals("and")) andFlag = false;
+            if(strarrOperators[i].equalsIgnoreCase("and")) andFlag = false;
         }
         if(andFlag && useIndex){
             Point p = indexToBeUsed.pointToBeSearchedFor(hashMap);

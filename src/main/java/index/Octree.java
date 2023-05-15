@@ -639,6 +639,9 @@ public class Octree implements Serializable {
     }
 
     public void clearOctree() {
+//        if(this==null) return;
+//        clearOctreeHelper(this);
+
         this.firstOctant = null;
         this.secondOctant = null;
         this.thirdOctant = null;
@@ -650,6 +653,19 @@ public class Octree implements Serializable {
         this.isDivided = false;
         this.points.clear();
         this.overflow.clear();
+    }
+    public void clearOctreeHelper(Octree octree){
+        if(octree==null) return;
+        this.points.clear();
+        this.overflow.clear();
+        clearOctreeHelper(this.firstOctant);
+        clearOctreeHelper(this.secondOctant);
+        clearOctreeHelper(this.thirdOctant);
+        clearOctreeHelper(this.fourthOctant);
+        clearOctreeHelper(this.fifthOctant);
+        clearOctreeHelper(this.sixthOctant);
+        clearOctreeHelper(this.seventhOctant);
+        clearOctreeHelper(this.eighthOctant);
     }
 
     public String getTableName() {
