@@ -376,30 +376,68 @@ public class DBApp implements Serializable {
         // to make the operators between the different queries
         HashMap<String , Object> hashMap = new HashMap<>();
         for(int i = 0 ; i < arrSQLTerms.length ; i++) hashMap.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue()); // puts all columns in the hashset for O(1) access
-        Octree indexToBeUsed = null;
+//        Octree indexToBeUsed = null;
         boolean useIndex = false;
+        Vector<Octree> octreesToBeUsed = new Vector<>();
         for(int i = 0 ; i < T.getOctrees().size() && !useIndex ;i++){
             Octree o = FileManipulation.loadOctree("src/main/resources/data/indices/"+T.getTableName()+"/",T.getOctrees().get(i));
             useIndex = o.canBeUsed(hashMap);
-            if(useIndex) indexToBeUsed = o;
+            if(useIndex) {
+                octreesToBeUsed.add(o);
+//                indexToBeUsed = o;
+            }
         }
         // problem?
         boolean andFlag = true;
         for(int i = 0 ; i < strarrOperators.length; i++){
-            if(strarrOperators[i].equalsIgnoreCase("and")) andFlag = false;
+            if(!strarrOperators[i].equalsIgnoreCase("and")) andFlag = false;
         }
         if(andFlag && useIndex){
-            Point p = indexToBeUsed.pointToBeSearchedFor(hashMap);
-            Vector<Point> resultPoints = indexToBeUsed.search(p);
+            Vector<Vector<Tuple>> resultsFromOctrees = new Vector<>();
             Vector<Tuple> result = new Vector<Tuple>();
-            for(int i = 0 ; i < resultPoints.size() ; i++){
-                Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
-                for(int j = 0 ; j < temp.size() ; j++) result.add(temp.get(j));
+            for(int k=0;k<octreesToBeUsed.size();k++){
+                Octree currOctree = octreesToBeUsed.get(k);
+                Point p = currOctree.pointToBeSearchedFor(hashMap);
+                Vector<Point> resultPoints = currOctree.search(p);
+//                Vector<Tuple> result = new Vector<Tuple>();
+                for(int i = 0 ; i < resultPoints.size() ; i++){
+                    Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
+                    resultsFromOctrees.add(temp);
+//                    for(int j = 0 ; j < temp.size() ; j++) {
+//                        result.add(temp.get(j));
+//                    }
+                }
+            }
+            for(Vector<Tuple> currResult: resultsFromOctrees){
+                result = ANDSelect(result , currResult);
             }
             for(int i = 0 ; i < arrSQLTerms.length ; i++){
-                if(indexToBeUsed.partOfIndex(arrSQLTerms[i].get_strColumnName())) continue;
-                result = ANDSelect(result , results.get(i));
+                boolean octreeUsed = false;
+                for(int k=0;k<octreesToBeUsed.size();k++){
+                    Octree currOctree = octreesToBeUsed.get(k);
+                    if(currOctree.partOfIndex(arrSQLTerms[i].get_strColumnName())) {
+                        octreeUsed = true;
+                    }
+                }
+                if(!octreeUsed){
+                    String columnName = arrSQLTerms[i].get_strColumnName();
+                    String operator = arrSQLTerms[i].get_strOperator();
+                    Object value = arrSQLTerms[i].get_objValue();
+                    Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
+                    result = ANDSelect(result , temp);
+                }
             }
+//            Point p = indexToBeUsed.pointToBeSearchedFor(hashMap);
+//            Vector<Point> resultPoints = indexToBeUsed.search(p);
+//            Vector<Tuple> result = new Vector<Tuple>();
+//            for(int i = 0 ; i < resultPoints.size() ; i++){
+//                Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
+//                for(int j = 0 ; j < temp.size() ; j++) result.add(temp.get(j));
+//            }
+//            for(int i = 0 ; i < arrSQLTerms.length ; i++){
+//                if(indexToBeUsed.partOfIndex(arrSQLTerms[i].get_strColumnName())) continue;
+//                result = ANDSelect(result , results.get(i));
+//            }
             return result.iterator();
 
         }
@@ -464,6 +502,9 @@ public class DBApp implements Serializable {
     }
     public Vector<Tuple> ANDSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
+        if(vec1.size()==0) {
+            return vec2;
+        }
         String clusteringKey = vec1.get(0).getClusteringKey();
         Hashtable<Object , Tuple> hash1 = new Hashtable<Object , Tuple>();
         for(int i = 0 ; i < vec1.size() ; i++){
