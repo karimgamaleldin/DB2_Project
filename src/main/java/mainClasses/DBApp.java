@@ -375,14 +375,50 @@ public class DBApp implements Serializable {
         Vector<String> octrees = T.getOctrees();
         int n = octrees.size();
         Vector<Octree> octreesThatCanBeUsed = new Vector<Octree>();
-        HashSet<String> participatingInOctTree = new HashSet<String>();
+        HashSet<String> participatingInOctree = new HashSet<String>();
         for(int i = 0 ; i < n ; i++){
             Octree oct = FileManipulation.loadOctree("" , octrees.get(i)); // check path ya lol
-            if(oct.canBeUsed(htblColumnNameValues , participatingInOctTree)) octreesThatCanBeUsed.add(oct);
+            if(oct.canBeUsed(htblColumnNameValues , participatingInOctree)) octreesThatCanBeUsed.add(oct);
         }
-        Vector<String> result = new Vector<String>();
-
-
+        Vector<Tuple> result = new Vector<Tuple>();
+        int canBeUsedLength = octreesThatCanBeUsed.size();
+        if( canBeUsedLength > 0 && allAnds){
+            for(int i = 0 ; i < canBeUsedLength ; i++){
+                Octree currOctree = octreesThatCanBeUsed.get(i);
+                if(i == 0){
+                    Point p = currOctree.pointToBeSearchedFor(htblColumnNameValues);
+                    Vector<Point> resultPoints = currOctree.search(p);
+                    result = resultPoints.get(0).getPointsTuples();
+                }else{
+                    Point p = currOctree.pointToBeSearchedFor(htblColumnNameValues);
+                    Vector<Point> resultPoints = currOctree.search(p);
+                    Vector<Tuple> temp = resultPoints.get(0).getPointsTuples();
+                    result = ANDSelect(result,temp);
+                }
+            }
+            for(int i = 0 ; i < arrSQLTerms.length ; i++){
+                String columnName = arrSQLTerms[i].get_strColumnName();
+                Object columnValue = arrSQLTerms[i].get_objValue();
+                if(participatingInOctree.contains(columnName)) continue;
+                this.filter(result, columnName , columnValue);
+            }
+            return result.iterator();
+        }
+        else {
+            for(int i = 0 ; i < arrSQLTerms.length ; i++){
+                String columnName = arrSQLTerms[i].get_strColumnName();
+                Object value = arrSQLTerms[i].get_objValue();
+                String operator = arrSQLTerms[i].get_strOperator();
+                if(i == 0){
+                    result = T.selectDataFromTable(columnName,value,operator);
+                }else{
+                    Vector<Tuple> temp = new Vector<Tuple>();
+                    temp = T.selectDataFromTable(columnName , value , operator);
+                    String op = strarrOperators[i-1];
+                    result = op.equalsIgnoreCase("XOR") ? XORSelect(result , temp) : op.equalsIgnoreCase("OR") ? ORSelect(result , temp) : ANDSelect(result , temp);
+                }
+            }
+        }
 //        Vector<Vector<Tuple>> results = new Vector<Vector<Tuple>>();
 //        for(int i = 0; i < arrSQLTerms.length ; i++){
 //            String columnName = arrSQLTerms[i].get_strColumnName();
@@ -456,7 +492,7 @@ public class DBApp implements Serializable {
 ////                if(indexToBeUsed.partOfIndex(arrSQLTerms[i].get_strColumnName())) continue;
 ////                result = ANDSelect(result , results.get(i));
 ////            }
-//            return result.iterator();
+////            return result.iterator();
 //
 //        }
 //        Vector<Tuple> result = results.get(0);
@@ -467,7 +503,7 @@ public class DBApp implements Serializable {
 //        }
 //
 //        return result.iterator();
-        return null;
+        return result.iterator();
     }
     public Vector<Tuple> XORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
@@ -542,6 +578,7 @@ public class DBApp implements Serializable {
     }
     public void checkSelectQuery(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException, IOException, ClassNotFoundException {
         String[] operators = {">", ">=", "<", "<=", "!=" , "="};
+        if(!(arrSQLTerms.length == strarrOperators.length + 1)) throw new DBAppException("The Query you have entered is wrong");
         for(int i = 0; i < arrSQLTerms.length ; i++){
             if(checkTablePresent(arrSQLTerms[i].get_strTableName()) == -1){
                 throw new DBAppException("Table specified in the query isn't present");
@@ -566,8 +603,8 @@ public class DBApp implements Serializable {
             }
         }
     }
-    public void parseSQL( StringBuffer strbufSQL ) throws Exception {
+    public Iterator parseSQL( StringBuffer strbufSQL ) throws Exception {
         QueryParserExecutor qpe = new QueryParserExecutor(this , strbufSQL.toString());
-        qpe.queryExecute();
+        return qpe.queryExecute();
     }
 }

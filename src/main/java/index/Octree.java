@@ -244,8 +244,8 @@ public class Octree implements Serializable {
         }
         return false;
     }
-    public Point pointToBeSearchedFor(HashMap<String , Object> hashMap){
-        return new Point(hashMap.getOrDefault(strColWidth , null) , hashMap.getOrDefault(strColLength , null) ,hashMap.getOrDefault(strColHeight , null) , null);
+    public Point pointToBeSearchedFor(Hashtable<String , Object> hashtable){
+        return new Point(hashtable.getOrDefault(strColWidth , null) , hashtable.getOrDefault(strColLength , null) ,hashtable.getOrDefault(strColHeight , null) , null);
     }
     public boolean partOfIndex(String colName){
         return colName.equals(this.strColLength) || colName.equals(this.strColWidth) || colName.equals(this.strColHeight);

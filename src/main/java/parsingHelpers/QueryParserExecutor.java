@@ -29,10 +29,11 @@ public class QueryParserExecutor {
         qvh.visit(parser.sql_query());
     }
 
-    public void queryExecute() throws Exception {
+    public Iterator queryExecute() throws Exception {
         visitQuery();
+        Iterator it = null;
         switch(qvh.getStatement_Type()){
-            case "select": selectQuery(); break;
+            case "select": return selectQuery();
             case "create-index": createIndexQuery();break;
             case "delete": deleteQuery(); break;
             case "update": updateQuery(); break;
@@ -40,13 +41,14 @@ public class QueryParserExecutor {
             case "create-table": createTableQuery(); break;
             default: throw new DBAppException("This Query isn't supported!");
         }
+        return it;
     }
-    public void selectQuery() throws Exception {
+    public Iterator selectQuery() throws Exception {
         SQLTerm[] arrSQLTerms = fixSQLVector(qvh.getSelectConditions());
         String[] strarrOperators = fixStringVector(qvh.getSelectColumnOperators());
         System.out.println(qvh.getSelectConditions());
         Iterator x = app.selectFromTable(arrSQLTerms , strarrOperators);
-        System.out.println(x.next());
+        return x;
     }
     public String[] fixStringVector(Vector<String> vector){
         int n = vector.size();
