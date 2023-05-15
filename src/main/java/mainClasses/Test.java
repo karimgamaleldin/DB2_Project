@@ -2,7 +2,10 @@ package mainClasses;
 
 import index.Octree;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -135,26 +138,26 @@ public class Test {
         tuple27.put("gpa", 4.9);
         tuple27.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("31-12-2023"));
 
-        Hashtable<String, String> htblColNameType = new Hashtable();
-        htblColNameType.put("age", "java.lang.Integer");
-        htblColNameType.put("name", "java.lang.String");
-        htblColNameType.put("gpa", "java.lang.Double");
-        htblColNameType.put("dob", "java.util.Date");
-        htblColNameType.put("job", "java.lang.String");
-
-        Hashtable<String, String> htblColNameMin = new Hashtable();
-        htblColNameMin.put("age", "0");
-        htblColNameMin.put("name", "A");
-        htblColNameMin.put("gpa", "0");
-        htblColNameMin.put("dob", "1950-12-31");
-        htblColNameMin.put("job", "a");
-
-        Hashtable<String, String> htblColNameMax = new Hashtable();
-        htblColNameMax.put("age", "40");
-        htblColNameMax.put("name", "ZZZZZZZZZZ");
-        htblColNameMax.put("gpa", "5");
-        htblColNameMax.put("dob", "2023-12-31");
-        htblColNameMax.put("job", "zzzzzzzzzzzzzzzzzzzz");
+//        Hashtable<String, String> htblColNameType = new Hashtable();
+//        htblColNameType.put("age", "java.lang.Integer");
+//        htblColNameType.put("name", "java.lang.String");
+//        htblColNameType.put("gpa", "java.lang.Double");
+//        htblColNameType.put("dob", "java.util.Date");
+//        htblColNameType.put("job", "java.lang.String");
+//
+//        Hashtable<String, String> htblColNameMin = new Hashtable();
+//        htblColNameMin.put("age", "0");
+//        htblColNameMin.put("name", "A");
+//        htblColNameMin.put("gpa", "0");
+//        htblColNameMin.put("dob", "1950-12-31");
+//        htblColNameMin.put("job", "a");
+//
+//        Hashtable<String, String> htblColNameMax = new Hashtable();
+//        htblColNameMax.put("age", "40");
+//        htblColNameMax.put("name", "ZZZZZZZZZZ");
+//        htblColNameMax.put("gpa", "5");
+//        htblColNameMax.put("dob", "2023-12-31");
+//        htblColNameMax.put("job", "zzzzzzzzzzzzzzzzzzzz");
 //
         DBApp dbApp = new DBApp();
         dbApp.init();
@@ -198,9 +201,95 @@ public class Test {
 
         Hashtable<String, Object> deletingCriteria0 = new Hashtable();
         deletingCriteria0.put("gpa", 3);
-        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), (String)dbApp.getTables().get(0));
-        Iterator var35 = table.getTablePages().iterator();
+
+
+
+        String tableName = "students";
+
+        Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+        htblColNameType.put("id", "java.lang.Integer");
+        htblColNameType.put("first_name", "java.lang.String");
+        htblColNameType.put("last_name", "java.lang.String");
+        htblColNameType.put("dob", "java.util.Date");
+        htblColNameType.put("gpa", "java.lang.Double");
+
+        Hashtable<String, String> minValues = new Hashtable<>();
+        minValues.put("id", "0");
+        minValues.put("first_name", "AAAAAA");
+        minValues.put("last_name", "AAAAAA");
+        minValues.put("dob", "1990-01-01");
+        minValues.put("gpa", "0.7");
+
+        Hashtable<String, String> maxValues = new Hashtable<>();
+        maxValues.put("id", "50");
+        maxValues.put("first_name", "zzzzzz");
+        maxValues.put("last_name", "zzzzzz");
+        maxValues.put("dob", "2000-12-31");
+        maxValues.put("gpa", "5.0");
+
+//        dbApp.createTable(tableName, "id", htblColNameType, minValues, maxValues);
+//        dbApp.createIndex(tableName,new String[]{"gpa","first_name","dob"});
+        BufferedReader studentsTable = new BufferedReader(new FileReader("src/main/resources/students_table_4.csv"));
+        String record;
+
+        Hashtable<String, Object> row = new Hashtable<>();
+//        while ((record = studentsTable.readLine()) != null) {
+//            String[] fields = record.split(",");
 //
+//            row.put("id", Integer.parseInt(fields[0]));
+//            row.put("first_name", fields[1]);
+//            row.put("last_name", fields[2]);
+//
+//            int year = Integer.parseInt(fields[3].trim().substring(0, 4));
+//            int month = Integer.parseInt(fields[3].trim().substring(5, 7));
+//            int day = Integer.parseInt(fields[3].trim().substring(8));
+//
+//            Date dob = new Date(year - 1900, month - 1, day);
+//            row.put("dob", dob);
+//
+//            double gpa = Double.parseDouble(fields[4].trim());
+//
+//            row.put("gpa", gpa);
+//            // long start = System.currentTimeMillis();
+//            dbApp.insertIntoTable("students", row);
+//            // long end = System.currentTimeMillis();
+//            // long elapsedTime = end - start;
+//            // System.out.println("Elapsed Time : "+ elapsedTime);
+//            row.clear();
+//        }
+//        studentsTable.close();
+        Hashtable<String, Object> row1=new Hashtable<>();
+        row1.put("id", 3);
+        row1.put("first_name","Charlotte");
+        row1.put("last_name","abbas");
+        Date dob = new Date(1999 - 1900, 5 - 1, 10);
+        row1.put("dob", dob);
+        row1.put("gpa", 2.8);
+//        dbApp.insertIntoTable("students", row1);
+
+        Hashtable<String, Object> row2=new Hashtable<>();
+        row2.put("id", 4);
+        row2.put("first_name","Ava");
+        row2.put("last_name","Eva");
+        Date dob2 = new Date(1994 - 1900, 1 - 1, 05);
+        row2.put("dob", dob2);
+        row2.put("gpa", 0.85);
+//        dbApp.insertIntoTable("students", row2);
+        row.put("id", 262);
+        row.put("first_name","ZZZZZZ");
+        row.put("last_name","Eva");
+        Date dob3 = new Date(1994 - 1900, 1 - 1, 05);
+        row.put("dob", dob3);
+        row.put("gpa", 5.1);
+        dbApp.insertIntoTable("students", row);
+
+        Hashtable<String, Object> del=new Hashtable<>();
+        del.put("id",4);
+        del.put("gpa",3.19);
+//        dbApp.deleteFromTable("students",del);
+
+        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), tableName);
+        Iterator var35 = table.getTablePages().iterator();
         while(var35.hasNext()) {
             String pageName = (String)var35.next();
             Page p = FileManipulation.loadPage(pageName);
@@ -217,8 +306,8 @@ public class Test {
             octree.printOctree();
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
-        StringBuffer sb = new StringBuffer();
-        StringBuffer sbi = new StringBuffer();
+//        StringBuffer sb = new StringBuffer();
+//        StringBuffer sbi = new StringBuffer();
 //        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
 //        sbi.append("Insert into Employee (id , name , salary) values (201 , 'yoyo' , 2000)");
 //        dbApp.parseSQL(sbi);
