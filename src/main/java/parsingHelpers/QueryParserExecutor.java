@@ -105,11 +105,28 @@ public class QueryParserExecutor {
         app.insertIntoTable(this.fixTableName(tableName) , htbl);
     }
     public void createTableQuery() throws DBAppException {
-        String[] columnNames = this.fixStringVector(qvh.getCreateColumnNames());
-        String[] columnTypes = this.fixStringVector(qvh.getCreateColumnTypes());
-        Vector<String> clusteringKey = qvh.getCreateTableClusteringKey();
-        if(clusteringKey.size() != 0) throw new DBAppException("The clustering key in the Query is wrongly specified");
-
+        Vector<String> columnNames = (qvh.getCreateColumnNames());
+        Vector<String> columnTypes = (qvh.getCreateColumnTypes());
+        Vector<String> clusteringKeyVec = qvh.getCreateTableClusteringKey();
+        if(clusteringKeyVec.size() != 1) throw new DBAppException("The clustering key in the Query is wrongly specified");
+        String clusteringKey = clusteringKeyVec.get(0).toLowerCase();
+        String tableName = this.fixTableName(qvh.getTableName());
+        Hashtable<String , String> htblColNameType = new Hashtable<String , String>();
+        Hashtable<String , String> htblColNameMin = new Hashtable<String , String>();
+        Hashtable<String , String> htblColNameMax = new Hashtable<String , String>();
+        int n = columnTypes.size();
+        for (int i = 0 ; i < n ; i++){
+            String type = columnTypes.get(i).toLowerCase();
+            String name = columnNames.get(i).toLowerCase();
+            String min = this.getMinValueOfColumn(type);
+            String max = this.getMaxValueOfColumn(type);
+            String javaType = this.getType(type);
+            htblColNameType.put(name , javaType);
+            htblColNameMax.put(name , max);
+            htblColNameMin.put(name , min);
+        }
+        app.createTable(tableName,clusteringKey,htblColNameType,htblColNameMin,htblColNameMax);
+        System.out.println("Table Created!!!!!!!!!!!!!");
     }
     public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values) throws Exception {
         String tableName = this.fixTableName(qvh.getTableName());
@@ -129,9 +146,37 @@ public class QueryParserExecutor {
         return s.toUpperCase().charAt(0) + s.substring(1).toLowerCase();
     }
 
+    public String getMinValueOfColumn(String type) throws DBAppException {
+        switch (type){
+            case "int":
+            case "decimal": return "0";
+            case "varchar": return "A";
+            case "date": return "1900-1-1";
+            default: throw new DBAppException("Type specified is not good");
+        }
+    }
+    public String getMaxValueOfColumn(String type) throws DBAppException {
+        switch (type){
+            case "int":
+            case "decimal": return "10000";
+            case "varchar": return "ZZZZZZZZZZZ";
+            case "date": return "2099-12-31";
+            default: throw new DBAppException("Type specified is not good");
+        }
+    }
+    public String getType(String type) throws DBAppException {
+        switch (type){
+            case "int": return "java.lang.Integer";
+            case "decimal": return "java.lang.Double";
+            case "varchar": return "java.lang.String";
+            case "date": return "java.util.Date";
+            default: throw new DBAppException("Type specified is not good");
+        }
+    }
     public static void main(String[] args) throws Exception {
         QueryParserExecutor qf = new QueryParserExecutor(null , "Delete From Students where name = 'karim'");
         qf.queryExecute();
     }
+
 
 }

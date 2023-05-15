@@ -218,8 +218,10 @@ public class Test {
 //            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 //        }
         StringBuffer sb = new StringBuffer();
-        sb.append("Select * From Students where age = 5" );
-        dbApp.parseSQL(sb);
+        StringBuffer sbi = new StringBuffer();
+//        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
+//        sbi.append("Insert into Employee (id , name , salary) values (201 , 'yoyo' , 2000)");
+//        dbApp.parseSQL(sbi);
 
     }
 }
