@@ -377,7 +377,7 @@ public class DBApp implements Serializable {
         Vector<Octree> octreesThatCanBeUsed = new Vector<Octree>();
         HashSet<String> participatingInOctree = new HashSet<String>();
         for(int i = 0 ; i < n ; i++){
-            Octree oct = FileManipulation.loadOctree("" , octrees.get(i)); // check path ya lol
+            Octree oct = FileManipulation.loadOctree("src/main/resources/data/indices/"+T.getTableName()+"/" , octrees.get(i)); // check path ya lol
             if(oct.canBeUsed(htblColumnNameValues , participatingInOctree)) octreesThatCanBeUsed.add(oct);
         }
         Vector<Tuple> result = new Vector<Tuple>();
