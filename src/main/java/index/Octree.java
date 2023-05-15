@@ -235,8 +235,14 @@ public class Octree implements Serializable {
 //        clearOverflow();
 //        this.saveIntoOctreeFilepath();
     }
-    public boolean canBeUsed(HashMap<String , Object> hashMap){
-        return hashMap.containsKey(strColHeight) && hashMap.containsKey(strColLength) && hashMap.containsKey(strColWidth);
+    public boolean canBeUsed(Hashtable<String , Object> htbl , HashSet<String> particHashSet){
+        if(htbl.containsKey(strColHeight) && htbl.containsKey(strColLength) && htbl.containsKey(strColWidth)){
+            particHashSet.add(strColHeight);
+            particHashSet.add(strColLength);
+            particHashSet.add(strColWidth);
+            return true;
+        }
+        return false;
     }
     public Point pointToBeSearchedFor(HashMap<String , Object> hashMap){
         return new Point(hashMap.getOrDefault(strColWidth , null) , hashMap.getOrDefault(strColLength , null) ,hashMap.getOrDefault(strColHeight , null) , null);

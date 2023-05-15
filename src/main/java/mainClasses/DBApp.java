@@ -5,6 +5,7 @@ import index.Point;
 import parsingHelpers.QueryParserExecutor;
 import sqlterm.SQLTerm;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -365,90 +366,108 @@ public class DBApp implements Serializable {
         checkSelectQuery(arrSQLTerms , strarrOperators);
         String tableName = arrSQLTerms[0].get_strTableName();
         Table T = FileManipulation.loadTable(this.tablesFilepath , tableName);
-        Vector<Vector<Tuple>> results = new Vector<Vector<Tuple>>();
-        for(int i = 0; i < arrSQLTerms.length ; i++){
-            String columnName = arrSQLTerms[i].get_strColumnName();
-            String operator = arrSQLTerms[i].get_strOperator();
-            Object value = arrSQLTerms[i].get_objValue();
-            Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
-            results.add(temp);
+        Hashtable<String , Object> htblColumnNameValues = new Hashtable<String , Object>();
+        boolean allAnds = true;
+        for(int i = 0 ; i < arrSQLTerms.length ; i++){
+            htblColumnNameValues.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue());
+            if(i < arrSQLTerms.length - 1 && !strarrOperators[i].equalsIgnoreCase("and")) allAnds = false;
         }
-        // to make the operators between the different queries
-        HashMap<String , Object> hashMap = new HashMap<>();
-        for(int i = 0 ; i < arrSQLTerms.length ; i++) hashMap.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue()); // puts all columns in the hashset for O(1) access
-//        Octree indexToBeUsed = null;
-        boolean useIndex = false;
-        Vector<Octree> octreesToBeUsed = new Vector<>();
-        for(int i = 0 ; i < T.getOctrees().size() && !useIndex ;i++){
-            Octree o = FileManipulation.loadOctree("src/main/resources/data/indices/"+T.getTableName()+"/",T.getOctrees().get(i));
-            useIndex = o.canBeUsed(hashMap);
-            if(useIndex) {
-                octreesToBeUsed.add(o);
-//                indexToBeUsed = o;
-            }
+        Vector<String> octrees = T.getOctrees();
+        int n = octrees.size();
+        Vector<Octree> octreesThatCanBeUsed = new Vector<Octree>();
+        HashSet<String> participatingInOctTree = new HashSet<String>();
+        for(int i = 0 ; i < n ; i++){
+            Octree oct = FileManipulation.loadOctree("" , octrees.get(i)); // check path ya lol
+            if(oct.canBeUsed(htblColumnNameValues , participatingInOctTree)) octreesThatCanBeUsed.add(oct);
         }
-        // problem?
-        boolean andFlag = true;
-        for(int i = 0 ; i < strarrOperators.length; i++){
-            if(!strarrOperators[i].equalsIgnoreCase("and")) andFlag = false;
-        }
-        if(andFlag && useIndex){
-            Vector<Vector<Tuple>> resultsFromOctrees = new Vector<>();
-            Vector<Tuple> result = new Vector<Tuple>();
-            for(int k=0;k<octreesToBeUsed.size();k++){
-                Octree currOctree = octreesToBeUsed.get(k);
-                Point p = currOctree.pointToBeSearchedFor(hashMap);
-                Vector<Point> resultPoints = currOctree.search(p);
-//                Vector<Tuple> result = new Vector<Tuple>();
-                for(int i = 0 ; i < resultPoints.size() ; i++){
-                    Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
-                    resultsFromOctrees.add(temp);
-//                    for(int j = 0 ; j < temp.size() ; j++) {
-//                        result.add(temp.get(j));
-//                    }
-                }
-            }
-            for(Vector<Tuple> currResult: resultsFromOctrees){
-                result = ANDSelect(result , currResult);
-            }
-            for(int i = 0 ; i < arrSQLTerms.length ; i++){
-                boolean octreeUsed = false;
-                for(int k=0;k<octreesToBeUsed.size();k++){
-                    Octree currOctree = octreesToBeUsed.get(k);
-                    if(currOctree.partOfIndex(arrSQLTerms[i].get_strColumnName())) {
-                        octreeUsed = true;
-                    }
-                }
-                if(!octreeUsed){
-                    String columnName = arrSQLTerms[i].get_strColumnName();
-                    String operator = arrSQLTerms[i].get_strOperator();
-                    Object value = arrSQLTerms[i].get_objValue();
-                    Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
-                    result = ANDSelect(result , temp);
-                }
-            }
-//            Point p = indexToBeUsed.pointToBeSearchedFor(hashMap);
-//            Vector<Point> resultPoints = indexToBeUsed.search(p);
+        Vector<String> result = new Vector<String>();
+
+
+//        Vector<Vector<Tuple>> results = new Vector<Vector<Tuple>>();
+//        for(int i = 0; i < arrSQLTerms.length ; i++){
+//            String columnName = arrSQLTerms[i].get_strColumnName();
+//            String operator = arrSQLTerms[i].get_strOperator();
+//            Object value = arrSQLTerms[i].get_objValue();
+//            Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
+//            results.add(temp);
+//        }
+//        // to make the operators between the different queries
+//        HashMap<String , Object> hashMap = new HashMap<>();
+//        for(int i = 0 ; i < arrSQLTerms.length ; i++) hashMap.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue()); // puts all columns in the hashset for O(1) access
+////        Octree indexToBeUsed = null;
+//        boolean useIndex = false;
+//        Vector<Octree> octreesToBeUsed = new Vector<>();
+//        for(int i = 0 ; i < T.getOctrees().size() && !useIndex ;i++){
+//            Octree o = FileManipulation.loadOctree("src/main/resources/data/indices/"+T.getTableName()+"/",T.getOctrees().get(i));
+//            useIndex = o.canBeUsed(hashMap);
+//            if(useIndex) {
+//                octreesToBeUsed.add(o);
+////                indexToBeUsed = o;
+//            }
+//        }
+//        // problem?
+//        boolean andFlag = true;
+//        for(int i = 0 ; i < strarrOperators.length; i++){
+//            if(!strarrOperators[i].equalsIgnoreCase("and")) andFlag = false;
+//        }
+//        if(andFlag && useIndex){
+//            Vector<Vector<Tuple>> resultsFromOctrees = new Vector<>();
 //            Vector<Tuple> result = new Vector<Tuple>();
-//            for(int i = 0 ; i < resultPoints.size() ; i++){
-//                Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
-//                for(int j = 0 ; j < temp.size() ; j++) result.add(temp.get(j));
+//            for(int k=0;k<octreesToBeUsed.size();k++){
+//                Octree currOctree = octreesToBeUsed.get(k);
+//                Point p = currOctree.pointToBeSearchedFor(hashMap);
+//                Vector<Point> resultPoints = currOctree.search(p);
+////                Vector<Tuple> result = new Vector<Tuple>();
+//                for(int i = 0 ; i < resultPoints.size() ; i++){
+//                    Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
+//                    resultsFromOctrees.add(temp);
+////                    for(int j = 0 ; j < temp.size() ; j++) {
+////                        result.add(temp.get(j));
+////                    }
+//                }
+//            }
+//            for(Vector<Tuple> currResult: resultsFromOctrees){
+//                result = ANDSelect(result , currResult);
 //            }
 //            for(int i = 0 ; i < arrSQLTerms.length ; i++){
-//                if(indexToBeUsed.partOfIndex(arrSQLTerms[i].get_strColumnName())) continue;
-//                result = ANDSelect(result , results.get(i));
+//                boolean octreeUsed = false;
+//                for(int k=0;k<octreesToBeUsed.size();k++){
+//                    Octree currOctree = octreesToBeUsed.get(k);
+//                    if(currOctree.partOfIndex(arrSQLTerms[i].get_strColumnName())) {
+//                        octreeUsed = true;
+//                    }
+//                }
+//                if(!octreeUsed){
+//                    String columnName = arrSQLTerms[i].get_strColumnName();
+//                    String operator = arrSQLTerms[i].get_strOperator();
+//                    Object value = arrSQLTerms[i].get_objValue();
+//                    Vector<Tuple> temp =  T.selectDataFromTable(columnName , value , operator);
+//                    result = ANDSelect(result , temp);
+//                }
 //            }
-            return result.iterator();
-
-        }
-        Vector<Tuple> result = results.get(0);
-        for(int i = 1 ; i <= strarrOperators.length ; i++){
-            String op = strarrOperators[i-1];
-            // should we throw an exception if the operator is not AND , OR , XOR and check that strarrOperators length is less than results by 1
-            result = op.equals("XOR") ? XORSelect(result , results.get(i)) : op.equals("OR") ? ORSelect(result , results.get(i)) : ANDSelect(result , results.get(i));
-        }
-
-        return result.iterator();
+////            Point p = indexToBeUsed.pointToBeSearchedFor(hashMap);
+////            Vector<Point> resultPoints = indexToBeUsed.search(p);
+////            Vector<Tuple> result = new Vector<Tuple>();
+////            for(int i = 0 ; i < resultPoints.size() ; i++){
+////                Vector<Tuple> temp = resultPoints.get(i).getPointsTuples();
+////                for(int j = 0 ; j < temp.size() ; j++) result.add(temp.get(j));
+////            }
+////            for(int i = 0 ; i < arrSQLTerms.length ; i++){
+////                if(indexToBeUsed.partOfIndex(arrSQLTerms[i].get_strColumnName())) continue;
+////                result = ANDSelect(result , results.get(i));
+////            }
+//            return result.iterator();
+//
+//        }
+//        Vector<Tuple> result = results.get(0);
+//        for(int i = 1 ; i <= strarrOperators.length ; i++){
+//            String op = strarrOperators[i-1];
+//            // should we throw an exception if the operator is not AND , OR , XOR and check that strarrOperators length is less than results by 1
+//            result = op.equals("XOR") ? XORSelect(result , results.get(i)) : op.equals("OR") ? ORSelect(result , results.get(i)) : ANDSelect(result , results.get(i));
+//        }
+//
+//        return result.iterator();
+        return null;
     }
     public Vector<Tuple> XORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
