@@ -264,7 +264,7 @@ public class Page implements Serializable{
             return;
         }
         Tuple tupleToBeUpdated = this.getPageTuples().get(indexToBeUpdated);
-
+        System.out.println("tuple to be updated: "+tupleToBeUpdated);
         this.updateOctree(tupleToBeUpdated,htblColNameValue,octrees);
 
         Set<Map.Entry<String, Object>> entrySet = htblColNameValue.entrySet();
@@ -285,11 +285,13 @@ public class Page implements Serializable{
             boolean isWidthUpdated = htblColNameValue.containsKey(currOctree.getStrColWidth());
             boolean isLengthUpdated = htblColNameValue.containsKey(currOctree.getStrColLength());
             boolean isHeightUpdated = htblColNameValue.containsKey(currOctree.getStrColHeight());
+            System.out.println("width updated: "+isWidthUpdated+", length updated: "+isLengthUpdated+", height updated: "+isHeightUpdated);
             if(isWidthUpdated || isLengthUpdated || isHeightUpdated){
                 Object width = tuple.getTupleAttributes().get(currOctree.getStrColWidth());
                 Object length = tuple.getTupleAttributes().get(currOctree.getStrColLength());
                 Object height = tuple.getTupleAttributes().get(currOctree.getStrColHeight());
                 currOctree.updateInOctree(width,length,height,htblColNameValue,this.filepath);
+                currOctree.saveIntoOctreeFilepath();
             }
         }
     }

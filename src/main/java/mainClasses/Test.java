@@ -1,6 +1,7 @@
 package mainClasses;
 
 import index.Octree;
+import sqlterm.SQLTerm;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -194,13 +195,13 @@ public class Test {
 //         dbApp.insertIntoTable("Students", tuple26);
 //         dbApp.insertIntoTable("Students", tuple27);
 
-        Hashtable<String, Object> updateHtbl = new Hashtable();
-        updateHtbl.put("name", "updatedName");
-        updateHtbl.put("gpa", 2);
-//        updateHtbl.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("01-02-2019"));
-
-        Hashtable<String, Object> deletingCriteria0 = new Hashtable();
-        deletingCriteria0.put("gpa", 3);
+//        Hashtable<String, Object> updateHtbl = new Hashtable();
+//        updateHtbl.put("name", "updatedName");
+//        updateHtbl.put("gpa", 2);
+////        updateHtbl.put("dob", (new SimpleDateFormat("dd-MM-yyyy")).parse("01-02-2019"));
+//
+//        Hashtable<String, Object> deletingCriteria0 = new Hashtable();
+//        deletingCriteria0.put("gpa", 3);
 
 
 
@@ -212,6 +213,8 @@ public class Test {
         htblColNameType.put("last_name", "java.lang.String");
         htblColNameType.put("dob", "java.util.Date");
         htblColNameType.put("gpa", "java.lang.Double");
+        htblColNameType.put("job", "java.lang.String");
+        htblColNameType.put("money", "java.lang.Double");
 
         Hashtable<String, String> minValues = new Hashtable<>();
         minValues.put("id", "0");
@@ -219,6 +222,8 @@ public class Test {
         minValues.put("last_name", "AAAAAA");
         minValues.put("dob", "1990-01-01");
         minValues.put("gpa", "0.7");
+        minValues.put("job", "a");
+        minValues.put("money", "0");
 
         Hashtable<String, String> maxValues = new Hashtable<>();
         maxValues.put("id", "50");
@@ -226,13 +231,16 @@ public class Test {
         maxValues.put("last_name", "zzzzzz");
         maxValues.put("dob", "2000-12-31");
         maxValues.put("gpa", "5.0");
+        maxValues.put("job", "ZZZZZZ");
+        maxValues.put("money", "20000");
 
 //        dbApp.createTable(tableName, "id", htblColNameType, minValues, maxValues);
 //        dbApp.createIndex(tableName,new String[]{"gpa","first_name","dob"});
-        BufferedReader studentsTable = new BufferedReader(new FileReader("src/main/resources/students_table_4.csv"));
-        String record;
-
-        Hashtable<String, Object> row = new Hashtable<>();
+//        dbApp.createIndex(tableName,new String[]{"id","last_name","job"});
+//        BufferedReader studentsTable = new BufferedReader(new FileReader("src/main/resources/students_table_4.csv"));
+//        String record;
+//
+//        Hashtable<String, Object> row = new Hashtable<>();
 //        while ((record = studentsTable.readLine()) != null) {
 //            String[] fields = record.split(",");
 //
@@ -250,6 +258,9 @@ public class Test {
 //            double gpa = Double.parseDouble(fields[4].trim());
 //
 //            row.put("gpa", gpa);
+//            row.put("job", fields[5]);
+//            double money = Double.parseDouble(fields[6].trim());
+//            row.put("money", money);
 //            // long start = System.currentTimeMillis();
 //            dbApp.insertIntoTable("students", row);
 //            // long end = System.currentTimeMillis();
@@ -258,36 +269,58 @@ public class Test {
 //            row.clear();
 //        }
 //        studentsTable.close();
-        Hashtable<String, Object> row1=new Hashtable<>();
-        row1.put("id", 3);
-        row1.put("first_name","Charlotte");
-        row1.put("last_name","abbas");
-        Date dob = new Date(1999 - 1900, 5 - 1, 10);
-        row1.put("dob", dob);
-        row1.put("gpa", 2.8);
-//        dbApp.insertIntoTable("students", row1);
-
+//        Hashtable<String, Object> row1=new Hashtable<>();
+//        row1.put("id", 3);
+//        row1.put("first_name","Charlotte");
+//        row1.put("last_name","abbas");
+//        Date dob = new Date(1999 - 1900, 5 - 1, 10);
+//        row1.put("dob", dob);
+//        row1.put("gpa", 2.8);
+////        dbApp.insertIntoTable("students", row1);
+//
         Hashtable<String, Object> row2=new Hashtable<>();
-        row2.put("id", 4);
+        row2.put("id", 6);
         row2.put("first_name","Ava");
         row2.put("last_name","Eva");
         Date dob2 = new Date(1994 - 1900, 1 - 1, 05);
         row2.put("dob", dob2);
         row2.put("gpa", 0.85);
 //        dbApp.insertIntoTable("students", row2);
-        row.put("id", 262);
-        row.put("first_name","ZZZZZZ");
-        row.put("last_name","Eva");
-        Date dob3 = new Date(1994 - 1900, 1 - 1, 05);
-        row.put("dob", dob3);
-        row.put("gpa", 5.1);
-        dbApp.insertIntoTable("students", row);
+
+//        Hashtable<String, Object> row3=new Hashtable<>();
+//        row3.put("id", 262);
+//        row3.put("first_name","ZZZZZZ");
+//        row3.put("last_name","Eva");
+//        Date dob3 = new Date(1994 - 1900, 1 - 1, 05);
+//        row3.put("dob", dob3);
+//        row3.put("gpa", 5.1);
+//        dbApp.insertIntoTable("students", row3);
 
         Hashtable<String, Object> del=new Hashtable<>();
         del.put("id",4);
         del.put("gpa",3.19);
 //        dbApp.deleteFromTable("students",del);
 
+        Hashtable<String, Object> updateHtbl = new Hashtable();
+//        updateHtbl.put("first_name", "Updated Charlotte");
+        updateHtbl.put("gpa", 0.89);
+        updateHtbl.put("job", "doc");
+        updateHtbl.put("money", 90);
+//        dbApp.updateTable(tableName,"6",updateHtbl);
+
+        SQLTerm sqlTerm1 = new SQLTerm(tableName,"gpa","=",0.89);
+        SQLTerm sqlTerm2 = new SQLTerm(tableName,"first_name","=","Ava");
+        SQLTerm sqlTerm3 = new SQLTerm(tableName,"dob","=",new SimpleDateFormat("dd-MM-yyyy").parse("05-01-1994"));
+        SQLTerm sqlTerm4 = new SQLTerm(tableName,"money","<=",300);
+        SQLTerm sqlTerm5 = new SQLTerm(tableName,"last_name","=","Eva");
+        SQLTerm sqlTerm6 = new SQLTerm(tableName,"job","=","doc");
+        SQLTerm sqlTerm7 = new SQLTerm(tableName,"id","=",6);
+        SQLTerm[] sqlTerms = new SQLTerm[]{sqlTerm1,sqlTerm2,sqlTerm3,sqlTerm4,sqlTerm5,sqlTerm6,sqlTerm7};
+        String[] op = new String[]{"AND","AND","OR","OR","OR","OR"};
+        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
+        while(itr.hasNext()){
+            System.out.println(itr.next());
+        }
         Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), tableName);
         Iterator var35 = table.getTablePages().iterator();
         while(var35.hasNext()) {

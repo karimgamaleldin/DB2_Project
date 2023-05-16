@@ -202,10 +202,11 @@ public class Table implements Serializable {
         String clusterKeyDataType = Metadata.getClusterKeyDataType(this.tableName);
         Object correctValType = Column.adjustDataType(strClusteringKeyValue,clusterKeyDataType);
         htblColNameValue.put(clusteringKey,correctValType);
-//        if(this.updateUsingOctree(clusterKeyDataType,correctValType,htblColNameValue)){
-//            saveIntoTableFilepath();
-//            return;
-//        }
+        if(this.updateUsingOctree(clusterKeyDataType,correctValType,htblColNameValue)){
+            saveIntoTableFilepath();
+            System.out.println("octree used in update");
+            return;
+        }
         Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
         int start =0;
         int end = this.tablePages.size()-1;
@@ -256,13 +257,15 @@ public class Table implements Serializable {
         boolean useOctree = false;
         for(String octreeName: octrees){
             Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octreeName);
-            boolean hasWidthAsClusteringKey = currOctree.getStrColWidth().equals(this.clusteringKey);
-            boolean hasLengthAsClusteringKey = currOctree.getStrColLength().equals(this.clusteringKey);
-            boolean hasHeightAsClusteringKey = currOctree.getStrColHeight().equals(this.clusteringKey);
+            boolean hasWidthAsClusteringKey = currOctree.getStrColWidth().equalsIgnoreCase(this.clusteringKey);
+            boolean hasLengthAsClusteringKey = currOctree.getStrColLength().equalsIgnoreCase(this.clusteringKey);
+            boolean hasHeightAsClusteringKey = currOctree.getStrColHeight().equalsIgnoreCase(this.clusteringKey);
 
             if(hasWidthAsClusteringKey || hasLengthAsClusteringKey || hasHeightAsClusteringKey){
+                System.out.println("used "+currOctree.getName());
                 currOctree.updateInOctreeUsingClusteringKey(dataType, clusteringKeyValue,htblColNameValue, this.clusteringKey,this.octrees);
                 useOctree = true;
+//                currOctree.saveIntoOctreeFilepath();
                 break;
             }
         }
