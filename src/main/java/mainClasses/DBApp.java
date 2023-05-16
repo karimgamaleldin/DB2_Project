@@ -394,7 +394,7 @@ public class DBApp implements Serializable {
         Vector<Tuple> result = new Vector<Tuple>();
         int canBeUsedLength = octreesThatCanBeUsed.size();
         //canBeUsedLength > 0 && allAnds
-        if( false ){
+        if( canBeUsedLength > 0 && allAnds ){
             System.out.println("octree used");
             for(int i = 0 ; i < canBeUsedLength ; i++){
                 Octree currOctree = octreesThatCanBeUsed.get(i);
