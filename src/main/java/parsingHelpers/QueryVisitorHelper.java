@@ -126,7 +126,6 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     }
     public Void visitInsertValue(QueryParser.InsertValueContext ctx) {
         this.insertValues.add(ctx.getText());
-        System.out.println(ctx.getText());
         return visitChildren(ctx);
     }
 
