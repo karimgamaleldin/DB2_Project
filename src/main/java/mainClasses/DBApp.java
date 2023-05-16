@@ -374,6 +374,7 @@ public class DBApp implements Serializable {
         for(int i=0;i<arrSQLTerms.length;i++){
             System.out.print(arrSQLTerms[i]+",");
         }
+        System.out.println();
         for(int i=0;i<strarrOperators.length;i++){
             System.out.print(strarrOperators[i]+",");
         }
@@ -392,7 +393,8 @@ public class DBApp implements Serializable {
         }
         Vector<Tuple> result = new Vector<Tuple>();
         int canBeUsedLength = octreesThatCanBeUsed.size();
-        if( canBeUsedLength > 0 && allAnds){
+        //canBeUsedLength > 0 && allAnds
+        if( false ){
             System.out.println("octree used");
             for(int i = 0 ; i < canBeUsedLength ; i++){
                 Octree currOctree = octreesThatCanBeUsed.get(i);
@@ -423,8 +425,8 @@ public class DBApp implements Serializable {
             return result.iterator();
         }
         else {
+            System.out.println("no octree used");
             for(int i = 0 ; i < arrSQLTerms.length ; i++){
-                System.out.println("no octree used");
                 String columnName = arrSQLTerms[i].get_strColumnName();
                 Object value = arrSQLTerms[i].get_objValue();
                 String operator = arrSQLTerms[i].get_strOperator();
