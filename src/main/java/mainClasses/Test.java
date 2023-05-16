@@ -530,7 +530,7 @@ public class Test {
         sbci.append("create index on Zemployee5 (name , salary , dob)");
 
 
-        Iterator x = dbApp.parseSQL(sbd);
+        Iterator x = dbApp.parseSQL(sbs);
         SQLTerm sqlTerm1 = new SQLTerm(tableName,"gpa",">",1.28);
         SQLTerm sqlTerm2 = new SQLTerm(tableName,"first_name","!=","jarim");
         SQLTerm sqlTerm3 = new SQLTerm(tableName,"dob","<",new SimpleDateFormat("dd-MM-yyyy").parse("12-04-1995"));
@@ -551,7 +551,7 @@ public class Test {
 //        }
         System.out.println("--------------------------------------------");
 
-        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), "Zemployee5");
+        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), "students");
 
         Iterator var35 = table.getTablePages().iterator();
 

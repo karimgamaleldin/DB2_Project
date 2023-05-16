@@ -44,7 +44,6 @@ public class QueryParserExecutor {
     public Iterator selectQuery() throws Exception {
         SQLTerm[] arrSQLTerms = fixSQLVector(qvh.getSelectConditions());
         String[] strarrOperators = fixStringVector(qvh.getSelectColumnOperators());
-        System.out.println(qvh.getSelectConditions());
         Iterator x = app.selectFromTable(arrSQLTerms , strarrOperators);
         return x;
     }
@@ -102,7 +101,6 @@ public class QueryParserExecutor {
     public void insertQuery() throws Exception {
         Hashtable<String , Object> htbl = getHashTable(qvh.getInsertColumns() , qvh.getInsertValues());
         String tableName = qvh.getTableName();
-        System.out.println(htbl);
         //this.fixTableName(tableName)
         app.insertIntoTable(tableName.toLowerCase() , htbl);
     }
@@ -128,7 +126,6 @@ public class QueryParserExecutor {
             htblColNameMin.put(name , min);
         }
         app.createTable(tableName,clusteringKey,htblColNameType,htblColNameMin,htblColNameMax);
-        System.out.println("Table Created!!!!!!!!!!!!!");
     }
     public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values) throws Exception {
         String tableName = qvh.getTableName();
@@ -137,7 +134,6 @@ public class QueryParserExecutor {
             String keyTemp = keys.get(i).toLowerCase();
             Metadata metaData = this.app.getMetaData();
             String columnType = metaData.getColumnType(tableName , keyTemp);
-//            System.out.println("key: "+keyTemp+"type: "+columnType);
             String valueString = values.get(i).replaceAll("'" , "");
             Object valueObject = Column.adjustDataType(valueString , columnType);
             hashTable.put(keyTemp , valueObject);
