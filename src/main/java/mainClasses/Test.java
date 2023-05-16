@@ -399,11 +399,11 @@ public class Test {
 //            octree.printOctree();
 //            System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 //        }
-////        StringBuffer sb = new StringBuffer();
-////        StringBuffer sbi = new StringBuffer();
-////        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
-////        sbi.append("Insert into Employee (id , name , salary) values (201 , 'yoyo' , 2000)");
-////        dbApp.parseSQL(sbi);
+//        StringBuffer sb = new StringBuffer();
+//        StringBuffer sbi = new StringBuffer();
+//        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
+//        sbi.append("Insert into Employee (id , name , salary) values (201 , 'yoyo' , 2000)");
+//        dbApp.parseSQL(sbi);
 //        Hashtable<String , Object> x = new Hashtable<String , Object>();
 //        x.put("gpa" , 1.82);
 ////        dbApp.deleteFromTable(tableName,x);
@@ -441,9 +441,9 @@ public class Test {
 //        BufferedReader studentsTable = new BufferedReader(new FileReader("src/main/resources/students_table_5.csv"));
 //        String record;
 //        dbApp.createIndex(tableName,new String[]{"gpa","first_name","dob"});
-
-
-        Hashtable<String, Object> row = new Hashtable<>();
+//
+//
+//        Hashtable<String, Object> row = new Hashtable<>();
 //        while ((record = studentsTable.readLine()) != null) {
 //            String[] fields = record.split(",");
 //
@@ -468,13 +468,13 @@ public class Test {
 //            // System.out.println("Elapsed Time : "+ elapsedTime);
 //            row.clear();
 //        }
-////        Hashtable<String , Object> x = new Hashtable<String , Object>();
-////        x.put("gpa" , 4.54);
-////        x.put("first_name" , "Emma");
-////        x.put("dob" , new Date(1994 - 1900, 7 - 1, 28));
-////        x.put("last_name" , "Sienna");
-////        dbApp.deleteFromTable(tableName,x);
 //        studentsTable.close();
+//        Hashtable<String , Object> x = new Hashtable<String , Object>();
+//        x.put("gpa" , 4.54);
+//        x.put("first_name" , "Emma");
+//        x.put("dob" , new Date(1994 - 1900, 7 - 1, 28));
+//        x.put("last_name" , "Sienna");
+//        dbApp.deleteFromTable(tableName,x);
         Hashtable<String , Object> x = new Hashtable<String , Object>();
 //        x.put("id" , 33);
 //        x.put("gpa" , 1);
@@ -485,7 +485,17 @@ public class Test {
         Hashtable<String , Object> person1 = new Hashtable<String , Object>();
 //        person1.put("dob" , new Date(1990 - 1900, 3 - 1, 13));
         person1.put("gpa" , 3.12);
-        dbApp.deleteFromTable(tableName,person1);
+//        dbApp.deleteFromTable(tableName,person1);
+        StringBuffer sb = new StringBuffer();
+        StringBuffer sbi = new StringBuffer();
+        StringBuffer sbs = new StringBuffer();
+        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
+        sbi.append("Insert into Employee (id , name , salary) values (201 , 'yoyo' , 2000)");
+        sbs.append("Select * From students where dob = 1994-07-28 , last_name = 'Siena'");
+        Iterator itr = dbApp.parseSQL(sbs);
+        while(itr.hasNext()){
+            System.out.println(itr.next());
+        }
         Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), tableName);
 
         Iterator var35 = table.getTablePages().iterator();

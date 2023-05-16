@@ -369,6 +369,14 @@ public class DBApp implements Serializable {
         String tableName = arrSQLTerms[0].get_strTableName();
         Table T = FileManipulation.loadTable(this.tablesFilepath , tableName);
         Hashtable<String , Object> htblColumnNameValues = new Hashtable<String , Object>();
+        System.out.println(strarrOperators.length);
+        System.out.println(arrSQLTerms.length);
+        for(int i=0;i<arrSQLTerms.length;i++){
+            System.out.print(arrSQLTerms[i]+",");
+        }
+        for(int i=0;i<strarrOperators.length;i++){
+            System.out.print(strarrOperators[i]+",");
+        }
         boolean allAnds = true;
         for(int i = 0 ; i < arrSQLTerms.length ; i++){
             htblColumnNameValues.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue());
@@ -416,6 +424,7 @@ public class DBApp implements Serializable {
         }
         else {
             for(int i = 0 ; i < arrSQLTerms.length ; i++){
+                System.out.println("no octree used");
                 String columnName = arrSQLTerms[i].get_strColumnName();
                 Object value = arrSQLTerms[i].get_objValue();
                 String operator = arrSQLTerms[i].get_strOperator();

@@ -63,7 +63,8 @@ public class QueryParserExecutor {
         SQLTerm[] re = new SQLTerm[n];
         for(int i = 0 ; i < n ; i++){
             SQLTerm sql = vector.get(i);
-            sql.set_strTableName(this.fixTableName(sql.get_strTableName()));
+//            this.fixTableName(sql.get_strTableName())
+            sql.set_strTableName(sql.get_strTableName().toLowerCase());
             sql.set_strColumnName(sql.get_strColumnName().toLowerCase());
             sql.set_strOperator(sql.get_strOperator());
             String value = (String) sql.get_objValue();

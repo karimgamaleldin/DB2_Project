@@ -219,7 +219,9 @@ public class Metadata {
 
     public String getColumnType(String strTableName ,String columnName){
         String type = "";
-        Vector<Column> columns = this.columnsOfMetaData.get(strTableName);
+        Vector<Column> columns = this.columnsOfMetaData.get(strTableName.toLowerCase());
+//        System.out.println(strTableName+": "+ columnName);
+//        System.out.println(columnsOfMetaData);
         for(int i = 0 ; i < columns.size(); i++){
             Column currentColumn = columns.get(i);
             if(strTableName.equalsIgnoreCase(currentColumn.getTableName()) && columnName.equalsIgnoreCase(currentColumn.getColumnName())){
