@@ -79,7 +79,7 @@ public class DBApp implements Serializable {
             for(int i = 0; i< tables.size(); i++){
                 Table currTable = FileManipulation.loadTable(this.tablesFilepath,tables.get(i));
                 String currentTableName = currTable.getTableName();
-                if (currentTableName.equals(strTableName)) {
+                if (currentTableName.equalsIgnoreCase(strTableName)) {
                     throw new DBAppException("This table already exists");
                 }
             }
@@ -232,7 +232,7 @@ public class DBApp implements Serializable {
         for(int i = 0; i < tables.size(); i++){
             Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(i));
             String currentTableName = currTable.getTableName();
-            if (currentTableName.equals(strTableName)){
+            if (currentTableName.equalsIgnoreCase(strTableName)){
                 tableIndex = i;
                 break;
             }
@@ -287,7 +287,7 @@ public class DBApp implements Serializable {
                 continue;
             }
             if(valClass.compareTo(columnType)!=0){
-                if(!(valClass.equals("java.lang.Integer")&&columnType.equals("java.lang.Double"))){
+                if(!(valClass.equalsIgnoreCase("java.lang.Integer")&&columnType.equalsIgnoreCase("java.lang.Double"))){
                     throw new DBAppException("Please check " + key + " as it has a wrong data type");
                 }
                 else {

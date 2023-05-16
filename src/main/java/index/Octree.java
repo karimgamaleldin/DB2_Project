@@ -248,7 +248,7 @@ public class Octree implements Serializable {
         return new Point(hashtable.getOrDefault(strColWidth , null) , hashtable.getOrDefault(strColLength , null) ,hashtable.getOrDefault(strColHeight , null) , null);
     }
     public boolean partOfIndex(String colName){
-        return colName.equals(this.strColLength) || colName.equals(this.strColWidth) || colName.equals(this.strColHeight);
+        return colName.equalsIgnoreCase(this.strColLength) || colName.equalsIgnoreCase(this.strColWidth) || colName.equalsIgnoreCase(this.strColHeight);
     }
     public void clearOverflow(){
         for(int i=0;i<this.overflow.size();i++){
@@ -320,9 +320,9 @@ public class Octree implements Serializable {
 //        this.saveIntoOctreeFilepath();
     }
     public boolean checkClusteringKey(String datatype,Object clusteringKeyValue,Point p, String strClusteringKey){
-        boolean hasWidthAsClusteringKey = this.getStrColWidth().equals(strClusteringKey);
-        boolean hasLengthAsClusteringKey = this.getStrColLength().equals(strClusteringKey);
-        boolean hasHeightAsClusteringKey = this.getStrColHeight().equals(strClusteringKey);
+        boolean hasWidthAsClusteringKey = this.getStrColWidth().equalsIgnoreCase(strClusteringKey);
+        boolean hasLengthAsClusteringKey = this.getStrColLength().equalsIgnoreCase(strClusteringKey);
+        boolean hasHeightAsClusteringKey = this.getStrColHeight().equalsIgnoreCase(strClusteringKey);
         if(hasWidthAsClusteringKey){
             return Comparison.compareTo(clusteringKeyValue,p.getWidth(),datatype)==0;
         }else if(hasLengthAsClusteringKey){

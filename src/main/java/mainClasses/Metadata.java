@@ -99,7 +99,7 @@ public class Metadata {
             String columnName = temp.get(1);
             String dataType = temp.get(2);
             String isClusteringKeyStr = temp.get(3);
-            Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
+            Boolean isClusteringKeyBool = isClusteringKeyStr.equalsIgnoreCase("True")? true:false;
             String indexName = temp.get(4);
             String indexType = temp.get(5);
             String minColValue = temp.get(6);
@@ -147,10 +147,10 @@ public class Metadata {
             for (Entry<String, String> entry : entrySet) {
                 String columnName = entry.getKey();
                 String dataType = entry.getValue();
-                String isClusteringKeyStr = columnName.equals(strClusteringKeyColumn) ? "True" : "False";
+                String isClusteringKeyStr = columnName.equalsIgnoreCase(strClusteringKeyColumn) ? "True" : "False";
                 String minColValue = htblColNameMin.get(columnName);
                 String maxColValue = htblColNameMax.get(columnName);
-                Boolean isClusteringKeyBool = isClusteringKeyStr.equals("True")? true:false;
+                Boolean isClusteringKeyBool = isClusteringKeyStr.equalsIgnoreCase("True")? true:false;
                 Column col = new Column(strTableName,columnName,dataType,null,null,isClusteringKeyBool,minColValue,maxColValue);
                 Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
                 columns.add(col);
@@ -192,12 +192,12 @@ public class Metadata {
     }
     public Vector<String> getColumnNames(String strTableName){
         Vector<String> columnsNames = new Vector<String>();
-//        System.out.println(columnsOfMetaData);
-//        System.out.println(strTableName+"-"+columnsOfMetaData.keySet()+": ");
-        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        System.out.println(columnsOfMetaData);
+        System.out.println(strTableName.toLowerCase()+"-"+columnsOfMetaData.keySet()+": ");
+        Vector<Column> columns = columnsOfMetaData.get(strTableName.toLowerCase());
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
-            if(currentColumn.getTableName().equals(strTableName)) {
+            if(currentColumn.getTableName().equalsIgnoreCase(strTableName)) {
                 columnsNames.add(currentColumn.getColumnName());
             }
         }
@@ -209,7 +209,7 @@ public class Metadata {
         String clusteringKey = "";
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
-            if(currentColumn.getTableName().equals(strTableName)&&currentColumn.isClusteringKey()) {
+            if(currentColumn.getTableName().equalsIgnoreCase(strTableName)&&currentColumn.isClusteringKey()) {
                 clusteringKey = currentColumn.getColumnName();
                 break;
             }
@@ -240,7 +240,7 @@ public class Metadata {
             String currentColumnTableName = currentColumn.getTableName();
             String currentColumnName = currentColumn.getColumnName();
             String currentColumnType = currentColumn.getColumnType();
-            if(currentColumnTableName.equals(strTableName) && columnName.equals(currentColumnName)) {
+            if(currentColumnTableName.equalsIgnoreCase(strTableName) && columnName.equalsIgnoreCase(currentColumnName)) {
                 Object min = Column.adjustDataType(currentColumn.getMin(),currentColumnType);
                 Object max = Column.adjustDataType(currentColumn.getMax(),currentColumnType);
                 columnsMinAndMax.add(min);
@@ -271,11 +271,11 @@ public class Metadata {
 //            if(!strArray[0].equals(strTableName)){
 //                continue;
 //            }
-            boolean isTableName = strArray[0].equals(strTableName);
+            boolean isTableName = strArray[0].equalsIgnoreCase(strTableName);
             String currColName = strArray[1];
-            boolean isCurrCol = currColName.equals(strarrColName[0])
-                    || currColName.equals(strarrColName[1])
-                    || currColName.equals(strarrColName[2]);
+            boolean isCurrCol = currColName.equalsIgnoreCase(strarrColName[0])
+                    || currColName.equalsIgnoreCase(strarrColName[1])
+                    || currColName.equalsIgnoreCase(strarrColName[2]);
 //            String print = "";
             for(int j=0; j<strArray.length; j++){
 //                print+= strArray[j]+",";
@@ -307,7 +307,7 @@ public class Metadata {
         HashSet<String> columnNamesWithIndex = new HashSet<>();
         Vector<Column> columns = columnsOfMetaData.get(strTableName);
         for(Column col: columns){
-            if(!col.getIndexType().equals("null")){
+            if(!col.getIndexType().equalsIgnoreCase("null")){
                 columnNamesWithIndex.add(col.getColumnName());
             }
         }

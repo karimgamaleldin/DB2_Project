@@ -47,15 +47,15 @@ public abstract class Comparison {
             type = o1.getClass().getName();
         }
 
-        if (type.equals("java.lang.Integer")) {
+        if (type.equalsIgnoreCase("java.lang.Integer")) {
             return ((Integer) o1).compareTo((Integer) o2);
-        } else if (type.equals("java.lang.String")) {
+        } else if (type.equalsIgnoreCase("java.lang.String")) {
             return (((String) o1).toLowerCase()).compareTo(((String) o2).toLowerCase());
-        } else if (type.equals("java.lang.Double")) {
+        } else if (type.equalsIgnoreCase("java.lang.Double")) {
             o1 = Double.parseDouble(o1+"");
             o2 = Double.parseDouble(o2+"");
             return ((Double) o1).compareTo((Double) o2);
-        } else if (type.equals("java.util.Date")) {
+        } else if (type.equalsIgnoreCase("java.util.Date")) {
             return ((Date) o1).compareTo((Date) o2);
         } else {
             return 0;

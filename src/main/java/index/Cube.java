@@ -49,13 +49,13 @@ public class Cube implements Serializable {
         String type = ((""+o1.getClass())
                 .replaceAll("class",""))
                 .replaceAll(" ","");
-        if (type.equals("java.lang.Integer")) {
+        if (type.equalsIgnoreCase("java.lang.Integer")) {
             return this.getMiddleInteger((Integer) o1,(Integer) o2);
-        } else if (type.equals("java.lang.String")) {
+        } else if (type.equalsIgnoreCase("java.lang.String")) {
             return this.getMiddleString(((String) o1).toLowerCase(),((String) o2).toLowerCase());
-        } else if (type.equals("java.lang.Double")) {
+        } else if (type.equalsIgnoreCase("java.lang.Double")) {
             return this.getMiddleDouble((Double) o1,(Double) o2);
-        } else if (type.equals("java.util.Date")) {
+        } else if (type.equalsIgnoreCase("java.util.Date")) {
             return this.getMiddleDate((Date) o1,(Date) o2);
         } else {
             return null;

@@ -105,7 +105,8 @@ public class QueryParserExecutor {
         Hashtable<String , Object> htbl = getHashTable(qvh.getInsertColumns() , qvh.getInsertValues());
         String tableName = qvh.getTableName();
         System.out.println(htbl);
-        app.insertIntoTable(this.fixTableName(tableName) , htbl);
+        //this.fixTableName(tableName)
+        app.insertIntoTable(tableName.toLowerCase() , htbl);
     }
     public void createTableQuery() throws DBAppException {
         Vector<String> columnNames = (qvh.getCreateColumnNames());
@@ -138,6 +139,7 @@ public class QueryParserExecutor {
             String keyTemp = keys.get(i).toLowerCase();
             Metadata metaData = this.app.getMetaData();
             String columnType = metaData.getColumnType(tableName , keyTemp);
+//            System.out.println("key: "+keyTemp+"type: "+columnType);
             String valueString = values.get(i).replaceAll("'" , "");
             Object valueObject = Column.adjustDataType(valueString , columnType);
             hashTable.put(keyTemp , valueObject);

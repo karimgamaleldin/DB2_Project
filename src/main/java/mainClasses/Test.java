@@ -519,8 +519,11 @@ public class Test {
         StringBuffer sb = new StringBuffer();
         StringBuffer sbi = new StringBuffer();
         StringBuffer sbs = new StringBuffer();
+        StringBuffer sbu = new StringBuffer();
         sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
-        sbi.append("Insert into Employee (id , name , salary) values (201 , 'yoyo' , 2000)");
+        sbi.append("Insert into students (id , first_name , money) values (40 , 'yoyo' , 2000)");
+        sbu.append("Update students SET last_name = 'gamaleldin'  and  gpa = 3.85 WHERE id = 40");
+        dbApp.parseSQL(sbu);
         sbs.append("Select * From students where dob = 1994-01-05 and first_name = 'Ava' and gpa = 0.85");
         SQLTerm sqlTerm1 = new SQLTerm(tableName,"gpa","=",0.89);
         SQLTerm sqlTerm2 = new SQLTerm(tableName,"first_name","=","Ava");
@@ -531,15 +534,15 @@ public class Test {
         SQLTerm sqlTerm7 = new SQLTerm(tableName,"id","=",6);
         SQLTerm[] sqlTerms = new SQLTerm[]{sqlTerm1,sqlTerm2,sqlTerm3,sqlTerm4,sqlTerm5,sqlTerm6,sqlTerm7};
         String[] op = new String[]{"AND","AND","AND","AND","AND","AND"};
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
 //        //        Iterator itr = dbApp.parseSQL(sbs);
-        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
-        long end = System.currentTimeMillis();
-        long elapsedTime = end - start;
-        System.out.println(elapsedTime);
-        while(itr.hasNext()){
-            System.out.println(itr.next());
-        }
+//        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
+//        long end = System.currentTimeMillis();
+//        long elapsedTime = end - start;
+//        System.out.println(elapsedTime);
+//        while(itr.hasNext()){
+//            System.out.println(itr.next());
+//        }
 
         Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), tableName);
 
