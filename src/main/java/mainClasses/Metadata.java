@@ -234,7 +234,7 @@ public class Metadata {
 
     public static Vector<Object> getColumnMinAndMax(String strTableName, String columnName) throws Exception {
         Vector<Object> columnsMinAndMax = new Vector<Object>();
-        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        Vector<Column> columns = columnsOfMetaData.get(Metadata.fixTableMetaDataName(strTableName));
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
             String currentColumnTableName = currentColumn.getTableName();
@@ -313,6 +313,10 @@ public class Metadata {
         }
         return columnNamesWithIndex;
     }
+    public static String fixTableMetaDataName (String n){
+        return n.toLowerCase();
+    }
+
 }
 
 

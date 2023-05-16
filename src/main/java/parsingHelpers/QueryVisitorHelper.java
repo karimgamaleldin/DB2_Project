@@ -296,7 +296,6 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
 
     public static void main(String[] args){
         String in = "CREATE TABLE STUDENTS (Name varchar Primary Key , age int , gpa decimal)" ;
-        in = in.toUpperCase();
         QueryLexer q = new QueryLexer(CharStreams.fromString(in));
         CommonTokenStream commonTokenStream = new CommonTokenStream(q);
         QueryParser parser = new QueryParser(commonTokenStream);

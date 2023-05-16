@@ -84,15 +84,15 @@ public class QueryParserExecutor {
         for(int i = 0 ; i < vectorcolumns.size() ; i++){
             vectorColumnsString[i] = vectorcolumns.get(i).toLowerCase();
         }
-        app.createIndex(this.fixTableName(tableName) , vectorColumnsString);
+        app.createIndex(tableName , vectorColumnsString);
     }
     public void deleteQuery() throws Exception {
         Hashtable<String , Object> htbl = getHashTable(qvh.getUpdateDeleteColumnNames() , qvh.getUpdateDeleteObjectValues());
         String tableName = qvh.getTableName();
-        app.deleteFromTable(this.fixTableName(tableName) , htbl);
+        app.deleteFromTable(tableName , htbl);
     }
     public void updateQuery() throws Exception {
-        String tableName = this.fixTableName(qvh.getTableName());
+        String tableName = qvh.getTableName();
         Hashtable<String , Object> htbl = getHashTable(qvh.getUpdateColumnToSetNames() , qvh.getUpdateColumToSetValues());
         String tempClusteringKey = qvh.getUpdateDeleteObjectValues().get(0);
         Metadata metaData = this.app.getMetaData();
@@ -114,7 +114,7 @@ public class QueryParserExecutor {
         Vector<String> clusteringKeyVec = qvh.getCreateTableClusteringKey();
         if(clusteringKeyVec.size() != 1) throw new DBAppException("The clustering key in the Query is wrongly specified");
         String clusteringKey = clusteringKeyVec.get(0).toLowerCase();
-        String tableName = this.fixTableName(qvh.getTableName());
+        String tableName = qvh.getTableName();
         Hashtable<String , String> htblColNameType = new Hashtable<String , String>();
         Hashtable<String , String> htblColNameMin = new Hashtable<String , String>();
         Hashtable<String , String> htblColNameMax = new Hashtable<String , String>();
@@ -133,7 +133,7 @@ public class QueryParserExecutor {
         System.out.println("Table Created!!!!!!!!!!!!!");
     }
     public Hashtable<String , Object> getHashTable(Vector<String> keys , Vector<String> values) throws Exception {
-        String tableName = this.fixTableName(qvh.getTableName());
+        String tableName = qvh.getTableName();
         Hashtable<String , Object> hashTable = new Hashtable<String , Object>();
         for(int i = 0 ; i < keys.size() ; i++){
             String keyTemp = keys.get(i).toLowerCase();
@@ -147,9 +147,6 @@ public class QueryParserExecutor {
         return hashTable;
     }
 
-    public String fixTableName(String s){
-        return s.toUpperCase().charAt(0) + s.substring(1).toLowerCase();
-    }
 
     public String getMinValueOfColumn(String type) throws DBAppException {
         switch (type){
