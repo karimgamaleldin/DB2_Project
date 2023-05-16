@@ -1,0 +1,8 @@
+Table Name,Column Name,Column Type,ClusteringKey,IndexName,IndexType,min,max,
+students,gpa,java.lang.Double,False,gpafirst_namedobIndex,Octree,0.7,5.0,
+students,last_name,java.lang.String,False,moneylast_namejobIndex,Octree,AAAAAA,zzzzzz,
+students,first_name,java.lang.String,False,gpafirst_namedobIndex,Octree,AAAAAA,zzzzzz,
+students,money,java.lang.Double,False,moneylast_namejobIndex,Octree,0,20000,
+students,job,java.lang.String,False,moneylast_namejobIndex,Octree,a,ZZZZZZ,
+students,dob,java.util.Date,False,gpafirst_namedobIndex,Octree,1990-01-01,2000-12-31,
+students,id,java.lang.Integer,True,null,null,0,50,
