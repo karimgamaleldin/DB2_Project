@@ -273,7 +273,7 @@ public class Octree implements Serializable {
                 }
             }
         }
-        this.saveIntoOctreeFilepath();
+//        this.saveIntoOctreeFilepath();
 //        checkInsertedValues(tobeDeletedPoint);
 //        Vector<Octree> octrees = new Vector<>();
 //        searchForOctree(tobeDeletedPoint,octrees);
@@ -647,8 +647,10 @@ public class Octree implements Serializable {
         }
         if(!octree.isDivided){
             s+= octree.points;
+            System.out.println(s);
             return;
         }
+        System.out.println(s);
         printOctreeHelper(octree.firstOctant,1,shift+2,false);
         printOctreeHelper(octree.secondOctant,2,shift+2,false);
         printOctreeHelper(octree.thirdOctant,3,shift+2,false);

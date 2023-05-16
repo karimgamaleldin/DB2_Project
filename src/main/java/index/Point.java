@@ -118,7 +118,7 @@ public class Point implements Serializable {
                 continue;
             }
             p = FileManipulation.loadPage(currPage);
-            boolean isDeleted = p.deleteFromPageFromPoint(htblColNameValue);
+            boolean isDeleted = p.deleteFromPage(htblColNameValue);
             int indexOfPage = currTable.getTablePages().indexOf(currPage);
             if(isDeleted){
                 currTable.getTablePages().remove(indexOfPage);

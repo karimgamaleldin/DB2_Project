@@ -542,16 +542,16 @@ public class Test {
         String[] op = new String[]{"AND","AND","AND","AND","AND"};
 //        long start = System.currentTimeMillis();
 //        Iterator itr = dbApp.parseSQL(sbi);
-        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
+//        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
 //        long end = System.currentTimeMillis();
 //        long elapsedTime = end - start;
 //        System.out.println(elapsedTime);
-        while(itr.hasNext()){
-            System.out.println(itr.next());
-        }
+//        while(itr.hasNext()){
+//            System.out.println(itr.next());
+//        }
         System.out.println("--------------------------------------------");
 
-        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), "students");
+        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), "Zemployee5");
 
         Iterator var35 = table.getTablePages().iterator();
 
