@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static mainClasses.Comparison.compareTo;
+
 
 public class DBApp implements Serializable {
 
@@ -383,24 +385,32 @@ public class DBApp implements Serializable {
         Vector<Tuple> result = new Vector<Tuple>();
         int canBeUsedLength = octreesThatCanBeUsed.size();
         if( canBeUsedLength > 0 && allAnds){
+            System.out.println("octree used");
             for(int i = 0 ; i < canBeUsedLength ; i++){
                 Octree currOctree = octreesThatCanBeUsed.get(i);
+                Point p = currOctree.pointToBeSearchedFor(htblColumnNameValues);
+//                System.out.println("point to search for: "+p);
+                Vector<Point> resultPoints = currOctree.search(p);
+                if(resultPoints.size()==0){
+                    continue;
+                }
+//                System.out.println("pts : "+resultPoints);
                 if(i == 0){
-                    Point p = currOctree.pointToBeSearchedFor(htblColumnNameValues);
-                    Vector<Point> resultPoints = currOctree.search(p);
                     result = resultPoints.get(0).getPointsTuples();
+//                    System.out.println("i==0: "+result);
                 }else{
-                    Point p = currOctree.pointToBeSearchedFor(htblColumnNameValues);
-                    Vector<Point> resultPoints = currOctree.search(p);
                     Vector<Tuple> temp = resultPoints.get(0).getPointsTuples();
                     result = ANDSelect(result,temp);
+//                    System.out.println("i!=0: "+result);
                 }
             }
+//            System.out.println("after loop: "+result);
             for(int i = 0 ; i < arrSQLTerms.length ; i++){
                 String columnName = arrSQLTerms[i].get_strColumnName();
                 Object columnValue = arrSQLTerms[i].get_objValue();
+                String op = arrSQLTerms[i].get_strOperator();
                 if(participatingInOctree.contains(columnName)) continue;
-                this.filter(result, columnName , columnValue);
+                this.filter(result, columnName , columnValue,op);
             }
             return result.iterator();
         }
@@ -419,6 +429,8 @@ public class DBApp implements Serializable {
                 }
             }
         }
+        return result.iterator();
+
 //        Vector<Vector<Tuple>> results = new Vector<Vector<Tuple>>();
 //        for(int i = 0; i < arrSQLTerms.length ; i++){
 //            String columnName = arrSQLTerms[i].get_strColumnName();
@@ -503,20 +515,37 @@ public class DBApp implements Serializable {
 //        }
 //
 //        return result.iterator();
-        return result.iterator();
     }
-    public void filter(Vector<Tuple> result, String colName, Object colValue){
+    public void filter(Vector<Tuple> result, String colName, Object colValue,String op){
         for(int i=0;i<result.size();i++){
             Tuple currTuple = result.get(i);
             Object currValue = currTuple.getTupleAttributes().get(colName);
-            if(Comparison.compareTo(currValue,colValue,null)!=0){
+            if(!checkOperator(op,currValue,colValue)){
                 result.remove(i);
                 i--;
             }
         }
     }
+    public boolean checkOperator(String operator,Object o1, Object o2){
+        boolean flag = false;
+        switch(operator) {
+            case ">": flag = (compareTo(o1 , o2 , null) > 0) ; break;
+            case ">=": flag = (compareTo(o1 , o2 , null) >= 0) ; break;
+            case "<": flag = (compareTo(o1 , o2 , null) < 0) ; break;
+            case "<=": flag = (compareTo(o1 , o2, null) <= 0) ; break;
+            case "!=": flag = (compareTo(o1 , o2, null) != 0) ; break;
+            case "=": flag = (compareTo(o1 , o2, null) == 0) ; break;
+        }
+        return flag;
+    }
     public Vector<Tuple> XORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
+        //check 3ashan sleepy :))
+        if(vec1.size()==0) {
+            return vec2;
+        }else if(vec2.size()==0){
+            return vec1;
+        }
         String clusteringKey = vec1.get(0).getClusteringKey();
         Hashtable<Object , Object> hash1 = new Hashtable<Object , Object>();
         Hashtable<Object , Object> hash2 = new Hashtable<Object , Object>();
@@ -548,6 +577,11 @@ public class DBApp implements Serializable {
     }
     public Vector<Tuple> ORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
+        if(vec1.size()==0) {
+            return vec2;
+        }else if(vec2.size()==0){
+            return vec1;
+        }
         String clusteringKey = vec1.get(0).getClusteringKey();
         Hashtable<Object , Tuple> hash1 = new Hashtable<Object , Tuple>();
         for(int i = 0 ; i < vec1.size() ; i++){
@@ -567,6 +601,9 @@ public class DBApp implements Serializable {
     }
     public Vector<Tuple> ANDSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
+        if(vec1.size()==0 || vec2.size()==0) {
+            return result;
+        }
         String clusteringKey = vec1.get(0).getClusteringKey();
         Hashtable<Object , Tuple> hash1 = new Hashtable<Object , Tuple>();
         for(int i = 0 ; i < vec1.size() ; i++){

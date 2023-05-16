@@ -155,7 +155,7 @@ public class Point implements Serializable {
             if(hashSet.contains(pageString)) continue;
             hashSet.add(pageString);
             Page page = FileManipulation.loadPage(pageString);
-            for(int j = 0 ; j < page.getPageTuples().size() ; i++){
+            for(int j = 0 ; j < page.getPageTuples().size() ; j++){
                 Tuple temp = page.getPageTuples().get(j);
                 if(this.isInPoint(temp)) tuples.add(temp);
             }

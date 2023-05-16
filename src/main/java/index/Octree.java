@@ -270,23 +270,29 @@ public class Octree implements Serializable {
                 break;
             }
         }
+        System.out.println("required point: "+requiredPoint);
         Object newWidth = htblColNameValue.get(this.strColWidth)==null?oldValOfCol1:htblColNameValue.get(this.strColWidth);
         Object newLength = htblColNameValue.get(this.strColLength)==null?oldValOfCol2:htblColNameValue.get(this.strColLength);
         Object newHeight = htblColNameValue.get(this.strColHeight)==null?oldValOfCol3:htblColNameValue.get(this.strColHeight);
         Point newPoint = new Point(newWidth,newLength,newHeight,ref);
+        System.out.println("old point: "+oldPoint+"---"+" new point: "+newPoint);
+        System.out.println("old point==new point: "+oldPoint.isEqual(newPoint));
         if(!oldPoint.isEqual(newPoint)){
             requiredPoint.getReferences().remove(ref);
+            System.out.println("required  point after deletion: "+requiredPoint);
             if(requiredPoint.getReferences().size()==0){
                 Octree parent = requiredPoint.getParent();
                 if(requiredPoint.checkNulls()){
                     parent.overflow.remove(requiredPoint);
                 }else {
+                    System.out.println("before removing from parent: "+ parent.points);
                     parent.points.remove(requiredPoint);
+                    System.out.println("removing from parent: "+ parent.points);
                 }
             }
             this.insertIntoOctree(newPoint);
         }
-        this.saveIntoOctreeFilepath();
+//        this.saveIntoOctreeFilepath();
 
 //        checkInsertedValues(tobeUpdatedPoint);
 //        Vector<Octree> octrees = new Vector<>();
@@ -327,9 +333,9 @@ public class Octree implements Serializable {
         return false;
     }
     public void updateInOctreeUsingClusteringKey(String dataType,Object clusteringKeyValue, Hashtable<String, Object> htblColNameValue, String strClusteringKey, Vector<String> octrees) throws Exception {
-        boolean hasWidthAsClusteringKey = this.getStrColWidth().equals(strClusteringKey);
-        boolean hasLengthAsClusteringKey = this.getStrColLength().equals(strClusteringKey);
-        boolean hasHeightAsClusteringKey = this.getStrColHeight().equals(strClusteringKey);
+        boolean hasWidthAsClusteringKey = this.getStrColWidth().equalsIgnoreCase(strClusteringKey);
+        boolean hasLengthAsClusteringKey = this.getStrColLength().equalsIgnoreCase(strClusteringKey);
+        boolean hasHeightAsClusteringKey = this.getStrColHeight().equalsIgnoreCase(strClusteringKey);
         Point oldPoint = null;
         if(hasWidthAsClusteringKey){
             oldPoint = new Point(clusteringKeyValue,null,null,null);
@@ -338,17 +344,20 @@ public class Octree implements Serializable {
         }else if(hasHeightAsClusteringKey){
             oldPoint = new Point(null,null,clusteringKeyValue,null);
         }
+        System.out.println(oldPoint);
         Vector<Point> pointsToBeUpdated = search(oldPoint);
         for(int i=0;i<pointsToBeUpdated.size();i++){
             Point currPoint = pointsToBeUpdated.get(i);
             if(checkClusteringKey(dataType,clusteringKeyValue,currPoint,strClusteringKey)){
+                System.out.println("currPoint: "+currPoint);
                 for(int j=0;j<currPoint.getReferences().size();j++){
                     String currRef = currPoint.getReferences().get(j);
                     Page currPage = FileManipulation.loadPage(currRef);
-                    currPage.updatePage(clusteringKeyValue+"",htblColNameValue,dataType, octrees);
+                    currPage.updatePage(clusteringKeyValue.toString(),htblColNameValue,dataType, octrees);
                 }
             }
         }
+//        this.saveIntoOctreeFilepath();
 //        Object newWidth = htblColNameValue.get(this.strColWidth)==null?oldValOfCol1:htblColNameValue.get(this.strColWidth);
 //        Object newLength = htblColNameValue.get(this.strColLength)==null?oldValOfCol2:htblColNameValue.get(this.strColLength);
 //        Object newHeight = htblColNameValue.get(this.strColHeight)==null?oldValOfCol3:htblColNameValue.get(this.strColHeight);
