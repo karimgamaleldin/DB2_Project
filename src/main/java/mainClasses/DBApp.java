@@ -79,7 +79,7 @@ public class DBApp implements Serializable {
             for(int i = 0; i< tables.size(); i++){
                 Table currTable = FileManipulation.loadTable(this.tablesFilepath,tables.get(i));
                 String currentTableName = currTable.getTableName();
-                if (currentTableName.equals(strTableName)) {
+                if (currentTableName.equalsIgnoreCase(strTableName)) {
                     throw new DBAppException("This table already exists");
                 }
             }
@@ -232,7 +232,7 @@ public class DBApp implements Serializable {
         for(int i = 0; i < tables.size(); i++){
             Table currTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(i));
             String currentTableName = currTable.getTableName();
-            if (currentTableName.equals(strTableName)){
+            if (currentTableName.equalsIgnoreCase(strTableName)){
                 tableIndex = i;
                 break;
             }
@@ -287,7 +287,7 @@ public class DBApp implements Serializable {
                 continue;
             }
             if(valClass.compareTo(columnType)!=0){
-                if(!(valClass.equals("java.lang.Integer")&&columnType.equals("java.lang.Double"))){
+                if(!(valClass.equalsIgnoreCase("java.lang.Integer")&&columnType.equalsIgnoreCase("java.lang.Double"))){
                     throw new DBAppException("Please check " + key + " as it has a wrong data type");
                 }
                 else {
@@ -369,6 +369,15 @@ public class DBApp implements Serializable {
         String tableName = arrSQLTerms[0].get_strTableName();
         Table T = FileManipulation.loadTable(this.tablesFilepath , tableName);
         Hashtable<String , Object> htblColumnNameValues = new Hashtable<String , Object>();
+        System.out.println(strarrOperators.length);
+        System.out.println(arrSQLTerms.length);
+        for(int i=0;i<arrSQLTerms.length;i++){
+            System.out.print(arrSQLTerms[i]+",");
+        }
+        System.out.println();
+        for(int i=0;i<strarrOperators.length;i++){
+            System.out.print(strarrOperators[i]+",");
+        }
         boolean allAnds = true;
         for(int i = 0 ; i < arrSQLTerms.length ; i++){
             htblColumnNameValues.put(arrSQLTerms[i].get_strColumnName() , arrSQLTerms[i].get_objValue());
@@ -384,7 +393,8 @@ public class DBApp implements Serializable {
         }
         Vector<Tuple> result = new Vector<Tuple>();
         int canBeUsedLength = octreesThatCanBeUsed.size();
-        if( canBeUsedLength > 0 && allAnds){
+        //canBeUsedLength > 0 && allAnds
+        if( canBeUsedLength > 0 && allAnds ){
             System.out.println("octree used");
             for(int i = 0 ; i < canBeUsedLength ; i++){
                 Octree currOctree = octreesThatCanBeUsed.get(i);
@@ -415,6 +425,7 @@ public class DBApp implements Serializable {
             return result.iterator();
         }
         else {
+            System.out.println("no octree used");
             for(int i = 0 ; i < arrSQLTerms.length ; i++){
                 String columnName = arrSQLTerms[i].get_strColumnName();
                 Object value = arrSQLTerms[i].get_objValue();

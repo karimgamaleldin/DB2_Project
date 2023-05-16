@@ -59,13 +59,13 @@ public class Column {
     }
 
     public static Object adjustDataType(String key, String type) throws Exception {
-        if (type.equals("java.lang.Integer")) {
+        if (type.equalsIgnoreCase("java.lang.Integer")) {
             return Integer.parseInt(key);
-        } else if (type.equals("java.lang.String")) {
+        } else if (type.equalsIgnoreCase("java.lang.String")) {
             return key;
-        } else if (type.equals("java.lang.Double")) {
+        } else if (type.equalsIgnoreCase("java.lang.Double")) {
             return Double.parseDouble(key);
-        } else if (type.equals("java.util.Date")) {
+        } else if (type.equalsIgnoreCase("java.util.Date")) {
             //YYYY-MM-DD
             SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
             return formatter.parse(key);

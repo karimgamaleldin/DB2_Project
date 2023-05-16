@@ -19,12 +19,12 @@ public class QueryParser extends Parser {
 	protected static final PredictionContextCache _sharedContextCache =
 		new PredictionContextCache();
 	public static final int
-		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, TABLE=6, CREATE=7, UPDATE=8, INSERT=9, 
-		DELETE=10, SET=11, SELECT=12, FROM=13, WHERE=14, AND=15, OR=16, XOR=17, 
-		INDEX=18, ON=19, INTO=20, VALUES=21, PRIMARY=22, KEY=23, IDENTIFIER=24, 
-		INTEGER=25, DECIMAL=26, STRING=27, DATE=28, GREATERTHAN=29, GREATERTHANOREQUAL=30, 
-		LESSTHAN=31, LESSTHANOREQUAL=32, NOTEQUAL=33, EQUAL=34, LPAREN=35, RPAREN=36, 
-		COMMA=37, WS=38;
+		T__0=1, TABLE=2, CREATE=3, UPDATE=4, INSERT=5, DELETE=6, SET=7, SELECT=8, 
+		FROM=9, WHERE=10, AND=11, OR=12, XOR=13, INDEX=14, ON=15, INTO=16, VALUES=17, 
+		PRIMARY=18, INT=19, DECIMALSTRING=20, VARCHAR=21, DATESTRING=22, KEY=23, 
+		IDENTIFIER=24, INTEGER=25, DECIMAL=26, STRING=27, DATE=28, GREATERTHAN=29, 
+		GREATERTHANOREQUAL=30, LESSTHAN=31, LESSTHANOREQUAL=32, NOTEQUAL=33, EQUAL=34, 
+		LPAREN=35, RPAREN=36, COMMA=37, WS=38;
 	public static final int
 		RULE_sql_query = 0, RULE_create_table = 1, RULE_column_def = 2, RULE_createColumnName = 3, 
 		RULE_primaryKey = 4, RULE_datatype = 5, RULE_update_table = 6, RULE_insert_into = 7, 
@@ -50,21 +50,21 @@ public class QueryParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'INT'", "'DECIMAL'", "'VARCHAR'", "'DATE'", "'*'", "'TABLE'", 
-			"'CREATE'", "'UPDATE'", "'INSERT'", "'DELETE'", "'SET'", "'SELECT'", 
-			"'FROM'", "'WHERE'", "'AND'", "'OR'", "'XOR'", "'INDEX'", "'ON'", "'INTO'", 
-			"'VALUES'", "'PRIMARY'", "'KEY'", null, null, null, null, null, "'>'", 
-			"'>='", "'<'", "'<='", "'!='", "'='", "'('", "')'", "','"
+			null, "'*'", null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, "'>'", "'>='", "'<'", "'<='", "'!='", "'='", 
+			"'('", "')'", "','"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
-			null, null, null, null, null, null, "TABLE", "CREATE", "UPDATE", "INSERT", 
-			"DELETE", "SET", "SELECT", "FROM", "WHERE", "AND", "OR", "XOR", "INDEX", 
-			"ON", "INTO", "VALUES", "PRIMARY", "KEY", "IDENTIFIER", "INTEGER", "DECIMAL", 
-			"STRING", "DATE", "GREATERTHAN", "GREATERTHANOREQUAL", "LESSTHAN", "LESSTHANOREQUAL", 
-			"NOTEQUAL", "EQUAL", "LPAREN", "RPAREN", "COMMA", "WS"
+			null, null, "TABLE", "CREATE", "UPDATE", "INSERT", "DELETE", "SET", "SELECT", 
+			"FROM", "WHERE", "AND", "OR", "XOR", "INDEX", "ON", "INTO", "VALUES", 
+			"PRIMARY", "INT", "DECIMALSTRING", "VARCHAR", "DATESTRING", "KEY", "IDENTIFIER", 
+			"INTEGER", "DECIMAL", "STRING", "DATE", "GREATERTHAN", "GREATERTHANOREQUAL", 
+			"LESSTHAN", "LESSTHANOREQUAL", "NOTEQUAL", "EQUAL", "LPAREN", "RPAREN", 
+			"COMMA", "WS"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -414,6 +414,10 @@ public class QueryParser extends Parser {
 	}
 
 	public static class DatatypeContext extends ParserRuleContext {
+		public TerminalNode INT() { return getToken(QueryParser.INT, 0); }
+		public TerminalNode DECIMALSTRING() { return getToken(QueryParser.DECIMALSTRING, 0); }
+		public TerminalNode VARCHAR() { return getToken(QueryParser.VARCHAR, 0); }
+		public TerminalNode DATESTRING() { return getToken(QueryParser.DATESTRING, 0); }
 		public DatatypeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -434,7 +438,7 @@ public class QueryParser extends Parser {
 			{
 			setState(92);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__1) | (1L << T__2) | (1L << T__3))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INT) | (1L << DECIMALSTRING) | (1L << VARCHAR) | (1L << DATESTRING))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -503,7 +507,7 @@ public class QueryParser extends Parser {
 			setState(101);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==COMMA) {
+			while (_la==AND) {
 				{
 				{
 				setState(98);
@@ -790,7 +794,7 @@ public class QueryParser extends Parser {
 				setState(143);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==COMMA) {
+				while (_la==AND) {
 					{
 					{
 					setState(140);
@@ -854,7 +858,7 @@ public class QueryParser extends Parser {
 			setState(148);
 			match(SELECT);
 			setState(149);
-			match(T__4);
+			match(T__0);
 			setState(150);
 			match(FROM);
 			setState(151);
@@ -1386,7 +1390,7 @@ public class QueryParser extends Parser {
 	}
 
 	public static class OtherDeleteConditionContext extends ParserRuleContext {
-		public TerminalNode COMMA() { return getToken(QueryParser.COMMA, 0); }
+		public TerminalNode AND() { return getToken(QueryParser.AND, 0); }
 		public UpdateDeleteColumnNameContext updateDeleteColumnName() {
 			return getRuleContext(UpdateDeleteColumnNameContext.class,0);
 		}
@@ -1412,7 +1416,7 @@ public class QueryParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(201);
-			match(COMMA);
+			match(AND);
 			setState(202);
 			updateDeleteColumnName();
 			setState(203);
@@ -1557,7 +1561,7 @@ public class QueryParser extends Parser {
 	}
 
 	public static class OtherUpdateColumnToSetContext extends ParserRuleContext {
-		public TerminalNode COMMA() { return getToken(QueryParser.COMMA, 0); }
+		public TerminalNode AND() { return getToken(QueryParser.AND, 0); }
 		public UpdateColumnNameContext updateColumnName() {
 			return getRuleContext(UpdateColumnNameContext.class,0);
 		}
@@ -1583,7 +1587,7 @@ public class QueryParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(214);
-			match(COMMA);
+			match(AND);
 			setState(215);
 			updateColumnName();
 			setState(216);
@@ -1694,38 +1698,38 @@ public class QueryParser extends Parser {
 		"\3\27\3\27\3\30\3\30\3\30\3\30\3\31\3\31\3\31\3\31\3\31\3\32\3\32\3\33"+
 		"\3\33\3\34\3\34\3\34\3\34\3\35\3\35\3\35\3\35\3\35\3\36\3\36\3\37\3\37"+
 		"\3\37\3\37\2\2 \2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
-		"\64\668:<\2\6\3\2\3\6\3\2\33\36\3\2\37$\3\2\21\23\2\u00d2\2D\3\2\2\2\4"+
-		"F\3\2\2\2\6T\3\2\2\2\bY\3\2\2\2\n[\3\2\2\2\f^\3\2\2\2\16`\3\2\2\2\20m"+
-		"\3\2\2\2\22\u0085\3\2\2\2\24\u0087\3\2\2\2\26\u0089\3\2\2\2\30\u0096\3"+
-		"\2\2\2\32\u00a4\3\2\2\2\34\u00a8\3\2\2\2\36\u00b4\3\2\2\2 \u00b6\3\2\2"+
-		"\2\"\u00b8\3\2\2\2$\u00ba\3\2\2\2&\u00bc\3\2\2\2(\u00c1\3\2\2\2*\u00c3"+
+		"\64\668:<\2\6\3\2\25\30\3\2\33\36\3\2\37$\3\2\r\17\2\u00d2\2D\3\2\2\2"+
+		"\4F\3\2\2\2\6T\3\2\2\2\bY\3\2\2\2\n[\3\2\2\2\f^\3\2\2\2\16`\3\2\2\2\20"+
+		"m\3\2\2\2\22\u0085\3\2\2\2\24\u0087\3\2\2\2\26\u0089\3\2\2\2\30\u0096"+
+		"\3\2\2\2\32\u00a4\3\2\2\2\34\u00a8\3\2\2\2\36\u00b4\3\2\2\2 \u00b6\3\2"+
+		"\2\2\"\u00b8\3\2\2\2$\u00ba\3\2\2\2&\u00bc\3\2\2\2(\u00c1\3\2\2\2*\u00c3"+
 		"\3\2\2\2,\u00c5\3\2\2\2.\u00c7\3\2\2\2\60\u00cb\3\2\2\2\62\u00d0\3\2\2"+
 		"\2\64\u00d2\3\2\2\2\66\u00d4\3\2\2\28\u00d8\3\2\2\2:\u00dd\3\2\2\2<\u00df"+
 		"\3\2\2\2>E\5\16\b\2?E\5\20\t\2@E\5\26\f\2AE\5\30\r\2BE\5\34\17\2CE\5\4"+
 		"\3\2D>\3\2\2\2D?\3\2\2\2D@\3\2\2\2DA\3\2\2\2DB\3\2\2\2DC\3\2\2\2E\3\3"+
-		"\2\2\2FG\7\t\2\2GH\7\b\2\2HI\5\36\20\2IJ\7%\2\2JO\5\6\4\2KL\7\'\2\2LN"+
+		"\2\2\2FG\7\5\2\2GH\7\4\2\2HI\5\36\20\2IJ\7%\2\2JO\5\6\4\2KL\7\'\2\2LN"+
 		"\5\6\4\2MK\3\2\2\2NQ\3\2\2\2OM\3\2\2\2OP\3\2\2\2PR\3\2\2\2QO\3\2\2\2R"+
 		"S\7&\2\2S\5\3\2\2\2TU\5\b\5\2UW\5\f\7\2VX\5\n\6\2WV\3\2\2\2WX\3\2\2\2"+
-		"X\7\3\2\2\2YZ\7\32\2\2Z\t\3\2\2\2[\\\7\30\2\2\\]\7\31\2\2]\13\3\2\2\2"+
-		"^_\t\2\2\2_\r\3\2\2\2`a\7\n\2\2ab\5\36\20\2bc\7\r\2\2cg\5\66\34\2df\5"+
+		"X\7\3\2\2\2YZ\7\32\2\2Z\t\3\2\2\2[\\\7\24\2\2\\]\7\31\2\2]\13\3\2\2\2"+
+		"^_\t\2\2\2_\r\3\2\2\2`a\7\6\2\2ab\5\36\20\2bc\7\t\2\2cg\5\66\34\2df\5"+
 		"8\35\2ed\3\2\2\2fi\3\2\2\2ge\3\2\2\2gh\3\2\2\2hj\3\2\2\2ig\3\2\2\2jk\7"+
-		"\20\2\2kl\5.\30\2l\17\3\2\2\2mn\7\13\2\2no\7\26\2\2op\5\36\20\2pq\7%\2"+
-		"\2qu\5:\36\2rt\5<\37\2sr\3\2\2\2tw\3\2\2\2us\3\2\2\2uv\3\2\2\2vx\3\2\2"+
-		"\2wu\3\2\2\2xy\7&\2\2yz\7\27\2\2z{\7%\2\2{\u0080\5\24\13\2|}\7\'\2\2}"+
-		"\177\5\24\13\2~|\3\2\2\2\177\u0082\3\2\2\2\u0080~\3\2\2\2\u0080\u0081"+
-		"\3\2\2\2\u0081\u0083\3\2\2\2\u0082\u0080\3\2\2\2\u0083\u0084\7&\2\2\u0084"+
+		"\f\2\2kl\5.\30\2l\17\3\2\2\2mn\7\7\2\2no\7\22\2\2op\5\36\20\2pq\7%\2\2"+
+		"qu\5:\36\2rt\5<\37\2sr\3\2\2\2tw\3\2\2\2us\3\2\2\2uv\3\2\2\2vx\3\2\2\2"+
+		"wu\3\2\2\2xy\7&\2\2yz\7\23\2\2z{\7%\2\2{\u0080\5\24\13\2|}\7\'\2\2}\177"+
+		"\5\24\13\2~|\3\2\2\2\177\u0082\3\2\2\2\u0080~\3\2\2\2\u0080\u0081\3\2"+
+		"\2\2\u0081\u0083\3\2\2\2\u0082\u0080\3\2\2\2\u0083\u0084\7&\2\2\u0084"+
 		"\21\3\2\2\2\u0085\u0086\t\3\2\2\u0086\23\3\2\2\2\u0087\u0088\t\3\2\2\u0088"+
-		"\25\3\2\2\2\u0089\u008a\7\f\2\2\u008a\u008b\7\17\2\2\u008b\u0094\5\36"+
-		"\20\2\u008c\u008d\7\20\2\2\u008d\u0091\5.\30\2\u008e\u0090\5\60\31\2\u008f"+
+		"\25\3\2\2\2\u0089\u008a\7\b\2\2\u008a\u008b\7\13\2\2\u008b\u0094\5\36"+
+		"\20\2\u008c\u008d\7\f\2\2\u008d\u0091\5.\30\2\u008e\u0090\5\60\31\2\u008f"+
 		"\u008e\3\2\2\2\u0090\u0093\3\2\2\2\u0091\u008f\3\2\2\2\u0091\u0092\3\2"+
 		"\2\2\u0092\u0095\3\2\2\2\u0093\u0091\3\2\2\2\u0094\u008c\3\2\2\2\u0094"+
-		"\u0095\3\2\2\2\u0095\27\3\2\2\2\u0096\u0097\7\16\2\2\u0097\u0098\7\7\2"+
-		"\2\u0098\u0099\7\17\2\2\u0099\u00a2\5\36\20\2\u009a\u009b\7\20\2\2\u009b"+
+		"\u0095\3\2\2\2\u0095\27\3\2\2\2\u0096\u0097\7\n\2\2\u0097\u0098\7\3\2"+
+		"\2\u0098\u0099\7\13\2\2\u0099\u00a2\5\36\20\2\u009a\u009b\7\f\2\2\u009b"+
 		"\u009f\5\32\16\2\u009c\u009e\5&\24\2\u009d\u009c\3\2\2\2\u009e\u00a1\3"+
 		"\2\2\2\u009f\u009d\3\2\2\2\u009f\u00a0\3\2\2\2\u00a0\u00a3\3\2\2\2\u00a1"+
 		"\u009f\3\2\2\2\u00a2\u009a\3\2\2\2\u00a2\u00a3\3\2\2\2\u00a3\31\3\2\2"+
 		"\2\u00a4\u00a5\5 \21\2\u00a5\u00a6\5$\23\2\u00a6\u00a7\5\22\n\2\u00a7"+
-		"\33\3\2\2\2\u00a8\u00a9\7\t\2\2\u00a9\u00aa\7\24\2\2\u00aa\u00ab\7\25"+
+		"\33\3\2\2\2\u00a8\u00a9\7\5\2\2\u00a9\u00aa\7\20\2\2\u00aa\u00ab\7\21"+
 		"\2\2\u00ab\u00ac\5\36\20\2\u00ac\u00ad\7%\2\2\u00ad\u00ae\5\"\22\2\u00ae"+
 		"\u00af\7\'\2\2\u00af\u00b0\5\"\22\2\u00b0\u00b1\7\'\2\2\u00b1\u00b2\5"+
 		"\"\22\2\u00b2\u00b3\7&\2\2\u00b3\35\3\2\2\2\u00b4\u00b5\7\32\2\2\u00b5"+
@@ -1734,11 +1738,11 @@ public class QueryParser extends Parser {
 		"\u00be\5 \21\2\u00be\u00bf\5$\23\2\u00bf\u00c0\5\22\n\2\u00c0\'\3\2\2"+
 		"\2\u00c1\u00c2\t\5\2\2\u00c2)\3\2\2\2\u00c3\u00c4\7\32\2\2\u00c4+\3\2"+
 		"\2\2\u00c5\u00c6\t\3\2\2\u00c6-\3\2\2\2\u00c7\u00c8\5*\26\2\u00c8\u00c9"+
-		"\7$\2\2\u00c9\u00ca\5,\27\2\u00ca/\3\2\2\2\u00cb\u00cc\7\'\2\2\u00cc\u00cd"+
+		"\7$\2\2\u00c9\u00ca\5,\27\2\u00ca/\3\2\2\2\u00cb\u00cc\7\r\2\2\u00cc\u00cd"+
 		"\5*\26\2\u00cd\u00ce\7$\2\2\u00ce\u00cf\5,\27\2\u00cf\61\3\2\2\2\u00d0"+
 		"\u00d1\7\32\2\2\u00d1\63\3\2\2\2\u00d2\u00d3\t\3\2\2\u00d3\65\3\2\2\2"+
 		"\u00d4\u00d5\5\62\32\2\u00d5\u00d6\7$\2\2\u00d6\u00d7\5\64\33\2\u00d7"+
-		"\67\3\2\2\2\u00d8\u00d9\7\'\2\2\u00d9\u00da\5\62\32\2\u00da\u00db\7$\2"+
+		"\67\3\2\2\2\u00d8\u00d9\7\r\2\2\u00d9\u00da\5\62\32\2\u00da\u00db\7$\2"+
 		"\2\u00db\u00dc\5\64\33\2\u00dc9\3\2\2\2\u00dd\u00de\7\32\2\2\u00de;\3"+
 		"\2\2\2\u00df\u00e0\7\'\2\2\u00e0\u00e1\5:\36\2\u00e1=\3\2\2\2\fDOWgu\u0080"+
 		"\u0091\u0094\u009f\u00a2";

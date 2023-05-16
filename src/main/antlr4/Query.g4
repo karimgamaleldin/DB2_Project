@@ -18,7 +18,7 @@ createColumnName: IDENTIFIER;
 
 primaryKey: PRIMARY KEY;
 
-datatype : 'INT' | 'DECIMAL' | 'VARCHAR' | 'DATE' ;
+datatype : INT | DECIMALSTRING | VARCHAR | DATESTRING ;
 
 update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition ;
 
@@ -56,7 +56,7 @@ updateDeleteValue: INTEGER | DECIMAL | STRING | DATE;
 
 updateDeleteCondition : updateDeleteColumnName '=' updateDeleteValue;
 
-otherDeleteCondition: ',' updateDeleteColumnName '=' updateDeleteValue;
+otherDeleteCondition: AND updateDeleteColumnName '=' updateDeleteValue;
 
 updateColumnName: IDENTIFIER;
 
@@ -64,7 +64,7 @@ updateValue: INTEGER | DECIMAL | STRING | DATE;
 
 updateColumnToSet : updateColumnName '=' updateValue;
 
-otherUpdateColumnToSet : ',' updateColumnName '=' updateValue;
+otherUpdateColumnToSet : AND updateColumnName '=' updateValue;
 
 insertColumnName: IDENTIFIER;
 
@@ -79,25 +79,55 @@ fragment DIGIT : [0-9];
 fragment DAY: [0-9][0-9];
 fragment MONTH: [0-9][0-9];
 fragment YEAR: [0-9][0-9][0-9][0-9];
+fragment A:[aA];
+fragment B:[bB];
+fragment C:[cC];
+fragment D:[dD];
+fragment E:[eE];
+fragment F:[fF];
+fragment G:[gG];
+fragment H:[hH];
+fragment I:[iI];
+fragment J:[jJ];
+fragment K:[kK];
+fragment L:[lL];
+fragment M:[mM];
+fragment N:[nN];
+fragment O:[oO];
+fragment P:[pP];
+fragment Q:[qQ];
+fragment R:[rR];
+fragment S:[sS];
+fragment T:[tT];
+fragment U:[uU];
+fragment V:[vV];
+fragment W:[wW];
+fragment X:[xX];
+fragment Y:[yY];
+fragment Z:[zZ];
 
-TABLE : 'TABLE';
-CREATE : 'CREATE';
-UPDATE : 'UPDATE';
-INSERT : 'INSERT';
-DELETE : 'DELETE';
-SET : 'SET';
-SELECT : 'SELECT';
-FROM : 'FROM';
-WHERE : 'WHERE';
-AND : 'AND';
-OR : 'OR';
-XOR: 'XOR';
-INDEX : 'INDEX';
-ON : 'ON';
-INTO : 'INTO';
-VALUES : 'VALUES';
-PRIMARY: 'PRIMARY';
-KEY: 'KEY';
+TABLE : T A B L E;
+CREATE : C R E A T E;
+UPDATE : U P D A T E;
+INSERT : I N S E R T;
+DELETE : D E L E T E;
+SET : S E T;
+SELECT : S E L E C T;
+FROM : F R O M;
+WHERE : W H E R E;
+AND : A N D ;
+OR : O R;
+XOR: X O R;
+INDEX : I N D E X;
+ON : O N;
+INTO : I N T O;
+VALUES : V A L U E S;
+PRIMARY: P R I M A R Y;
+INT: I N T;
+DECIMALSTRING: D E C I M A L;
+VARCHAR: V A R C H A R;
+DATESTRING : D A T E;
+KEY: K E Y;
 IDENTIFIER : LETTER (LETTER | DIGIT | '_')*;
 INTEGER: DIGIT+;
 DECIMAL : DIGIT+ '.' DIGIT*;

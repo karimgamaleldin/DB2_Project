@@ -14,7 +14,7 @@ public class Tuple implements Serializable {
         this.tupleAttributes=tupleAttributes;
         this.clusteringKey =clusteringKey;
         this.clusteringKeyDataType = clusteringKeyDataType;
-        if(this.clusteringKeyDataType.equals("java.lang.Double")){
+        if(this.clusteringKeyDataType.equalsIgnoreCase("java.lang.Double")){
             try{
                 Object clusterKeyVal = Column.adjustDataType(""+this.tupleAttributes.get(this.clusteringKey),this.clusteringKeyDataType);
                 this.tupleAttributes.put(this.clusteringKey,clusterKeyVal);
