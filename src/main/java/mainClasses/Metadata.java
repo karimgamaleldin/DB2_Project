@@ -105,9 +105,9 @@ public class Metadata {
             String minColValue = temp.get(6);
             String maxColValue = temp.get(7);
             Column col = new Column(strTableName,columnName,dataType,indexName,indexType,isClusteringKeyBool,minColValue,maxColValue);
-            Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
+            Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName.toLowerCase(),new Vector<Column>());
             columns.add(col);
-            columnsOfMetaData.put(strTableName,columns);
+            columnsOfMetaData.put(strTableName.toLowerCase().toLowerCase(),columns);
         }
         sc.close();
     }
@@ -152,10 +152,10 @@ public class Metadata {
                 String maxColValue = htblColNameMax.get(columnName);
                 Boolean isClusteringKeyBool = isClusteringKeyStr.equalsIgnoreCase("True")? true:false;
                 Column col = new Column(strTableName,columnName,dataType,null,null,isClusteringKeyBool,minColValue,maxColValue);
-                Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName,new Vector<Column>());
+                Vector<Column> columns = columnsOfMetaData.getOrDefault(strTableName.toLowerCase(),new Vector<Column>());
                 columns.add(col);
-                columnsOfMetaData.put(strTableName,columns);
-                sb.append(strTableName);
+                columnsOfMetaData.put(strTableName.toLowerCase(),columns);
+                sb.append(strTableName.toLowerCase());
                 sb.append(",");
                 sb.append(columnName);
                 sb.append(",");
@@ -192,8 +192,8 @@ public class Metadata {
     }
     public Vector<String> getColumnNames(String strTableName){
         Vector<String> columnsNames = new Vector<String>();
-        System.out.println(columnsOfMetaData);
-        System.out.println(strTableName.toLowerCase()+"-"+columnsOfMetaData.keySet()+": ");
+//        System.out.println(columnsOfMetaData);
+//        System.out.println(strTableName.toLowerCase()+"-"+columnsOfMetaData.keySet()+": ");
         Vector<Column> columns = columnsOfMetaData.get(strTableName.toLowerCase());
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
@@ -205,7 +205,7 @@ public class Metadata {
     }
 
     public static String getTableClusteringKey(String strTableName){
-        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        Vector<Column> columns = columnsOfMetaData.get(strTableName.toLowerCase());
         String clusteringKey = "";
         for(int i = 0 ; i < columns.size() ; i++){
             Column currentColumn = columns.get(i);
@@ -305,7 +305,7 @@ public class Metadata {
     }
     public HashSet<String> getColumnNamesWithIndex(String strTableName){
         HashSet<String> columnNamesWithIndex = new HashSet<>();
-        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        Vector<Column> columns = columnsOfMetaData.get(strTableName.toLowerCase());
         for(Column col: columns){
             if(!col.getIndexType().equalsIgnoreCase("null")){
                 columnNamesWithIndex.add(col.getColumnName());

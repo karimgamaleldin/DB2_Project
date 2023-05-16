@@ -711,36 +711,6 @@ public class Octree implements Serializable {
         System.out.println(octree.search(new Point(null,null,20,null)));
     }
 
-    public void clearOctree() {
-//        if(this==null) return;
-//        clearOctreeHelper(this);
-
-        this.firstOctant = null;
-        this.secondOctant = null;
-        this.thirdOctant = null;
-        this.fourthOctant = null;
-        this.fifthOctant = null;
-        this.sixthOctant = null;
-        this.seventhOctant = null;
-        this.eighthOctant = null;
-        this.isDivided = false;
-        this.points.clear();
-        this.overflow.clear();
-    }
-    public void clearOctreeHelper(Octree octree){
-        if(octree==null) return;
-        this.points.clear();
-        this.overflow.clear();
-        clearOctreeHelper(this.firstOctant);
-        clearOctreeHelper(this.secondOctant);
-        clearOctreeHelper(this.thirdOctant);
-        clearOctreeHelper(this.fourthOctant);
-        clearOctreeHelper(this.fifthOctant);
-        clearOctreeHelper(this.sixthOctant);
-        clearOctreeHelper(this.seventhOctant);
-        clearOctreeHelper(this.eighthOctant);
-    }
-
     public String getTableName() {
         return tableName;
     }

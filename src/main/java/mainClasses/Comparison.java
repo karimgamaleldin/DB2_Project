@@ -16,9 +16,9 @@ public abstract class Comparison {
             String type1 = o1.getClass().getName();
             String type2 = o2.getClass().getName();
             type = o1!=null?type1:type2;
-//            if(o1 instanceof Integer && o2 instanceof Double){
-//                type = "java.lang.Double";
-//            }
+            if(o1 instanceof Integer && o2 instanceof Double){
+                type = "java.lang.Double";
+            }
         }
         if (type.equalsIgnoreCase("java.lang.Integer")) {
             return ((Integer) o1).compareTo((Integer) o2);

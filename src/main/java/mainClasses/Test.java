@@ -463,13 +463,13 @@ public class Test {
         maxValues.put("money", "20000");
 
 //        dbApp.createTable(tableName, "id", htblColNameType, minValues, maxValues);
-//
+////
 //        BufferedReader studentsTable = new BufferedReader(new FileReader("src/main/resources/students_table_4.csv"));
 //        String record;
 //        dbApp.createIndex(tableName,new String[]{"gpa","first_name","dob"});
-//        dbApp.createIndex(tableName,new String[]{"id","last_name","job"});
-//
-//
+//        dbApp.createIndex(tableName,new String[]{"money","last_name","job"});
+////
+////
 //        Hashtable<String, Object> row = new Hashtable<>();
 //        while ((record = studentsTable.readLine()) != null) {
 //            String[] fields = record.split(",");
@@ -546,9 +546,10 @@ public class Test {
 //        long end = System.currentTimeMillis();
 //        long elapsedTime = end - start;
 //        System.out.println(elapsedTime);
-//        while(itr.hasNext()){
-//            System.out.println(itr.next());
-//        }
+        while(itr.hasNext()){
+            System.out.println(itr.next());
+        }
+        System.out.println("--------------------------------------------");
 
         Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), "students");
 

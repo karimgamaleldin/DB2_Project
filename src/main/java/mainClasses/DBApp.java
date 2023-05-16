@@ -65,7 +65,7 @@ public class DBApp implements Serializable {
             this.maxPageSize = FileManipulation.readFromConfig("MaximumRowsCountinTablePage");
             this.tables = FileManipulation.loadFilesFromDirectory(this.tablesFilepath);
         }catch(Exception e){
-            System.out.println("init: "+e);
+
         }
     }
 
@@ -153,80 +153,65 @@ public class DBApp implements Serializable {
         }
 
     }
-    public void createIndex(String strTableName , String[] strarrColName) throws Exception {
-        metaData.loadMetaData();
-        if(strarrColName.length<3){
-            throw new DBAppException("Array missing index attributes ");
-        } else if (strarrColName.length>3) {
-            throw new DBAppException("index attributes should be only 3 ");
-        }
-        int tableIndex = checkTablePresent(strTableName);
-        if(tableIndex==-1){
-            throw new DBAppException("table not found");
-        }
-        Vector<String> columnNames = metaData.getColumnNames(strTableName);
-        for (int i=0;i<3;i++){
-            if (!columnNames.contains(strarrColName[i])){
-                throw new DBAppException("columns specified are not in the table");
+    public void createIndex(String strTableName , String[] strarrColName) throws DBAppException {
+        try{
+            metaData.loadMetaData();
+            if(strarrColName.length<3){
+                throw new DBAppException("Array missing index attributes ");
+            } else if (strarrColName.length>3) {
+                throw new DBAppException("index attributes should be only 3 ");
             }
-        }
-
-        HashSet<String> columnNamesWithIndex = metaData.getColumnNamesWithIndex(strTableName);
-        if(columnNamesWithIndex.contains(strarrColName[0])||columnNamesWithIndex.contains(strarrColName[1])||columnNamesWithIndex.contains(strarrColName[2])){
-            throw new DBAppException("one of the entered columns has an index created on it");
-        }
-
-        Vector<Object> firstAttribute= null;
-        Vector<Object> secondAttribute= null;
-        Vector<Object> thirdAttribute= null;
-        Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
-        firstAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[0]);//getMinMax(columnNames,strarrColName[0],strTableName);
-        secondAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[1]);
-        thirdAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[2]);
-        String indexName = strarrColName[0]+strarrColName[1]+strarrColName[2]+"Index";
-        int maxEntries = FileManipulation.readFromConfig("MaximumEntriesinOctreeNode");
-        Octree octree=new Octree(firstAttribute.get(0),firstAttribute.get(1),secondAttribute.get(0),secondAttribute.get(1),
-                thirdAttribute.get(0),thirdAttribute.get(1),maxEntries,
-                strarrColName[0],strarrColName[1],strarrColName[2],indexName,strTableName);
-        if(!toBeInsertedInTable.isTableEmpty()){
-            // insert all the existing values in octree
-            for(int i=0;i<toBeInsertedInTable.getTablePages().size();i++){
-                String currPagePath = toBeInsertedInTable.getTablePages().get(i);
-                Page currPage = FileManipulation.loadPage(currPagePath);
-                for(int j=0;j<currPage.getPageTuples().size();j++){
-                    Object valOfCol1 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[0]);
-                    Object valOfCol2 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[1]);
-                    Object valOfCol3 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[2]);
-                    Point insertPoint = new Point(valOfCol1,valOfCol2,valOfCol3,currPagePath);
-                    octree.insertIntoOctree(insertPoint);
+            int tableIndex = checkTablePresent(strTableName);
+            if(tableIndex==-1){
+                throw new DBAppException("table not found");
+            }
+            Vector<String> columnNames = metaData.getColumnNames(strTableName);
+            for (int i=0;i<3;i++){
+                if (!columnNames.contains(strarrColName[i])){
+                    throw new DBAppException("columns specified are not in the table");
                 }
             }
-        }
-        Metadata.updateCSV(strTableName,strarrColName,indexName,"Octree");
-        FileManipulation.createSerFile(octree.getFilepath());
-        octree.saveIntoOctreeFilepath();
-    }
-    public Object[] getMinMax(Vector<String> columnNames,String columnNeededString,String strTableName) {
-        String[] minMax=null;
-        Column columnNeeded=null;
-//        for (int i = 0; i < columnNames.size(); i++) {
-//            if (columnNames.get(i) == columnNeededString) {
-//                type = metaData.getColumnType(strTableName, columnNeededString);
-//                break;
-//            }
-//        }
-        Vector<Column> columns = metaData.getColumnsOfMetaData().get(strTableName);
-        for (int i = 0; i < columns.size(); i++) {
-            if (columns.get(i).getColumnName() == columnNeededString) {
-                columnNeeded=columns.get(i);
-                break;
+
+            HashSet<String> columnNamesWithIndex = metaData.getColumnNamesWithIndex(strTableName);
+            if(columnNamesWithIndex.contains(strarrColName[0])||columnNamesWithIndex.contains(strarrColName[1])||columnNamesWithIndex.contains(strarrColName[2])){
+                throw new DBAppException("one of the entered columns has an index created on it");
             }
+
+            Vector<Object> firstAttribute= null;
+            Vector<Object> secondAttribute= null;
+            Vector<Object> thirdAttribute= null;
+            Table toBeInsertedInTable = FileManipulation.loadTable(this.tablesFilepath,this.tables.get(tableIndex));
+            firstAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[0]);//getMinMax(columnNames,strarrColName[0],strTableName);
+            secondAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[1]);
+            thirdAttribute=Metadata.getColumnMinAndMax(strTableName,strarrColName[2]);
+            String indexName = strarrColName[0]+strarrColName[1]+strarrColName[2]+"Index";
+            int maxEntries = FileManipulation.readFromConfig("MaximumEntriesinOctreeNode");
+            Octree octree=new Octree(firstAttribute.get(0),firstAttribute.get(1),secondAttribute.get(0),secondAttribute.get(1),
+                    thirdAttribute.get(0),thirdAttribute.get(1),maxEntries,
+                    strarrColName[0],strarrColName[1],strarrColName[2],indexName,strTableName);
+            if(!toBeInsertedInTable.isTableEmpty()){
+                // insert all the existing values in octree
+                for(int i=0;i<toBeInsertedInTable.getTablePages().size();i++){
+                    String currPagePath = toBeInsertedInTable.getTablePages().get(i);
+                    Page currPage = FileManipulation.loadPage(currPagePath);
+                    for(int j=0;j<currPage.getPageTuples().size();j++){
+                        Object valOfCol1 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[0]);
+                        Object valOfCol2 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[1]);
+                        Object valOfCol3 = currPage.getPageTuples().get(j).getTupleAttributes().get(strarrColName[2]);
+                        Point insertPoint = new Point(valOfCol1,valOfCol2,valOfCol3,currPagePath);
+                        octree.insertIntoOctree(insertPoint);
+                    }
+                }
+            }
+            Metadata.updateCSV(strTableName,strarrColName,indexName,"Octree");
+            FileManipulation.createSerFile(octree.getFilepath());
+            octree.saveIntoOctreeFilepath();
+        }catch(Exception e){
+            throw new DBAppException(e.getMessage());
         }
-        minMax[0]=columnNeeded.getMin();
-        minMax[1]=columnNeeded.getMax();
-        return minMax;
 
     }
+
     public int checkTablePresent(String strTableName) throws DBAppException, IOException, ClassNotFoundException {
         int tableIndex = -1;
         for(int i = 0; i < tables.size(); i++){
@@ -280,9 +265,7 @@ public class DBApp implements Serializable {
                 throw new DBAppException("The Column names aren't correct");
             }
             String columnType = metaData.getColumnType(strTableName,key);
-            //((""+value.getClass()).replaceAll("class","")).replaceAll(" ","")
             String valClass = value.getClass().getName();
-//            System.out.println(key+": "+valClass+","+columnType);
             if(value instanceof DBAppNull){
                 continue;
             }
@@ -293,16 +276,12 @@ public class DBApp implements Serializable {
                 else {
                     htblColNameValue.put(key,Double.parseDouble("" + value));
                 }
-//                System.out.println(valClass+"-"+columnType);
             }
-//            System.out.println(key+": "+value);
             Vector<Object> columnMinAndMax = Metadata.getColumnMinAndMax(strTableName,key);
             Object min = columnMinAndMax.get(0);
             Object max = columnMinAndMax.get(1);
-//            System.out.println(max.toString());
             boolean lessThanMin = Comparison.compareTo(value,min,columnType)<0;
             boolean greaterThanMax = Comparison.compareTo(value,max,columnType)>0;
-//            System.out.println(lessThanMin+" ,"+ greaterThanMax);
             if(lessThanMin || greaterThanMax){
                 throw new DBAppException("Please Check " + key + " as " + value + " is out of range.");
             }
@@ -484,6 +463,7 @@ public class DBApp implements Serializable {
         }
         return flag;
     }
+
     public Vector<Tuple> XORSelect(Vector<Tuple> vec1 , Vector<Tuple> vec2){
         Vector<Tuple> result = new Vector<Tuple>();
         //check 3ashan sleepy :))
@@ -593,8 +573,13 @@ public class DBApp implements Serializable {
             }
         }
     }
-    public Iterator parseSQL( StringBuffer strbufSQL ) throws Exception {
-        QueryParserExecutor qpe = new QueryParserExecutor(this , strbufSQL.toString());
-        return qpe.queryExecute();
+    public Iterator parseSQL( StringBuffer strbufSQL ) throws DBAppException {
+        try{
+            QueryParserExecutor qpe = new QueryParserExecutor(this , strbufSQL.toString());
+            return qpe.queryExecute();
+        } catch(Exception e){
+            throw new DBAppException(e.getMessage());
+        }
+
     }
 }

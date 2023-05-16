@@ -175,10 +175,8 @@ public class Table implements Serializable {
             Point insertPoint = new Point(width,length,height,newRef);
             if(!isShifted) {
                 currOctree.insertIntoOctree(insertPoint);
-//                System.out.println("not shifted: "+oldRef+","+newRef+"-"+insertPoint);
             }else {
                 Vector<Point> pts = currOctree.search(insertPoint);
-//                System.out.println("shifted: "+oldRef+","+newRef+"-"+insertPoint+", "+pts);
                 if(pts.size()==0){
                     currOctree.insertIntoOctree(insertPoint);
                 }else {
@@ -204,7 +202,6 @@ public class Table implements Serializable {
         htblColNameValue.put(clusteringKey,correctValType);
         if(this.updateUsingOctree(clusterKeyDataType,correctValType,htblColNameValue)){
             saveIntoTableFilepath();
-            System.out.println("octree used in update");
             return;
         }
         Tuple toBeUpdated = new Tuple(htblColNameValue,clusteringKey,clusterKeyDataType);
@@ -262,7 +259,6 @@ public class Table implements Serializable {
             boolean hasHeightAsClusteringKey = currOctree.getStrColHeight().equalsIgnoreCase(this.clusteringKey);
 
             if(hasWidthAsClusteringKey || hasLengthAsClusteringKey || hasHeightAsClusteringKey){
-                System.out.println("used "+currOctree.getName());
                 currOctree.updateInOctreeUsingClusteringKey(dataType, clusteringKeyValue,htblColNameValue, this.clusteringKey,this.octrees);
                 useOctree = true;
 //                currOctree.saveIntoOctreeFilepath();
@@ -282,12 +278,24 @@ public class Table implements Serializable {
         this.maxValues=new Vector<Tuple>();
         for(int i=0;i<this.octrees.size();i++){
             Octree currOctree = FileManipulation.loadOctree("src/main/resources/data/indices/"+this.tableName+"/",octrees.get(i));
-            currOctree.clearOctree();
+            this.clearOctree(currOctree);
             currOctree.saveIntoOctreeFilepath();
         }
         this.saveIntoTableFilepath();
     }
-
+    public void clearOctree(Octree octree) {
+        if(octree==null) return;
+        octree.getPoints().clear();
+        octree.getOverflow().clear();
+        clearOctree(octree.getFirstOctant());
+        clearOctree(octree.getSecondOctant());
+        clearOctree(octree.getThirdOctant());
+        clearOctree(octree.getFourthOctant());
+        clearOctree(octree.getFifthOctant());
+        clearOctree(octree.getSixthOctant());
+        clearOctree(octree.getSeventhOctant());
+        clearOctree(octree.getEighthOctant());
+    }
     public void delete(Hashtable<String,Object> htblColNameValue) throws DBAppException, IOException, ClassNotFoundException {
         if(isTableEmpty()){
 //            throw new java.DBAppException("The table is empty");
@@ -302,7 +310,6 @@ public class Table implements Serializable {
             return;
         }
         for(int i=0;i<this.tablePages.size();i++){
-//            System.out.println(this.tablePages.get(i));
             Page loadedPage = FileManipulation.loadPage(this.tablePages.get(i));
             boolean isPageDeleted = loadedPage.deleteFromPage(htblColNameValue);
             if(isPageDeleted){
