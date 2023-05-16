@@ -2,11 +2,14 @@ package index;
 
 
 import mainClasses.*;
+import sqlterm.SQLTerm;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.*;
+
+import static mainClasses.Comparison.compareTo;
 
 public class Octree implements Serializable {
     private Cube cube;
@@ -130,6 +133,70 @@ public class Octree implements Serializable {
         }
         return pts;
     }
+    public Vector<Tuple> searchRange(SQLTerm[] sqlTerms) throws IOException, ClassNotFoundException {
+        Vector<Point> pts = new Vector<Point>();
+        Vector<Octree> octs = new Vector<Octree>();
+        searchInOctreeWithRange(octs , sqlTerms);
+        for(Octree currOctree: octs){
+            for(Point currPoint : currOctree.getPoints()){
+                boolean f1 = comparePoints(currPoint.getWidth() , sqlTerms[0].get_objValue() , sqlTerms[0].get_strOperator() );
+                boolean f2 = comparePoints(currPoint.getLength() , sqlTerms[1].get_objValue() , sqlTerms[1].get_strOperator() );
+                boolean f3 = comparePoints(currPoint.getHeight() , sqlTerms[2].get_objValue() , sqlTerms[2].get_strOperator() );
+                if(f1 && f2 && f3) pts.add(currPoint);
+            }
+        }
+        Vector<Tuple> tups  = new Vector<Tuple>();
+        for(int i = 0 ; i < pts.size() ; i++){
+            Vector<Tuple> temp = pts.get(i).getPointsTuples();
+            for(int j = 0 ; j < temp.size() ; j++){
+                tups.add(temp.get(j));
+            }
+        }
+        return tups;
+    }
+    public boolean comparePoints(Object p , Object q , String operator){
+        boolean flag = false;
+        switch(operator) {
+            case ">": flag = (Comparison.compareTo(p , q , null) > 0) ; break;
+            case ">=": flag = (Comparison.compareTo(p , q , null) >= 0) ; break;
+            case "<": flag = (Comparison.compareTo(p , q , null) < 0) ; break;
+            case "<=": flag = (Comparison.compareTo(p , q , null) <= 0) ; break;
+            case "!=": flag = (Comparison.compareTo(p , q , null) != 0) ; break;
+            case "=": flag = (Comparison.compareTo(p , q , null) == 0) ; break;
+        }
+        return flag;
+    }
+
+    public void searchInOctreeWithRange(Vector<Octree> octs , SQLTerm[] sqlTerms){
+        if(!this.isDivided) {
+            octs.add(this);
+            return;
+        }
+        if(checkOctantRange(sqlTerms , firstOctant)) firstOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , secondOctant)) secondOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , thirdOctant)) thirdOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , fourthOctant)) fourthOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , fifthOctant)) fifthOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , sixthOctant)) sixthOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , seventhOctant)) seventhOctant.searchInOctreeWithRange(octs , sqlTerms);
+        if(checkOctantRange(sqlTerms , eighthOctant)) eighthOctant.searchInOctreeWithRange(octs , sqlTerms);
+    }
+    public boolean checkOctantRange(SQLTerm[] sqlTerms , Octree oct){
+        boolean f1 = checkRangeSelectQuery(oct.cube.getMaxWidth() , oct.cube.getMinWidth() , sqlTerms[0].get_objValue() , sqlTerms[0].get_strOperator());
+        boolean f2 = checkRangeSelectQuery(oct.cube.getMaxLength() , oct.cube.getMinLength() , sqlTerms[1].get_objValue() , sqlTerms[1].get_strOperator());
+        boolean f3 = checkRangeSelectQuery(oct.cube.getMaxHeight() , oct.cube.getMinHeight() , sqlTerms[2].get_objValue() , sqlTerms[2].get_strOperator());
+        return f1 && f2 && f3;
+    }
+    public boolean checkRangeSelectQuery(Object octMax , Object octMin , Object qu , String operator){
+        if(operator.equals(">") || operator.equals(">=") ){
+            return (Comparison.compareTo(qu,octMin,null)>=0 && Comparison.compareTo(qu,octMax,null) <= 0) || Comparison.compareTo(qu , octMin, null) <= 0;
+        }else if(operator.equals("<") || operator.equals("<=")) {
+            return (Comparison.compareTo(qu,octMin,null)>=0 && Comparison.compareTo(qu,octMax,null) <= 0) || Comparison.compareTo(qu , octMax, null) >= 0;
+        }else if(operator.equals("=")){
+            return Comparison.compareTo(qu,octMin,null)>=0 && Comparison.compareTo(qu,octMax,null) <=0;
+        }
+        return false;
+    }
     public void containsPartialPoint(Point p,Vector<Point> pts){
         for(int i=0;i<points.size();i++){
             Point currPoint = points.get(i);
@@ -235,8 +302,9 @@ public class Octree implements Serializable {
 //        clearOverflow();
 //        this.saveIntoOctreeFilepath();
     }
-    public boolean canBeUsed(Hashtable<String , Object> htbl , HashSet<String> particHashSet){
-        if(htbl.containsKey(strColHeight) && htbl.containsKey(strColLength) && htbl.containsKey(strColWidth)){
+    public boolean canBeUsed(Hashtable<String , Object> htbl , Hashtable<String , String> htblOperator , HashSet<String> particHashSet){
+
+        if(htbl.containsKey(strColHeight) && htbl.containsKey(strColLength) && htbl.containsKey(strColWidth) && !htblOperator.getOrDefault(strColHeight , "!=").equals("!=") && !htblOperator.getOrDefault(strColLength , "!=").equals("!=") && !htblOperator.getOrDefault(strColWidth , "!=").equals("!=") ){
             particHashSet.add(strColHeight);
             particHashSet.add(strColLength);
             particHashSet.add(strColWidth);
@@ -270,24 +338,18 @@ public class Octree implements Serializable {
                 break;
             }
         }
-        System.out.println("required point: "+requiredPoint);
         Object newWidth = htblColNameValue.get(this.strColWidth)==null?oldValOfCol1:htblColNameValue.get(this.strColWidth);
         Object newLength = htblColNameValue.get(this.strColLength)==null?oldValOfCol2:htblColNameValue.get(this.strColLength);
         Object newHeight = htblColNameValue.get(this.strColHeight)==null?oldValOfCol3:htblColNameValue.get(this.strColHeight);
         Point newPoint = new Point(newWidth,newLength,newHeight,ref);
-        System.out.println("old point: "+oldPoint+"---"+" new point: "+newPoint);
-        System.out.println("old point==new point: "+oldPoint.isEqual(newPoint));
         if(!oldPoint.isEqual(newPoint)){
             requiredPoint.getReferences().remove(ref);
-            System.out.println("required  point after deletion: "+requiredPoint);
             if(requiredPoint.getReferences().size()==0){
                 Octree parent = requiredPoint.getParent();
                 if(requiredPoint.checkNulls()){
                     parent.overflow.remove(requiredPoint);
                 }else {
-                    System.out.println("before removing from parent: "+ parent.points);
                     parent.points.remove(requiredPoint);
-                    System.out.println("removing from parent: "+ parent.points);
                 }
             }
             this.insertIntoOctree(newPoint);
@@ -344,12 +406,10 @@ public class Octree implements Serializable {
         }else if(hasHeightAsClusteringKey){
             oldPoint = new Point(null,null,clusteringKeyValue,null);
         }
-        System.out.println(oldPoint);
         Vector<Point> pointsToBeUpdated = search(oldPoint);
         for(int i=0;i<pointsToBeUpdated.size();i++){
             Point currPoint = pointsToBeUpdated.get(i);
             if(checkClusteringKey(dataType,clusteringKeyValue,currPoint,strClusteringKey)){
-                System.out.println("currPoint: "+currPoint);
                 for(int j=0;j<currPoint.getReferences().size();j++){
                     String currRef = currPoint.getReferences().get(j);
                     Page currPage = FileManipulation.loadPage(currRef);
@@ -587,10 +647,8 @@ public class Octree implements Serializable {
         }
         if(!octree.isDivided){
             s+= octree.points;
-            System.out.println(s);
             return;
         }
-        System.out.println(s);
         printOctreeHelper(octree.firstOctant,1,shift+2,false);
         printOctreeHelper(octree.secondOctant,2,shift+2,false);
         printOctreeHelper(octree.thirdOctant,3,shift+2,false);

@@ -46,7 +46,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>src/main/java/sqlAntlrParser</outputDirectory>
+                    <outputDirectory>src/main/java/parser</outputDirectory>
                     <sourceDirectory>src/main/antlr4</sourceDirectory>
                     <listener>false</listener>
                     <visitor>true</visitor>

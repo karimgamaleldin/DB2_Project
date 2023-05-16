@@ -1,6 +1,6 @@
 // Generated from Query.g4 by ANTLR 4.9.2
 
-package sqlAntlrParser;
+package parser;
 
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 

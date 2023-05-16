@@ -520,23 +520,29 @@ public class Test {
         StringBuffer sbi = new StringBuffer();
         StringBuffer sbs = new StringBuffer();
         StringBuffer sbu = new StringBuffer();
-        sb.append("Create table Employee (id int primary key, name varchar , salary decimal)");
-        sbi.append("Insert into students (id , first_name , money) values (40 , 'yoyo' , 2000)");
+        StringBuffer sbd= new StringBuffer();
+        StringBuffer sbci= new StringBuffer();
+        sb.append("Create table Zemployee5 (id int primary key , name varchar , salary decimal)");
+        sbi.append("Insert into Students (id , gpa , first_name , dob) values (37, 5 , 'kimo' , 2000-12-31)");
         sbu.append("Update students SET last_name = 'gamaleldin'  and  gpa = 3.85 WHERE id = 40");
-        dbApp.parseSQL(sbu);
-        sbs.append("Select * From students where dob = 1994-01-05 and first_name = 'Ava' and gpa = 0.85");
-        SQLTerm sqlTerm1 = new SQLTerm(tableName,"gpa","=",0.89);
-        SQLTerm sqlTerm2 = new SQLTerm(tableName,"first_name","=","Ava");
-        SQLTerm sqlTerm3 = new SQLTerm(tableName,"dob","=",new SimpleDateFormat("dd-MM-yyyy").parse("05-01-1994"));
-        SQLTerm sqlTerm4 = new SQLTerm(tableName,"money","<=",300);
-        SQLTerm sqlTerm5 = new SQLTerm(tableName,"last_name","=","Eva");
-        SQLTerm sqlTerm6 = new SQLTerm(tableName,"job","=","doc");
-        SQLTerm sqlTerm7 = new SQLTerm(tableName,"id","=",6);
-        SQLTerm[] sqlTerms = new SQLTerm[]{sqlTerm1,sqlTerm2,sqlTerm3,sqlTerm4,sqlTerm5,sqlTerm6,sqlTerm7};
-        String[] op = new String[]{"AND","AND","AND","AND","AND","AND"};
+        sbs.append("Select * From students where gpa = 0.85");
+        sbd.append("Delete From students");
+        sbci.append("create index on Students (gpa , first_name , dob)");
+
+
+//        Iterator x = dbApp.parseSQL(sbi);
+        SQLTerm sqlTerm1 = new SQLTerm(tableName,"gpa",">",1.28);
+        SQLTerm sqlTerm2 = new SQLTerm(tableName,"first_name","!=","jarim");
+        SQLTerm sqlTerm3 = new SQLTerm(tableName,"dob","<",new SimpleDateFormat("dd-MM-yyyy").parse("12-04-1995"));
+        SQLTerm sqlTerm4 = new SQLTerm(tableName,"money","<",300);
+        SQLTerm sqlTerm5 = new SQLTerm(tableName,"last_name",">","Eva");
+        SQLTerm sqlTerm6 = new SQLTerm(tableName,"job",">","doc");
+//        SQLTerm sqlTerm7 = new SQLTerm(tableName,"id","=",6);
+        SQLTerm[] sqlTerms = new SQLTerm[]{sqlTerm1,sqlTerm2,sqlTerm3,sqlTerm4,sqlTerm5,sqlTerm6};
+        String[] op = new String[]{"AND","AND","AND","AND","AND"};
 //        long start = System.currentTimeMillis();
-//        //        Iterator itr = dbApp.parseSQL(sbs);
-//        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
+//        Iterator itr = dbApp.parseSQL(sbi);
+        Iterator itr = dbApp.selectFromTable(sqlTerms,op);
 //        long end = System.currentTimeMillis();
 //        long elapsedTime = end - start;
 //        System.out.println(elapsedTime);
@@ -544,7 +550,7 @@ public class Test {
 //            System.out.println(itr.next());
 //        }
 
-        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), tableName);
+        Table table = FileManipulation.loadTable(dbApp.getTablesFilepath(), "students");
 
         Iterator var35 = table.getTablePages().iterator();
 
@@ -564,6 +570,10 @@ public class Test {
             octree.printOctree();
             System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
+        System.out.println("-------------------------------------------------------------------------------");
+//        while(x.hasNext()){
+//            System.out.println(x.next());
+//        }
 
     }
 }

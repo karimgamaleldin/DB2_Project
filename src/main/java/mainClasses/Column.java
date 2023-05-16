@@ -13,7 +13,7 @@ public class Column {
     private String max;
 
     public Column(String tableName , String columnName , String columnType , String indexName , String indexType ,boolean isClusteringKey , String min, String max){
-        this.tableName = tableName;
+        this.tableName = tableName.toLowerCase();
         this.columnName = columnName;
         this.columnType = columnType;
         this.indexName = indexName;

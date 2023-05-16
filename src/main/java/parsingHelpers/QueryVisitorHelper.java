@@ -2,9 +2,10 @@ package parsingHelpers;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import sqlAntlrParser.QueryBaseVisitor;
-import sqlAntlrParser.QueryLexer;
-import sqlAntlrParser.QueryParser;
+import org.antlr.v4.runtime.tree.ParseTree;
+import parser.QueryBaseVisitor;
+import parser.QueryLexer;
+import parser.QueryParser;
 import sqlterm.SQLTerm;
 
 import java.util.Vector;
@@ -125,6 +126,7 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
     }
     public Void visitInsertValue(QueryParser.InsertValueContext ctx) {
         this.insertValues.add(ctx.getText());
+        System.out.println(ctx.getText());
         return visitChildren(ctx);
     }
 
@@ -299,8 +301,6 @@ public class QueryVisitorHelper extends QueryBaseVisitor<Void> {
         QueryLexer q = new QueryLexer(CharStreams.fromString(in));
         CommonTokenStream commonTokenStream = new CommonTokenStream(q);
         QueryParser parser = new QueryParser(commonTokenStream);
-//        ParseTree tree = parser.sql_query();
-//        System.out.println(tree.toStringTree(parser));
         QueryVisitorHelper qv = new QueryVisitorHelper();
         qv.visit(parser.sql_query());
     }

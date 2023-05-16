@@ -3,12 +3,10 @@ package parsingHelpers;
 import mainClasses.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import sqlAntlrParser.QueryLexer;
-import sqlAntlrParser.QueryParser;
+import parser.QueryLexer;
+import parser.QueryParser;
 import sqlterm.SQLTerm;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -19,7 +17,7 @@ public class QueryParserExecutor {
     private QueryVisitorHelper qvh;
     public QueryParserExecutor(DBApp app , String query){
         this.app = app;
-        this.query = query.toUpperCase();
+        this.query = query;
         this.qvh = new QueryVisitorHelper();
     }
     private void visitQuery(){

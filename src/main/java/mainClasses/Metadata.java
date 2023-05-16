@@ -28,7 +28,7 @@ public class Metadata {
 
     }
     public static String getClusterKeyDataType(String strTableName){
-        Vector<Column> columns = columnsOfMetaData.get(strTableName);
+        Vector<Column> columns = columnsOfMetaData.get(strTableName.toLowerCase());
         String clusterKeyDataType = "";
         for(int i=0;i<columns.size();i++){
             Column currentColumn = columns.get(i);
@@ -179,7 +179,7 @@ public class Metadata {
         }
     }
     public int getTupleSize(String strTableName){
-        return this.columnsOfMetaData.get(strTableName).size();
+        return this.columnsOfMetaData.get(strTableName.toLowerCase()).size();
     }
     public Vector<String> getTableNames(){
         Vector<String> tableNames = new Vector<String>();

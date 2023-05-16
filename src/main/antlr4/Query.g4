@@ -1,16 +1,16 @@
 grammar Query;
 
 @parser::header {
-package sqlAntlrParser;
+package parser;
 }
 
 @lexer::header {
-package sqlAntlrParser;
+package parser;
 }
 /* Parser Rules */
 sql_query :  update_table | insert_into | delete_from | select_from | create_index | create_table;
 
-create_table : CREATE TABLE tableName '(' column_def (',' column_def)* ')';
+create_table : CREATE TABLE tableName '(' column_def (',' column_def)* ')' (SEMICOLON)? EOF;
 
 column_def : createColumnName datatype (primaryKey)?;
 
@@ -20,23 +20,23 @@ primaryKey: PRIMARY KEY;
 
 datatype : INT | DECIMALSTRING | VARCHAR | DATESTRING ;
 
-update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition ;
+update_table : UPDATE tableName SET updateColumnToSet (otherUpdateColumnToSet)* WHERE updateDeleteCondition (SEMICOLON)? EOF;
 
 
 
-insert_into : INSERT INTO tableName '(' insertColumnName (additionalColumnInsert)* ')' VALUES '(' insertValue (',' insertValue)* ')';
+insert_into : INSERT INTO tableName '(' insertColumnName (additionalColumnInsert)* ')' VALUES '(' insertValue (',' insertValue)* ')' (SEMICOLON)? EOF;
 
 value : INTEGER | DECIMAL | STRING | DATE;
 
 insertValue: INTEGER | DECIMAL | STRING | DATE;
 
-delete_from : DELETE FROM tableName (WHERE updateDeleteCondition (otherDeleteCondition)*)?;
+delete_from : DELETE FROM tableName (WHERE updateDeleteCondition (otherDeleteCondition)*)? (SEMICOLON)? EOF;
 
-select_from : SELECT '*' FROM tableName (WHERE condition (otherSelectCondition)*)?;
+select_from : SELECT '*' FROM tableName (WHERE condition (otherSelectCondition)*)? (SEMICOLON)? EOF;
 
 condition : columnName operator value;
 
-create_index : CREATE INDEX ON tableName '('indexColumnName COMMA indexColumnName COMMA indexColumnName')';
+create_index : CREATE INDEX ON tableName '('indexColumnName COMMA indexColumnName COMMA indexColumnName')' (SEMICOLON)? EOF;
 
 tableName : IDENTIFIER;
 
@@ -142,5 +142,6 @@ EQUAL: '=';
 LPAREN : '(';
 RPAREN : ')';
 COMMA : ',';
+SEMICOLON : ';';
 WS : [ \t\n\r] + -> skip;
 /* End Of Lexer Rules */
