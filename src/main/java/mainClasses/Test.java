@@ -467,9 +467,9 @@ public class Test {
 //        BufferedReader studentsTable = new BufferedReader(new FileReader("src/main/resources/students_table_4.csv"));
 //        String record;
 //        dbApp.createIndex(tableName,new String[]{"gpa","first_name","dob"});
-//        dbApp.createIndex(tableName,new String[]{"money","last_name","job"});
-////
-////
+//        dbApp.createIndex(tableName,new String[]{"id","last_name","job"});
+//////
+//////
 //        Hashtable<String, Object> row = new Hashtable<>();
 //        while ((record = studentsTable.readLine()) != null) {
 //            String[] fields = record.split(",");
@@ -499,19 +499,19 @@ public class Test {
 //            row.clear();
 //        }
 //        studentsTable.close();
-//        Hashtable<String , Object> x = new Hashtable<String , Object>();
-//        x.put("gpa" , 4.54);
-//        x.put("first_name" , "Emma");
-//        x.put("dob" , new Date(1994 - 1900, 7 - 1, 28));
-//        x.put("last_name" , "Sienna");
-//        dbApp.deleteFromTable(tableName,x);
-//        Hashtable<String , Object> x = new Hashtable<String , Object>();
-//        x.put("id" , 33);
-//        x.put("gpa" , 1);
-//        x.put("first_name" , "Ethan");
-//        x.put("dob" , new Date(1994 - 1900, 7 - 1, 28));
-//        x.put("last_name" , "Sienna");
-//        dbApp.insertIntoTable(tableName,x);
+////        Hashtable<String , Object> x = new Hashtable<String , Object>();
+////        x.put("gpa" , 4.54);
+////        x.put("first_name" , "Emma");
+////        x.put("dob" , new Date(1994 - 1900, 7 - 1, 28));
+////        x.put("last_name" , "Sienna");
+////        dbApp.deleteFromTable(tableName,x);
+////        Hashtable<String , Object> x = new Hashtable<String , Object>();
+////        x.put("id" , 33);
+////        x.put("gpa" , 1);
+////        x.put("first_name" , "Ethan");
+////        x.put("dob" , new Date(1994 - 1900, 7 - 1, 28));
+////        x.put("last_name" , "Sienna");
+////        dbApp.insertIntoTable(tableName,x);
         Hashtable<String , Object> person1 = new Hashtable<String , Object>();
 //        person1.put("dob" , new Date(1990 - 1900, 3 - 1, 13));
         person1.put("gpa" , 3.12);
@@ -522,15 +522,15 @@ public class Test {
         StringBuffer sbu = new StringBuffer();
         StringBuffer sbd= new StringBuffer();
         StringBuffer sbci= new StringBuffer();
-        sb.append("Create table Zemployee5 (id int primary key , name varchar , salary decimal)");
-        sbi.append("Insert into Students (id , gpa , first_name , dob) values (37, 5 , 'kimo' , 2000-12-31)");
-        sbu.append("Update students SET last_name = 'gamaleldin'  and  gpa = 3.85 WHERE id = 40");
-        sbs.append("Select * From students where gpa = 0.85");
-        sbd.append("Delete From students");
-        sbci.append("create index on Students (gpa , first_name , dob)");
+        sb.append("Create table Zemployee6 (id int primary key , name varchar, salary decimal, dob date)");
+        sbi.append("Insert into Zemployee5 (id , name , salary , dob) values (3 ,'lol3' , 5000 , '1995-11-11');");
+        sbu.append("Update students SET gpa = 4 WHERE id = 38;");
+        sbs.append("Select * From students where gpa > 2 and first_name > 'Drake' and dob < 2000-12-01 ");
+        sbd.append("Delete From Zemployee5;");
+        sbci.append("create index on Zemployee5 (name , salary , dob)");
 
 
-//        Iterator x = dbApp.parseSQL(sbi);
+        Iterator x = dbApp.parseSQL(sbd);
         SQLTerm sqlTerm1 = new SQLTerm(tableName,"gpa",">",1.28);
         SQLTerm sqlTerm2 = new SQLTerm(tableName,"first_name","!=","jarim");
         SQLTerm sqlTerm3 = new SQLTerm(tableName,"dob","<",new SimpleDateFormat("dd-MM-yyyy").parse("12-04-1995"));
