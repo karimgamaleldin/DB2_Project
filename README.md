@@ -8,4 +8,4 @@ The required functionalities are:
 4) searching in tables linearly
 5) creating an Octree upon demand 
 6) using the created octree(s) where appropriate(updating, deleting and selecting tuples).
-7) Making SQL parser to do the aforementioned actions using SQL statements.
+7) Using SQL parser to do the aforementioned actions using SQL statements.
